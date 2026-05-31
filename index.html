@@ -76,7 +76,7 @@
         );
 
         // ==========================================
-        // DỮ LIỆU CÁC BÀI HỌC
+        // DỮ LIỆU CÁC BÀI HỌC (ĐÃ MỞ RỘNG)
         // ==========================================
         const LESSONS_DATA = {
             do_vat: {
@@ -86,41 +86,89 @@
                     { id: 'tivi', name: 'ti vi', emoji: '📺' }, { id: 'coc', name: 'cái cốc', emoji: '🥛' },
                     { id: 'quat', name: 'cái quạt', emoji: '🪭' }, { id: 'den', name: 'cái đèn', emoji: '💡' },
                     { id: 'dongho', name: 'đồng hồ', emoji: '⏰' }, { id: 'chia_khoa', name: 'cái chìa khóa', emoji: '🔑' },
+                    { id: 'bat', name: 'cái bát', emoji: '🥣' }, { id: 'thia', name: 'cái thìa', emoji: '🥄' },
+                    { id: 'cap_sach', name: 'cặp sách', emoji: '🎒' }, { id: 'mu', name: 'cái mũ', emoji: '🧢' },
+                    { id: 'giay', name: 'đôi giày', emoji: '👟' }, { id: 'ao', name: 'cái áo', emoji: '👕' },
+                    { id: 'quan', name: 'cái quần', emoji: '👖' }, { id: 'dien_thoai', name: 'điện thoại', emoji: '📱' },
+                    { id: 'ban_chai', name: 'bàn chải đánh răng', emoji: '🪥' }, { id: 'xa_phong', name: 'xà phòng', emoji: '🧼' }
                 ]
             },
             con_vat: {
-                id: 'con_vat', title: 'Thế giới động vật', color: 'bg-green-400', icon: '🐱',
+                id: 'con_vat', title: 'Thế giới động vật', color: 'bg-green-400', icon: '🐶',
                 items: [
                     { id: 'cho', name: 'con chó', emoji: '🐶' }, { id: 'meo', name: 'con mèo', emoji: '🐱' },
                     { id: 'ga', name: 'con gà', emoji: '🐔' }, { id: 'vit', name: 'con vịt', emoji: '🦆' },
                     { id: 'bo', name: 'con bò', emoji: '🐮' }, { id: 'lon', name: 'con lợn', emoji: '🐷' },
                     { id: 'chim', name: 'con chim', emoji: '🐦' }, { id: 'ca', name: 'con cá', emoji: '🐟' },
+                    { id: 'ho', name: 'con hổ', emoji: '🐯' }, { id: 'su_tu', name: 'sư tử', emoji: '🦁' },
+                    { id: 'voi', name: 'con voi', emoji: '🐘' }, { id: 'khi', name: 'con khỉ', emoji: '🐒' },
+                    { id: 'tho', name: 'con thỏ', emoji: '🐰' }, { id: 'gau', name: 'con gấu', emoji: '🐻' },
+                    { id: 'huou', name: 'hươu cao cổ', emoji: '🦒' }, { id: 'ngua_van', name: 'ngựa vằn', emoji: '🦓' },
+                    { id: 'chuot', name: 'con chuột', emoji: '🐭' }, { id: 'rua', name: 'con rùa', emoji: '🐢' },
+                    { id: 'ech', name: 'con ếch', emoji: '🐸' }, { id: 'buom', name: 'con bướm', emoji: '🦋' }
+                ]
+            },
+            trai_cay: {
+                id: 'trai_cay', title: 'Trái cây thơm ngon', color: 'bg-orange-400', icon: '🍎',
+                items: [
+                    { id: 'tao', name: 'quả táo', emoji: '🍎' }, { id: 'chuoi', name: 'quả chuối', emoji: '🍌' },
+                    { id: 'cam', name: 'quả cam', emoji: '🍊' }, { id: 'dua_hau', name: 'dưa hấu', emoji: '🍉' },
+                    { id: 'nho', name: 'chùm nho', emoji: '🍇' }, { id: 'dau_tay', name: 'dâu tây', emoji: '🍓' },
+                    { id: 'xoai', name: 'quả xoài', emoji: '🥭' }, { id: 'dua', name: 'quả dứa', emoji: '🍍' },
+                    { id: 'dao', name: 'quả đào', emoji: '🍑' }, { id: 'cherry', name: 'quả anh đào', emoji: '🍒' }
+                ]
+            },
+            phuong_tien: {
+                id: 'phuong_tien', title: 'Phương tiện giao thông', color: 'bg-cyan-500', icon: '🚗',
+                items: [
+                    { id: 'o_to', name: 'ô tô', emoji: '🚗' }, { id: 'xe_may', name: 'xe máy', emoji: '🏍️' },
+                    { id: 'xe_dap', name: 'xe đạp', emoji: '🚲' }, { id: 'may_bay', name: 'máy bay', emoji: '✈️' },
+                    { id: 'tau_hoa', name: 'tàu hỏa', emoji: '🚆' }, { id: 'thuyen', name: 'cái thuyền', emoji: '⛵' },
+                    { id: 'xe_buyt', name: 'xe buýt', emoji: '🚌' }, { id: 'truc_thang', name: 'trực thăng', emoji: '🚁' },
+                    { id: 'xe_cuu_hoa', name: 'xe cứu hỏa', emoji: '🚒' }, { id: 'xe_canh_sat', name: 'xe cảnh sát', emoji: '🚓' }
                 ]
             },
             chu_cai: {
                 id: 'chu_cai', title: 'Chữ cái tiếng Việt', color: 'bg-pink-400', icon: '🔤',
                 items: [
-                    { id: 'a', name: 'chữ a', emoji: 'A' }, { id: 'b', name: 'chữ bê', emoji: 'B' },
-                    { id: 'c', name: 'chữ cờ', emoji: 'C' }, { id: 'd', name: 'chữ dê', emoji: 'D' },
-                    { id: 'e', name: 'chữ e', emoji: 'E' }, { id: 'g', name: 'chữ gờ', emoji: 'G' },
-                    { id: 'h', name: 'chữ hát', emoji: 'H' }, { id: 'o', name: 'chữ o', emoji: 'O' },
+                    { id: 'a', name: 'chữ a', emoji: 'A' }, { id: 'aw', name: 'chữ á', emoji: 'Ă' },
+                    { id: 'aa', name: 'chữ ớ', emoji: 'Â' }, { id: 'b', name: 'chữ bờ', emoji: 'B' },
+                    { id: 'c', name: 'chữ cờ', emoji: 'C' }, { id: 'd', name: 'chữ dờ', emoji: 'D' },
+                    { id: 'dd', name: 'chữ đờ', emoji: 'Đ' }, { id: 'e', name: 'chữ e', emoji: 'E' },
+                    { id: 'ee', name: 'chữ ê', emoji: 'Ê' }, { id: 'g', name: 'chữ gờ', emoji: 'G' },
+                    { id: 'h', name: 'chữ hờ', emoji: 'H' }, { id: 'i', name: 'chữ i ngắn', emoji: 'I' },
+                    { id: 'k', name: 'chữ ca', emoji: 'K' }, { id: 'l', name: 'chữ lờ', emoji: 'L' },
+                    { id: 'm', name: 'chữ mờ', emoji: 'M' }, { id: 'n', name: 'chữ nờ', emoji: 'N' },
+                    { id: 'o', name: 'chữ o', emoji: 'O' }, { id: 'oo', name: 'chữ ô', emoji: 'Ô' },
+                    { id: 'ow', name: 'chữ ơ', emoji: 'Ơ' }, { id: 'p', name: 'chữ pờ', emoji: 'P' },
+                    { id: 'q', name: 'chữ cu', emoji: 'Q' }, { id: 'r', name: 'chữ rờ', emoji: 'R' },
+                    { id: 's', name: 'chữ sờ', emoji: 'S' }, { id: 't', name: 'chữ tờ', emoji: 'T' },
+                    { id: 'u', name: 'chữ u', emoji: 'U' }, { id: 'uw', name: 'chữ ư', emoji: 'Ư' },
+                    { id: 'v', name: 'chữ vờ', emoji: 'V' }, { id: 'x', name: 'chữ xờ', emoji: 'X' },
+                    { id: 'y', name: 'chữ i dài', emoji: 'Y' }
                 ]
             },
             chu_so: {
                 id: 'chu_so', title: 'Bé tập đếm số', color: 'bg-yellow-400', icon: '🔢',
                 items: [
-                    { id: '1', name: 'số một', emoji: '1' }, { id: '2', name: 'số hai', emoji: '2' },
-                    { id: '3', name: 'số ba', emoji: '3' }, { id: '4', name: 'số bốn', emoji: '4' },
-                    { id: '5', name: 'số năm', emoji: '5' }, { id: '6', name: 'số sáu', emoji: '6' },
-                    { id: '7', name: 'số bảy', emoji: '7' }, { id: '8', name: 'số tám', emoji: '8' },
+                    { id: '0', name: 'số không', emoji: '0' }, { id: '1', name: 'số một', emoji: '1' }, 
+                    { id: '2', name: 'số hai', emoji: '2' }, { id: '3', name: 'số ba', emoji: '3' }, 
+                    { id: '4', name: 'số bốn', emoji: '4' }, { id: '5', name: 'số năm', emoji: '5' }, 
+                    { id: '6', name: 'số sáu', emoji: '6' }, { id: '7', name: 'số bảy', emoji: '7' }, 
+                    { id: '8', name: 'số tám', emoji: '8' }, { id: '9', name: 'số chín', emoji: '9' },
+                    { id: '10', name: 'số mười', emoji: '10' }
                 ]
             },
             hinh_khoi: {
-                id: 'hinh_khoi', title: 'Hình khối cơ bản', color: 'bg-purple-400', icon: '🔺',
+                id: 'hinh_khoi', title: 'Hình khối & Màu sắc', color: 'bg-purple-400', icon: '🎨',
                 items: [
                     { id: 'tron', name: 'hình tròn', emoji: '🔴' }, { id: 'vuong', name: 'hình vuông', emoji: '🟩' },
                     { id: 'tamgiac', name: 'hình tam giác', emoji: '🔺' }, { id: 'traitim', name: 'hình trái tim', emoji: '❤️' },
-                    { id: 'ngoisao', name: 'hình ngôi sao', emoji: '⭐' },
+                    { id: 'ngoisao', name: 'hình ngôi sao', emoji: '⭐' }, { id: 'chunhat', name: 'hình chữ nhật', emoji: '🟦' },
+                    { id: 'kimcuong', name: 'hình thoi', emoji: '♦️' }, { id: 'mattrang', name: 'mặt trăng', emoji: '🌙' },
+                    { id: 'mau_do', name: 'màu đỏ', emoji: '🟥' }, { id: 'mau_vang', name: 'màu vàng', emoji: '🟨' },
+                    { id: 'mau_luc', name: 'màu xanh lá', emoji: '🟩' }, { id: 'mau_lam', name: 'màu xanh dương', emoji: '🟦' },
+                    { id: 'mau_cam', name: 'màu cam', emoji: '🟧' }, { id: 'mau_tim', name: 'màu tím', emoji: '🟪' }
                 ]
             }
         };
@@ -373,7 +421,7 @@
                         <p className="text-xl text-gray-500 font-medium">Bé hãy chọn một bài học bên dưới nhé!</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-5xl">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-7xl">
                         {Object.values(LESSONS_DATA).map((lesson) => (
                             <button
                                 key={lesson.id}
