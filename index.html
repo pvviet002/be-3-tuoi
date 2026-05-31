@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bé Vui Học - Nhận biết đồ vật & đếm số</title>
+
+    <!-- Import React, ReactDOM, và Babel để chạy JSX trực tiếp trên trình duyệt -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Import Tailwind CSS để tạo kiểu giao diện nhanh -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Ngăn chọn chữ để tránh bé bấm nhầm bôi đen văn bản */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        /* Hiệu ứng rung lắc khi bé chọn sai */
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+            40%, 60% { transform: translate3d(8px, 0, 0); }
+        }
+        
+        /* Hiệu ứng xoay chậm cho ngôi sao chiến thắng */
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .animate-spin-slow {
+            animation: spin-slow 8s linear infinite;
+        }
+
+        .animate-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+    </style>
+</head>
+<body>
+    <!-- Nơi React sẽ render ứng dụng -->
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback } = React;
+
+        // ==========================================
+        // CÁC COMPONENT ICON (Thay thế cho lucide-react)
+        // ==========================================
+        const IconPlay = ({ size=24, className="", fill="none" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        );
+        const IconVolume2 = ({ size=24, className="" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+        );
+        const IconStar = ({ size=24, className="", fill="none" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        );
+        const IconRefresh = ({ size=24, className="" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
+        );
+        const IconHome = ({ size=24, className="" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        );
+        const IconArrowLeft = ({ size=24, className="" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        );
+
+        // ==========================================
+        // DỮ LIỆU CÁC BÀI HỌC
+        // ==========================================
+        const LESSONS_DATA = {
+            do_vat: {
+                id: 'do_vat', title: 'Đồ vật quanh bé', color: 'bg-sky-400', icon: '🪑',
+                items: [
+                    { id: 'ghe', name: 'cái ghế', emoji: '🪑' }, { id: 'giuong', name: 'cái giường', emoji: '🛏️' },
+                    { id: 'tivi', name: 'ti vi', emoji: '📺' }, { id: 'coc', name: 'cái cốc', emoji: '🥛' },
+                    { id: 'quat', name: 'cái quạt', emoji: '🪭' }, { id: 'den', name: 'cái đèn', emoji: '💡' },
+                    { id: 'dongho', name: 'đồng hồ', emoji: '⏰' }, { id: 'chia_khoa', name: 'cái chìa khóa', emoji: '🔑' },
+                ]
+            },
+            con_vat: {
+                id: 'con_vat', title: 'Thế giới động vật', color: 'bg-green-400', icon: '🐱',
+                items: [
+                    { id: 'cho', name: 'con chó', emoji: '🐶' }, { id: 'meo', name: 'con mèo', emoji: '🐱' },
+                    { id: 'ga', name: 'con gà', emoji: '🐔' }, { id: 'vit', name: 'con vịt', emoji: '🦆' },
+                    { id: 'bo', name: 'con bò', emoji: '🐮' }, { id: 'lon', name: 'con lợn', emoji: '🐷' },
+                    { id: 'chim', name: 'con chim', emoji: '🐦' }, { id: 'ca', name: 'con cá', emoji: '🐟' },
+                ]
+            },
+            chu_cai: {
+                id: 'chu_cai', title: 'Chữ cái tiếng Việt', color: 'bg-pink-400', icon: '🔤',
+                items: [
+                    { id: 'a', name: 'chữ a', emoji: 'A' }, { id: 'b', name: 'chữ bê', emoji: 'B' },
+                    { id: 'c', name: 'chữ cờ', emoji: 'C' }, { id: 'd', name: 'chữ dê', emoji: 'D' },
+                    { id: 'e', name: 'chữ e', emoji: 'E' }, { id: 'g', name: 'chữ gờ', emoji: 'G' },
+                    { id: 'h', name: 'chữ hát', emoji: 'H' }, { id: 'o', name: 'chữ o', emoji: 'O' },
+                ]
+            },
+            chu_so: {
+                id: 'chu_so', title: 'Bé tập đếm số', color: 'bg-yellow-400', icon: '🔢',
+                items: [
+                    { id: '1', name: 'số một', emoji: '1' }, { id: '2', name: 'số hai', emoji: '2' },
+                    { id: '3', name: 'số ba', emoji: '3' }, { id: '4', name: 'số bốn', emoji: '4' },
+                    { id: '5', name: 'số năm', emoji: '5' }, { id: '6', name: 'số sáu', emoji: '6' },
+                    { id: '7', name: 'số bảy', emoji: '7' }, { id: '8', name: 'số tám', emoji: '8' },
+                ]
+            },
+            hinh_khoi: {
+                id: 'hinh_khoi', title: 'Hình khối cơ bản', color: 'bg-purple-400', icon: '🔺',
+                items: [
+                    { id: 'tron', name: 'hình tròn', emoji: '🔴' }, { id: 'vuong', name: 'hình vuông', emoji: '🟩' },
+                    { id: 'tamgiac', name: 'hình tam giác', emoji: '🔺' }, { id: 'traitim', name: 'hình trái tim', emoji: '❤️' },
+                    { id: 'ngoisao', name: 'hình ngôi sao', emoji: '⭐' },
+                ]
+            }
+        };
+
+        // ==========================================
+        // COMPONENT TRÒ CHƠI CHUNG
+        // ==========================================
+        const LessonGame = ({ lessonInfo, onBack }) => {
+            const [gameState, setGameState] = useState('START'); // START, PLAYING, END
+            const [targetItem, setTargetItem] = useState(null);
+            const [options, setOptions] = useState([]);
+            const [score, setScore] = useState(0);
+            const [wrongClickedId, setWrongClickedId] = useState(null);
+            const [showSuccess, setShowSuccess] = useState(false);
+
+            // Hàm đọc Text-to-Speech
+            const speak = useCallback((text, rate = 0.8) => {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    const voices = window.speechSynthesis.getVoices();
+                    const viVoice = voices.find(v => v.lang.includes('vi') || v.lang.includes('VN'));
+                    if (viVoice) utterance.voice = viVoice;
+                    
+                    utterance.lang = 'vi-VN';
+                    utterance.rate = rate;
+                    utterance.pitch = 1.2;
+                    window.speechSynthesis.speak(utterance);
+                }
+            }, []);
+
+            const generateQuestion = useCallback(() => {
+                const items = lessonInfo.items;
+                const randomTargetIndex = Math.floor(Math.random() * items.length);
+                const target = items[randomTargetIndex];
+
+                let wrongIndex = Math.floor(Math.random() * items.length);
+                while (wrongIndex === randomTargetIndex) {
+                    wrongIndex = Math.floor(Math.random() * items.length);
+                }
+                const wrong = items[wrongIndex];
+
+                const newOptions = Math.random() > 0.5 ? [target, wrong] : [wrong, target];
+                
+                setTargetItem(target);
+                setOptions(newOptions);
+                setWrongClickedId(null);
+                setShowSuccess(false);
+
+                setTimeout(() => {
+                    speak(`Bé ơi, ${target.name} ở đâu nhỉ?`);
+                }, 500);
+            }, [speak, lessonInfo]);
+
+            const startGame = () => {
+                speak(`Chào mừng bé đến với bài học: ${lessonInfo.title}!`);
+                setScore(0);
+                setGameState('PLAYING');
+                setTimeout(generateQuestion, 3000);
+            };
+
+            const handleItemClick = (item) => {
+                if (showSuccess) return;
+
+                if (item.id === targetItem.id) {
+                    setShowSuccess(true);
+                    setScore(s => s + 1);
+                    
+                    const praises = ["Bé giỏi quá!", "Tuyệt vời!", "Đúng rồi!", "Hoan hô bé!"];
+                    const randomPraise = praises[Math.floor(Math.random() * praises.length)];
+                    speak(`${randomPraise} Đây là ${targetItem.name}.`);
+
+                    setTimeout(() => {
+                        if (score + 1 >= 5) {
+                            setGameState('END');
+                            speak("Chúc mừng bé đã hoàn thành bài học xuất sắc! Bé được thưởng 5 ngôi sao luôn!");
+                        } else {
+                            generateQuestion();
+                        }
+                    }, 3000);
+
+                } else {
+                    setWrongClickedId(item.id);
+                    speak(`Chưa đúng rồi. Đây là ${item.name}. Bé tìm lại ${targetItem.name} nhé!`);
+                    setTimeout(() => setWrongClickedId(null), 1000);
+                }
+            };
+
+            const repeatQuestion = () => {
+                if (targetItem) {
+                    speak(`Bé tìm giúp cô, ${targetItem.name} ở đâu nhỉ?`);
+                }
+            };
+
+            if (gameState === 'START') {
+                return (
+                    <div className="min-h-screen bg-indigo-50 flex flex-col items-center justify-center p-4 font-sans relative">
+                        <button onClick={onBack} className="absolute top-6 left-6 flex items-center gap-2 bg-white text-indigo-500 hover:bg-indigo-100 px-4 py-2 rounded-xl shadow-md font-bold transition-transform active:scale-90">
+                            <IconArrowLeft size={24} /> Quay lại
+                        </button>
+                        <div className={`bg-white p-8 rounded-3xl shadow-xl text-center max-w-md w-full border-4 ${lessonInfo.color.replace('bg-', 'border-')} transform transition hover:scale-105`}>
+                            <div className="text-6xl mb-4">{lessonInfo.icon}</div>
+                            <h1 className={`text-4xl font-bold mb-8 font-sans ${lessonInfo.color.replace('bg-', 'text-').replace('-400', '-600')}`}>
+                                {lessonInfo.title}
+                            </h1>
+                            <button 
+                                onClick={startGame}
+                                className={`w-full ${lessonInfo.color} hover:opacity-90 text-white text-3xl font-bold py-6 px-8 rounded-2xl shadow-lg flex items-center justify-center gap-4 transition-transform active:scale-95`}
+                            >
+                                <IconPlay size={40} fill="currentColor" /> Bắt đầu học
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (gameState === 'END') {
+                return (
+                    <div className="min-h-screen bg-yellow-100 flex flex-col items-center justify-center p-4 font-sans">
+                        <div className="bg-white p-8 rounded-3xl shadow-xl text-center max-w-md w-full border-4 border-yellow-400">
+                            <h1 className="text-4xl font-bold text-yellow-500 mb-4">Bé Giỏi Quá!</h1>
+                            <div className="flex justify-center gap-2 mb-8">
+                                {[1, 2, 3, 4, 5].map(i => (
+                                    <IconStar key={i} size={48} className="text-yellow-400 animate-spin-slow" fill="currentColor" />
+                                ))}
+                            </div>
+                            <p className="text-2xl text-gray-700 mb-8">Bé đã hoàn thành xuất sắc!</p>
+                            <div className="flex flex-col gap-4">
+                                <button 
+                                    onClick={startGame}
+                                    className="w-full bg-sky-500 hover:bg-sky-600 text-white text-2xl font-bold py-4 rounded-2xl shadow flex items-center justify-center gap-2 active:scale-95"
+                                >
+                                    <IconRefresh size={28} /> Chơi lại bài này
+                                </button>
+                                <button 
+                                    onClick={onBack}
+                                    className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 text-2xl font-bold py-4 rounded-2xl shadow flex items-center justify-center gap-2 active:scale-95"
+                                >
+                                    <IconHome size={28} /> Về màn hình chính
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-between p-6 font-sans">
+                    <div className="w-full max-w-2xl flex justify-between items-center bg-white p-4 rounded-2xl shadow-md border-2 border-slate-200">
+                        <button onClick={onBack} className="text-slate-400 hover:text-red-500 bg-slate-100 p-2 rounded-full active:scale-90 transition">
+                            <IconArrowLeft size={28} />
+                        </button>
+                        <div className="flex gap-1 flex-1 justify-center">
+                            {[...Array(5)].map((_, i) => (
+                                <IconStar key={i} size={32} className={i < score ? "text-yellow-400 transform scale-110" : "text-gray-200"} fill={i < score ? "currentColor" : "none"} />
+                            ))}
+                        </div>
+                        <button onClick={repeatQuestion} className="bg-blue-100 hover:bg-blue-200 text-blue-600 p-3 rounded-full active:scale-90 transition">
+                            <IconVolume2 size={32} />
+                        </button>
+                    </div>
+
+                    <div className="flex-1 w-full max-w-2xl flex flex-col items-center justify-center gap-8 my-8">
+                        <h2 className={`text-4xl md:text-5xl font-bold text-center drop-shadow-sm ${lessonInfo.color.replace('bg-', 'text-').replace('-400', '-600')}`}>
+                            {targetItem && `Bé tìm: ${targetItem.name.toUpperCase()}`}
+                        </h2>
+
+                        <div className="flex flex-col sm:flex-row gap-6 w-full px-4 justify-center">
+                            {options.map((item) => {
+                                const isWrong = wrongClickedId === item.id;
+                                const isCorrectTarget = showSuccess && item.id === targetItem?.id;
+                                
+                                return (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => handleItemClick(item)}
+                                        className={`
+                                            flex-1 aspect-square max-w-[250px] mx-auto rounded-3xl shadow-xl flex items-center justify-center text-[100px] sm:text-[120px] transition-all duration-300 border-4 bg-white font-bold
+                                            ${isWrong ? 'border-red-400 animate-shake bg-red-50' : 'border-gray-200 hover:scale-105 hover:border-slate-300'}
+                                            ${isCorrectTarget ? 'border-green-500 bg-green-100 scale-110' : ''}
+                                            ${showSuccess && !isCorrectTarget ? 'opacity-30 scale-90' : ''}
+                                            active:scale-95 text-slate-800
+                                        `}
+                                    >
+                                        <span className={lessonInfo.id === 'chu_cai' || lessonInfo.id === 'chu_so' ? "text-8xl md:text-9xl" : "drop-shadow-lg"}>
+                                            {item.emoji}
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {showSuccess && (
+                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-50">
+                             <div className="text-6xl animate-bounce">🎉 🎈 🎉</div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // ==========================================
+        // COMPONENT CHÍNH (MENU MỤC LỤC)
+        // ==========================================
+        const App = () => {
+            const [selectedLessonId, setSelectedLessonId] = useState(null);
+            const [ttsWarning, setTtsWarning] = useState('');
+
+            useEffect(() => {
+                const checkVoices = () => {
+                    const voices = window.speechSynthesis.getVoices();
+                    if (voices.length > 0) {
+                        const hasVietnamese = voices.some(v => v.lang.includes('vi') || v.lang.includes('VN'));
+                        if (!hasVietnamese) {
+                            setTtsWarning('Máy của bạn chưa cài Giọng đọc tiếng Việt. Vui lòng mở bằng Google Chrome hoặc tải giọng tiếng Việt trong Cài đặt hệ thống.');
+                        } else {
+                            setTtsWarning('');
+                        }
+                    }
+                };
+                checkVoices();
+                if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                    window.speechSynthesis.onvoiceschanged = checkVoices;
+                }
+            }, []);
+
+            if (selectedLessonId) {
+                const lessonInfo = LESSONS_DATA[selectedLessonId];
+                return <LessonGame lessonInfo={lessonInfo} onBack={() => {
+                    window.speechSynthesis.cancel();
+                    setSelectedLessonId(null);
+                }} />;
+            }
+
+            return (
+                <div className="min-h-screen bg-sky-50 flex flex-col items-center py-10 px-4 font-sans">
+                    {ttsWarning && (
+                        <div className="w-full max-w-3xl bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6 rounded shadow-md text-sm md:text-base">
+                            <p><strong>Lưu ý:</strong> {ttsWarning}</p>
+                        </div>
+                    )}
+
+                    <div className="text-center mb-10">
+                        <h1 className="text-5xl md:text-6xl font-bold text-sky-600 mb-4 drop-shadow-sm flex items-center justify-center gap-4">
+                            <IconStar className="text-yellow-400" size={48} fill="currentColor"/> 
+                            Bé Vui Học 
+                            <IconStar className="text-yellow-400" size={48} fill="currentColor"/>
+                        </h1>
+                        <p className="text-xl text-gray-500 font-medium">Bé hãy chọn một bài học bên dưới nhé!</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-5xl">
+                        {Object.values(LESSONS_DATA).map((lesson) => (
+                            <button
+                                key={lesson.id}
+                                onClick={() => setSelectedLessonId(lesson.id)}
+                                className={`${lesson.color} hover:opacity-90 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl shadow-lg rounded-3xl p-6 flex flex-col items-center justify-center gap-4 text-white group active:scale-95`}
+                            >
+                                <div className="text-7xl group-hover:scale-110 transition-transform duration-300 drop-shadow-lg">
+                                    {lesson.icon}
+                                </div>
+                                <h2 className="text-2xl font-bold text-center">
+                                    {lesson.title}
+                                </h2>
+                            </button>
+                        ))}
+                    </div>
+                    
+                    <div className="mt-12 text-gray-400 text-sm font-medium">
+                        Ứng dụng thiết kế đặc biệt cho trẻ mầm non
+                    </div>
+                </div>
+            );
+        };
+
+        // Render App vào div#root
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
