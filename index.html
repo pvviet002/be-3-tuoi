@@ -51,7 +51,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useCallback } = React;
+        const { useState, useEffect, useCallback, useRef } = React;
 
         // ==========================================
         // CÁC COMPONENT ICON (Thay thế cho lucide-react)
@@ -184,6 +184,9 @@
             const [wrongClickedId, setWrongClickedId] = useState(null);
             const [showSuccess, setShowSuccess] = useState(false);
 
+            // Sử dụng useRef để lưu trữ các ID của đồ vật đã được hỏi trong suốt lượt chơi này
+            const usedItemsRef = useRef([]);
+
             // Hàm đọc Text-to-Speech
             const speak = useCallback((text, rate = 0.8) => {
                 if ('speechSynthesis' in window) {
@@ -202,15 +205,31 @@
 
             const generateQuestion = useCallback(() => {
                 const items = lessonInfo.items;
-                const randomTargetIndex = Math.floor(Math.random() * items.length);
-                const target = items[randomTargetIndex];
+                
+                // 1. Lọc ra danh sách các đồ vật chưa từng được hỏi
+                let availableItems = items.filter(item => !usedItemsRef.current.includes(item.id));
+                
+                // 2. Nếu đã hỏi hết tất cả các đồ vật, tự động reset lại lịch sử
+                if (availableItems.length === 0) {
+                    usedItemsRef.current = [];
+                    availableItems = items;
+                }
 
+                // 3. Bốc ngẫu nhiên 1 đồ vật từ danh sách chưa hỏi
+                const randomTargetIndex = Math.floor(Math.random() * availableItems.length);
+                const target = availableItems[randomTargetIndex];
+
+                // 4. Lưu ID vừa chọn vào lịch sử
+                usedItemsRef.current.push(target.id);
+
+                // 5. Chọn 1 đồ vật nhiễu (sai) ngẫu nhiên (có thể là đồ vật cũ để gây nhiễu)
                 let wrongIndex = Math.floor(Math.random() * items.length);
-                while (wrongIndex === randomTargetIndex) {
+                while (items[wrongIndex].id === target.id) {
                     wrongIndex = Math.floor(Math.random() * items.length);
                 }
                 const wrong = items[wrongIndex];
 
+                // 6. Trộn vị trí hiển thị
                 const newOptions = Math.random() > 0.5 ? [target, wrong] : [wrong, target];
                 
                 setTargetItem(target);
@@ -226,6 +245,7 @@
             const startGame = () => {
                 speak(`Chào mừng bé đến với bài học: ${lessonInfo.title}!`);
                 setScore(0);
+                usedItemsRef.current = []; // Xóa toàn bộ lịch sử khi bắt đầu một lượt chơi mới
                 setGameState('PLAYING');
                 setTimeout(generateQuestion, 3000);
             };
