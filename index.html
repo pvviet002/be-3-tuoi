@@ -76,7 +76,7 @@
         );
 
         // ==========================================
-        // DỮ LIỆU CÁC BÀI HỌC (ĐÃ MỞ RỘNG)
+        // DỮ LIỆU CÁC BÀI HỌC (ĐÃ LỌC & BỔ SUNG CHO VN)
         // ==========================================
         const LESSONS_DATA = {
             do_vat: {
@@ -87,10 +87,12 @@
                     { id: 'quat', name: 'cái quạt', emoji: '🪭' }, { id: 'den', name: 'cái đèn', emoji: '💡' },
                     { id: 'dongho', name: 'đồng hồ', emoji: '⏰' }, { id: 'chia_khoa', name: 'cái chìa khóa', emoji: '🔑' },
                     { id: 'bat', name: 'cái bát', emoji: '🥣' }, { id: 'thia', name: 'cái thìa', emoji: '🥄' },
+                    { id: 'dua', name: 'đôi đũa', emoji: '🥢' }, { id: 'choi', name: 'cái chổi', emoji: '🧹' },
+                    { id: 'guong', name: 'cái gương', emoji: '🪞' }, { id: 'o', name: 'cái ô', emoji: '☂️' },
                     { id: 'cap_sach', name: 'cặp sách', emoji: '🎒' }, { id: 'mu', name: 'cái mũ', emoji: '🧢' },
                     { id: 'giay', name: 'đôi giày', emoji: '👟' }, { id: 'ao', name: 'cái áo', emoji: '👕' },
                     { id: 'quan', name: 'cái quần', emoji: '👖' }, { id: 'dien_thoai', name: 'điện thoại', emoji: '📱' },
-                    { id: 'ban_chai', name: 'bàn chải đánh răng', emoji: '🪥' }, { id: 'xa_phong', name: 'xà phòng', emoji: '🧼' }
+                    { id: 'ban_chai', name: 'bàn chải', emoji: '🪥' }, { id: 'xa_phong', name: 'cục xà phòng', emoji: '🧼' }
                 ]
             },
             con_vat: {
@@ -99,13 +101,15 @@
                     { id: 'cho', name: 'con chó', emoji: '🐶' }, { id: 'meo', name: 'con mèo', emoji: '🐱' },
                     { id: 'ga', name: 'con gà', emoji: '🐔' }, { id: 'vit', name: 'con vịt', emoji: '🦆' },
                     { id: 'bo', name: 'con bò', emoji: '🐮' }, { id: 'lon', name: 'con lợn', emoji: '🐷' },
+                    { id: 'trau', name: 'con trâu', emoji: '🐃' }, { id: 'de', name: 'con dê', emoji: '🐐' },
                     { id: 'chim', name: 'con chim', emoji: '🐦' }, { id: 'ca', name: 'con cá', emoji: '🐟' },
-                    { id: 'ho', name: 'con hổ', emoji: '🐯' }, { id: 'su_tu', name: 'sư tử', emoji: '🦁' },
-                    { id: 'voi', name: 'con voi', emoji: '🐘' }, { id: 'khi', name: 'con khỉ', emoji: '🐒' },
-                    { id: 'tho', name: 'con thỏ', emoji: '🐰' }, { id: 'gau', name: 'con gấu', emoji: '🐻' },
-                    { id: 'huou', name: 'hươu cao cổ', emoji: '🦒' }, { id: 'ngua_van', name: 'ngựa vằn', emoji: '🦓' },
-                    { id: 'chuot', name: 'con chuột', emoji: '🐭' }, { id: 'rua', name: 'con rùa', emoji: '🐢' },
-                    { id: 'ech', name: 'con ếch', emoji: '🐸' }, { id: 'buom', name: 'con bướm', emoji: '🦋' }
+                    { id: 'tom', name: 'con tôm', emoji: '🦐' }, { id: 'cua', name: 'con cua', emoji: '🦀' },
+                    { id: 'oc', name: 'con ốc', emoji: '🐌' }, { id: 'ong', name: 'con ong', emoji: '🐝' },
+                    { id: 'kien', name: 'con kiến', emoji: '🐜' }, { id: 'buom', name: 'con bướm', emoji: '🦋' },
+                    { id: 'ech', name: 'con ếch', emoji: '🐸' }, { id: 'rua', name: 'con rùa', emoji: '🐢' },
+                    { id: 'tho', name: 'con thỏ', emoji: '🐰' }, { id: 'chuot', name: 'con chuột', emoji: '🐭' },
+                    { id: 'ho', name: 'con hổ', emoji: '🐯' }, { id: 'voi', name: 'con voi', emoji: '🐘' }, 
+                    { id: 'khi', name: 'con khỉ', emoji: '🐒' }
                 ]
             },
             trai_cay: {
@@ -114,18 +118,22 @@
                     { id: 'tao', name: 'quả táo', emoji: '🍎' }, { id: 'chuoi', name: 'quả chuối', emoji: '🍌' },
                     { id: 'cam', name: 'quả cam', emoji: '🍊' }, { id: 'dua_hau', name: 'dưa hấu', emoji: '🍉' },
                     { id: 'nho', name: 'chùm nho', emoji: '🍇' }, { id: 'dau_tay', name: 'dâu tây', emoji: '🍓' },
-                    { id: 'xoai', name: 'quả xoài', emoji: '🥭' }, { id: 'dua', name: 'quả dứa', emoji: '🍍' },
-                    { id: 'dao', name: 'quả đào', emoji: '🍑' }, { id: 'cherry', name: 'quả anh đào', emoji: '🍒' }
+                    { id: 'xoai', name: 'quả xoài', emoji: '🥭' }, { id: 'dua_qua', name: 'quả dứa', emoji: '🍍' },
+                    { id: 'dua_nuoc', name: 'quả dừa', emoji: '🥥' }, { id: 'chanh', name: 'quả chanh', emoji: '🍋' },
+                    { id: 'le', name: 'quả lê', emoji: '🍐' }, { id: 'ca_chua', name: 'quả cà chua', emoji: '🍅' },
+                    { id: 'dao', name: 'quả đào', emoji: '🍑' }
                 ]
             },
             phuong_tien: {
                 id: 'phuong_tien', title: 'Phương tiện giao thông', color: 'bg-cyan-500', icon: '🚗',
                 items: [
                     { id: 'o_to', name: 'ô tô', emoji: '🚗' }, { id: 'xe_may', name: 'xe máy', emoji: '🏍️' },
-                    { id: 'xe_dap', name: 'xe đạp', emoji: '🚲' }, { id: 'may_bay', name: 'máy bay', emoji: '✈️' },
-                    { id: 'tau_hoa', name: 'tàu hỏa', emoji: '🚆' }, { id: 'thuyen', name: 'cái thuyền', emoji: '⛵' },
-                    { id: 'xe_buyt', name: 'xe buýt', emoji: '🚌' }, { id: 'truc_thang', name: 'trực thăng', emoji: '🚁' },
-                    { id: 'xe_cuu_hoa', name: 'xe cứu hỏa', emoji: '🚒' }, { id: 'xe_canh_sat', name: 'xe cảnh sát', emoji: '🚓' }
+                    { id: 'xe_dap', name: 'xe đạp', emoji: '🚲' }, { id: 'xe_may_dien', name: 'xe máy điện', emoji: '🛵' },
+                    { id: 'xe_tai', name: 'xe tải', emoji: '🚚' }, { id: 'xe_khach', name: 'xe khách', emoji: '🚐' },
+                    { id: 'xe_buyt', name: 'xe buýt', emoji: '🚌' }, { id: 'tau_hoa', name: 'tàu hỏa', emoji: '🚆' }, 
+                    { id: 'may_bay', name: 'máy bay', emoji: '✈️' }, { id: 'thuyen', name: 'cái thuyền', emoji: '⛵' },
+                    { id: 'xuong', name: 'chiếc xuồng', emoji: '🛶' }, { id: 'xe_cuu_hoa', name: 'xe cứu hỏa', emoji: '🚒' }, 
+                    { id: 'xe_canh_sat', name: 'xe cảnh sát', emoji: '🚓' }
                 ]
             },
             chu_cai: {
@@ -168,7 +176,9 @@
                     { id: 'kimcuong', name: 'hình thoi', emoji: '♦️' }, { id: 'mattrang', name: 'mặt trăng', emoji: '🌙' },
                     { id: 'mau_do', name: 'màu đỏ', emoji: '🟥' }, { id: 'mau_vang', name: 'màu vàng', emoji: '🟨' },
                     { id: 'mau_luc', name: 'màu xanh lá', emoji: '🟩' }, { id: 'mau_lam', name: 'màu xanh dương', emoji: '🟦' },
-                    { id: 'mau_cam', name: 'màu cam', emoji: '🟧' }, { id: 'mau_tim', name: 'màu tím', emoji: '🟪' }
+                    { id: 'mau_cam', name: 'màu cam', emoji: '🟧' }, { id: 'mau_tim', name: 'màu tím', emoji: '🟪' },
+                    { id: 'mau_hong', name: 'màu hồng', emoji: '🩷' }, { id: 'mau_nau', name: 'màu nâu', emoji: '🟫' },
+                    { id: 'mau_den', name: 'màu đen', emoji: '⬛' }, { id: 'mau_trang', name: 'màu trắng', emoji: '⬜' }
                 ]
             }
         };
