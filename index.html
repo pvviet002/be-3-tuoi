@@ -328,8 +328,19 @@
                         applauseAudioRef.current.play().catch(e => console.log("Lỗi phát âm thanh:", e));
                     }
                     
+                    // Danh sách các lời khen ngẫu nhiên
+                    const praises = [
+                        "Hoan hô con, đúng rồi!",
+                        "Đúng rồi, con làm tốt lắm!",
+                        "Tuyệt vời quá, con chọn đúng rồi!",
+                        "Con giỏi quá ta, chính xác rồi!",
+                        "Con của cô xuất sắc quá!",
+                        "Đúng rồi! Con thật là thông minh!"
+                    ];
+                    const randomPraise = praises[Math.floor(Math.random() * praises.length)];
+
                     // Khen bé và ĐỢI ĐỌC XONG mới chuyển layout
-                    speak("Hoan hô con, đúng rồi!", 0.85, () => {
+                    speak(randomPraise, 0.85, () => {
                         // Nghỉ thêm 0.8 giây để con tận hưởng niềm vui chiến thắng
                         setTimeout(() => {
                             if (newScore >= 5) {
