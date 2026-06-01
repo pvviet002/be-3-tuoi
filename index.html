@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bé Vui Học - Menu</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const LESSONS = [
+            { id: 'do_vat', title: 'Đồ vật quanh con', color: 'bg-sky-400', icon: '🪑', link: 'do_vat.html' },
+            { id: 'con_vat', title: 'Thế giới động vật', color: 'bg-green-400', icon: '🐶', link: 'con_vat.html' },
+            { id: 'chu_cai', title: 'Chữ cái tiếng Việt', color: 'bg-pink-400', icon: '🔤', link: 'chu_cai.html' },
+            { id: 'chu_so', title: 'Con tập đếm số', color: 'bg-yellow-400', icon: '🔢', link: 'chu_so.html' },
+            { id: 'dem_ngon_tay', title: 'Bé đếm ngón tay', color: 'bg-teal-500', icon: '🖐️', link: 'dem_ngon_tay.html' },
+            { id: 'hinh_khoi', title: 'Hình khối cơ bản', color: 'bg-purple-400', icon: '🔺', link: 'hinh_khoi.html' },
+            { id: 'mau_sac', title: 'Nhận biết màu sắc', color: 'bg-violet-400', icon: '🎨', link: 'mau_sac.html' },
+            { id: 'ghep_hinh', title: 'Bé ghép bóng', color: 'bg-rose-400', icon: '🧩', link: 'ghep_hinh.html' }
+        ];
+
+        const IconStar = ({ size=24, className="", fill="none" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        );
+
+        const App = () => {
+            return (
+                <div className="min-h-screen bg-sky-50 flex flex-col items-center py-10 px-4 font-sans">
+                    <div className="text-center mb-10">
+                        <h1 className="text-5xl md:text-6xl font-bold text-sky-600 mb-4 drop-shadow-sm flex items-center justify-center gap-4">
+                            <IconStar className="text-yellow-400" size={48} fill="currentColor"/> 
+                            Bé Vui Học 
+                            <IconStar className="text-yellow-400" size={48} fill="currentColor"/>
+                        </h1>
+                        <p className="text-xl text-gray-500 font-medium">Con hãy chọn một bài học bên dưới nhé!</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-7xl">
+                        {LESSONS.map((lesson) => (
+                            <a
+                                key={lesson.id}
+                                href={lesson.link}
+                                className={`${lesson.color} hover:opacity-90 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl shadow-lg rounded-3xl p-6 flex flex-col items-center justify-center gap-4 text-white group active:scale-95 no-underline`}
+                            >
+                                <div className="text-7xl group-hover:scale-110 transition-transform duration-300 drop-shadow-lg">
+                                    {lesson.icon}
+                                </div>
+                                <h2 className="text-2xl font-bold text-center">
+                                    {lesson.title}
+                                </h2>
+                            </a>
+                        ))}
+                    </div>
+                    <div className="mt-12 text-gray-400 text-sm font-medium">Phiên bản tách rời (Multi-Page) trên GitHub</div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
