@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bé ghép bóng - Bé Vui Học</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overflow: hidden; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+            40%, 60% { transform: translate3d(8px, 0, 0); }
+        }
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin-slow { animation: spin-slow 8s linear infinite; }
+        .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useRef } = React;
+
+        const IconPlay = ({ size=24, className="" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>);
+        const IconVolume2 = ({ size=24, className="" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>);
+        const IconStar = ({ size=24, className="", fill="none" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>);
+        const IconRefresh = ({ size=24, className="" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>);
+        const IconHome = ({ size=24, className="" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>);
+        const IconArrowLeft = ({ size=24, className="" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>);
+
+        const LESSON_DATA = {
+            id: 'ghep_hinh', title: 'Bé ghép bóng', color: 'bg-rose-400', icon: '🧩',
+            items: [
+                { id: 'tao', name: 'quả táo', emoji: '🍎' }, { id: 'cho', name: 'con chó', emoji: '🐶' },
+                { id: 'o_to', name: 'ô tô', emoji: '🚗' }, { id: 'ngoisao', name: 'ngôi sao', emoji: '⭐' },
+                { id: 'ghe', name: 'cái ghế', emoji: '🪑' }, { id: 'meo', name: 'con mèo', emoji: '🐱' },
+                { id: 'may_bay', name: 'máy bay', emoji: '✈️' }, { id: 'chuoi', name: 'quả chuối', emoji: '🍌' },
+                { id: 'con_ca', name: 'con cá', emoji: '🐟' }, { id: 'bong_tuyet', name: 'bông tuyết', emoji: '❄️' },
+                { id: 'xe_dap', name: 'xe đạp', emoji: '🚲' }, { id: 'qua_cam', name: 'quả cam', emoji: '🍊' },
+                { id: 'hoa', name: 'bông hoa', emoji: '🌻' }, { id: 'buom', name: 'con bướm', emoji: '🦋' }
+            ]
+        };
+
+        const App = () => {
+            const [gameState, setGameState] = useState('START'); 
+            const [targetItem, setTargetItem] = useState(null);
+            const [options, setOptions] = useState([]);
+            const [score, setScore] = useState(0);
+            const [showSuccess, setShowSuccess] = useState(false);
+            
+            // State quản lý kéo thả
+            const [draggedId, setDraggedId] = useState(null);
+            const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
+            const [wrongDragId, setWrongDragId] = useState(null);
+
+            const dropZoneRef = useRef(null);
+            const usedItemsRef = useRef([]);
+            const recentPraisesRef = useRef([]);
+            const activeTimeoutsRef = useRef([]);
+
+            useEffect(() => {
+                return () => {
+                    activeTimeoutsRef.current.forEach(clearTimeout);
+                    window.speechSynthesis.cancel();
+                };
+            }, []);
+
+            const setSafeTimeout = (callback, delay) => {
+                const timer = setTimeout(callback, delay);
+                activeTimeoutsRef.current.push(timer);
+                return timer;
+            };
+
+            const speak = useCallback((text, rate = 0.85, onEndCallback = null) => {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    const voices = window.speechSynthesis.getVoices();
+                    
+                    const bestVoice = voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && (v.name.includes('Neural') || v.name.includes('HoaiMy')))
+                                   || voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && v.name.includes('Google'))
+                                   || voices.find(v => v.lang.includes('vi') || v.lang.includes('VN'));
+                                   
+                    if (bestVoice) utterance.voice = bestVoice;
+                    utterance.lang = 'vi-VN';
+                    utterance.rate = rate; 
+                    utterance.pitch = 1.1; 
+
+                    if (onEndCallback) {
+                        let isEnded = false;
+                        const handleEnd = () => { if (!isEnded) { isEnded = true; onEndCallback(); } };
+                        utterance.onend = handleEnd;
+                        utterance.onerror = handleEnd;
+                        setSafeTimeout(handleEnd, text.length * 150 + 1500); 
+                    }
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    if (onEndCallback) setSafeTimeout(onEndCallback, 2000);
+                }
+            }, []);
+
+            const generateQuestion = useCallback(() => {
+                const items = LESSON_DATA.items;
+                let availableItems = items.filter(item => !usedItemsRef.current.includes(item.id));
+                
+                if (availableItems.length < 3) {
+                    usedItemsRef.current = [];
+                    availableItems = items;
+                }
+
+                const targetIndex = Math.floor(Math.random() * availableItems.length);
+                const target = availableItems[targetIndex];
+                usedItemsRef.current.push(target.id);
+
+                let wrongItems = items.filter(item => item.id !== target.id);
+                wrongItems.sort(() => Math.random() - 0.5);
+                
+                const newOptions = [target, wrongItems[0], wrongItems[1]];
+                newOptions.sort(() => Math.random() - 0.5); 
+                
+                setTargetItem(target);
+                setOptions(newOptions);
+                setShowSuccess(false);
+                setWrongDragId(null);
+
+                setSafeTimeout(() => {
+                    speak(`Cô đố con tìm hình, và kéo vào đúng bóng đen nhé!`);
+                }, 500);
+            }, [speak]);
+
+            const startGame = () => {
+                const applause = document.getElementById('applauseSound');
+                if (applause) { applause.play().then(() => { applause.pause(); applause.currentTime = 0; }).catch(e=>e); }
+
+                setScore(0);
+                usedItemsRef.current = [];
+                speak(`Cô chào con! Chào mừng con đến với trò chơi: ${LESSON_DATA.title}!`, 0.85, () => {
+                    setGameState('PLAYING');
+                    generateQuestion();
+                });
+            };
+
+            const handlePointerDown = (e, item) => {
+                if (showSuccess) return;
+                setDraggedId(item.id);
+                setDragPos({ x: e.clientX, y: e.clientY });
+            };
+
+            const handlePointerMove = (e) => {
+                if (draggedId) {
+                    setDragPos({ x: e.clientX, y: e.clientY });
+                }
+            };
+
+            const handlePointerUp = (e) => {
+                if (!draggedId) return;
+
+                let isDroppedInside = false;
+                if (dropZoneRef.current) {
+                    const rect = dropZoneRef.current.getBoundingClientRect();
+                    const padding = 30; // Mở rộng vùng thả để bé dễ chơi
+                    if (
+                        e.clientX >= rect.left - padding && e.clientX <= rect.right + padding &&
+                        e.clientY >= rect.top - padding && e.clientY <= rect.bottom + padding
+                    ) {
+                        isDroppedInside = true;
+                    }
+                }
+
+                if (isDroppedInside) {
+                    if (draggedId === targetItem.id) {
+                        // Trả lời đúng
+                        setShowSuccess(true);
+                        setScore(s => s + 1);
+                        setDraggedId(null);
+                        
+                        const applause = document.getElementById('applauseSound');
+                        if (applause) { applause.currentTime = 0; applause.play().catch(e=>e); }
+
+                        const praisesList = ["Tuyệt vời quá, đúng khớp luôn!", "Con ghép xuất sắc quá!", "Hoan hô con, đúng rồi!", "Khớp rồi, con thật thông minh!"];
+                        let availablePraises = praisesList.filter(p => !recentPraisesRef.current.includes(p));
+                        if (availablePraises.length === 0) availablePraises = praisesList;
+                        const selectedPraise = availablePraises[Math.floor(Math.random() * availablePraises.length)];
+                        recentPraisesRef.current.push(selectedPraise);
+                        if (recentPraisesRef.current.length > 2) recentPraisesRef.current.shift();
+
+                        speak(selectedPraise, 0.85, () => {
+                            setSafeTimeout(() => {
+                                if (score + 1 >= 5) {
+                                    setGameState('END');
+                                    speak("Cô chúc mừng con đã hoàn thành xuất sắc! Cô thưởng cho con 5 ngôi sao nhé!");
+                                } else {
+                                    generateQuestion();
+                                }
+                            }, 500);
+                        });
+                    } else {
+                        // Sai hình
+                        const draggedObj = options.find(o => o.id === draggedId);
+                        setWrongDragId(draggedId);
+                        setDraggedId(null);
+                        speak(`Đây là ${draggedObj.name}, chưa khớp bóng rồi con ạ!`);
+                        setSafeTimeout(() => setWrongDragId(null), 1000);
+                    }
+                } else {
+                    // Thả ra ngoài
+                    setDraggedId(null);
+                }
+            };
+
+            const goBackMenu = () => { window.location.href = 'index.html'; };
+
+            if (gameState === 'START') {
+                return (
+                    <div className="min-h-screen bg-rose-50 flex flex-col items-center justify-center p-4 font-sans relative">
+                        <audio id="applauseSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_1067517c5b.mp3" preload="auto"></audio>
+                        <button onClick={goBackMenu} className="absolute top-6 left-6 flex items-center gap-2 bg-white text-rose-500 hover:bg-rose-100 px-4 py-2 rounded-xl shadow-md font-bold transition-transform active:scale-90">
+                            <IconArrowLeft size={24} /> Quay lại
+                        </button>
+                        <div className={`bg-white p-8 rounded-3xl shadow-xl text-center max-w-md w-full border-4 border-rose-400 transform transition hover:scale-105`}>
+                            <div className="text-6xl mb-4">{LESSON_DATA.icon}</div>
+                            <h1 className="text-4xl font-bold mb-8 font-sans text-rose-600">{LESSON_DATA.title}</h1>
+                            <button onClick={startGame} className={`w-full ${LESSON_DATA.color} hover:opacity-90 text-white text-3xl font-bold py-6 px-8 rounded-2xl shadow-lg flex items-center justify-center gap-4 transition-transform active:scale-95`}>
+                                <IconPlay size={40} /> Bắt đầu học
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (gameState === 'END') {
+                return (
+                    <div className="min-h-screen bg-yellow-100 flex flex-col items-center justify-center p-4 font-sans">
+                        <div className="bg-white p-8 rounded-3xl shadow-xl text-center max-w-md w-full border-4 border-yellow-400">
+                            <h1 className="text-4xl font-bold text-yellow-500 mb-4">Con Giỏi Quá!</h1>
+                            <div className="flex justify-center gap-2 mb-8">
+                                {[1, 2, 3, 4, 5].map(i => (<IconStar key={i} size={48} className="text-yellow-400 animate-spin-slow" fill="currentColor" />))}
+                            </div>
+                            <button onClick={startGame} className="w-full bg-rose-500 hover:bg-rose-600 text-white text-2xl font-bold py-4 rounded-2xl shadow flex items-center justify-center gap-2 mb-4 active:scale-95">
+                                <IconRefresh size={28} /> Chơi lại
+                            </button>
+                            <button onClick={goBackMenu} className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 text-2xl font-bold py-4 rounded-2xl shadow flex items-center justify-center gap-2 active:scale-95">
+                                <IconHome size={28} /> Menu chính
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div 
+                    className="min-h-screen bg-slate-50 flex flex-col items-center justify-between p-6 font-sans select-none overflow-hidden"
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerLeave={handlePointerUp} 
+                    style={{ touchAction: draggedId ? 'none' : 'auto' }} 
+                >
+                    <div className="w-full max-w-2xl flex justify-between items-center bg-white p-4 rounded-2xl shadow-md border-2 border-slate-200 z-10">
+                        <button onClick={goBackMenu} className="text-slate-400 hover:text-red-500 bg-slate-100 p-2 rounded-full active:scale-90 transition"><IconArrowLeft size={28} /></button>
+                        <div className="flex gap-1 flex-1 justify-center">
+                            {[...Array(5)].map((_, i) => (<IconStar key={i} size={32} className={i < score ? "text-yellow-400 transform scale-110" : "text-gray-200"} fill={i < score ? "currentColor" : "none"} />))}
+                        </div>
+                        <button onClick={() => speak('Con hãy tìm hình và kéo vào đúng bóng đen nhé!')} className="bg-blue-100 text-blue-600 p-3 rounded-full active:scale-90"><IconVolume2 size={32} /></button>
+                    </div>
+
+                    <div className="flex-1 w-full max-w-2xl flex flex-col items-center justify-center gap-4 my-4 relative">
+                        <h2 className="text-3xl md:text-4xl font-bold text-center drop-shadow-sm text-rose-600 mb-8">
+                            Kéo hình vào bóng đen
+                        </h2>
+
+                        {targetItem && (
+                            <div 
+                                ref={dropZoneRef} 
+                                className={`w-48 h-48 sm:w-64 sm:h-64 rounded-full flex items-center justify-center mb-12 transition-all duration-500
+                                    ${showSuccess ? 'bg-green-100 border-4 border-green-400 scale-110 shadow-2xl' : 'bg-slate-200 border-8 border-dashed border-slate-300'}
+                                `}
+                            >
+                                <span 
+                                    className="text-[120px] sm:text-[160px] drop-shadow-md transition-all duration-500" 
+                                    style={{ filter: showSuccess ? 'none' : 'brightness(0) opacity(0.15)' }} 
+                                >
+                                    {targetItem.emoji}
+                                </span>
+                            </div>
+                        )}
+
+                        <div className="flex justify-center gap-4 sm:gap-8 w-full px-2 z-20">
+                            {options.map((item) => {
+                                const isDragging = draggedId === item.id;
+                                const isWrong = wrongDragId === item.id;
+                                const isCorrectAndSuccess = showSuccess && item.id === targetItem.id;
+
+                                return (
+                                    <div key={item.id} className="w-[90px] h-[90px] sm:w-[120px] sm:h-[120px] relative">
+                                        {!isCorrectAndSuccess && (
+                                            <button
+                                                onPointerDown={(e) => handlePointerDown(e, item)}
+                                                style={{
+                                                    position: isDragging ? 'fixed' : 'relative',
+                                                    left: isDragging ? dragPos.x : 'auto',
+                                                    top: isDragging ? dragPos.y : 'auto',
+                                                    transform: isDragging ? 'translate(-50%, -50%) scale(0.75)' : 'none',
+                                                    zIndex: isDragging ? 1000 : 1,
+                                                    touchAction: 'none',
+                                                    opacity: isDragging ? 0.9 : 1
+                                                }}
+                                                className={`
+                                                    w-[90px] h-[90px] sm:w-[120px] sm:h-[120px] flex items-center justify-center bg-white rounded-3xl shadow-lg border-4 
+                                                    ${isWrong ? 'border-red-400 animate-shake bg-red-50' : 'border-gray-200'}
+                                                    transition-colors duration-200 active:scale-110 cursor-grab
+                                                `}
+                                            >
+                                                <span className="text-[50px] sm:text-[70px] drop-shadow-lg pointer-events-none">
+                                                    {item.emoji}
+                                                </span>
+                                            </button>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                    {showSuccess && <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-50"><div className="text-6xl animate-bounce">🎉 🎈 🎉</div></div>}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
