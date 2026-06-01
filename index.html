@@ -92,7 +92,7 @@
         // ==========================================
         const LESSONS_DATA = {
             do_vat: {
-                id: 'do_vat', title: 'Đồ vật quanh bé', color: 'bg-sky-400', icon: '🪑',
+                id: 'do_vat', title: 'Đồ vật quanh con', color: 'bg-sky-400', icon: '🪑',
                 items: [
                     { id: 'ghe', name: 'cái ghế', emoji: '🪑' }, { id: 'giuong', name: 'cái giường', emoji: '🛏️' },
                     { id: 'tivi', name: 'ti vi', emoji: '📺' }, { id: 'coc', name: 'cái cốc', emoji: '🥛' },
@@ -169,7 +169,7 @@
                 ]
             },
             chu_so: {
-                id: 'chu_so', title: 'Bé tập đếm số', color: 'bg-yellow-400', icon: '🔢',
+                id: 'chu_so', title: 'Con tập đếm số', color: 'bg-yellow-400', icon: '🔢',
                 items: [
                     { id: '0', name: 'số không', emoji: '0' }, { id: '1', name: 'số một', emoji: '1' }, 
                     { id: '2', name: 'số hai', emoji: '2' }, { id: '3', name: 'số ba', emoji: '3' }, 
@@ -273,12 +273,12 @@
                 setShowSuccess(false);
 
                 setTimeout(() => {
-                    speak(`Con ơi, ${target.name} ở đâu nhỉ?`);
+                    speak(`Cô đố con, ${target.name} ở đâu nhỉ?`);
                 }, 500);
             }, [speak, lessonInfo]);
 
             const startGame = () => {
-                speak(`Chào mừng con đến với bài học: ${lessonInfo.title}!`);
+                speak(`Cô chào con! Chào mừng con đến với bài học: ${lessonInfo.title}!`);
                 setScore(0);
                 usedItemsRef.current = []; // Xóa toàn bộ lịch sử khi bắt đầu một lượt chơi mới
                 setGameState('PLAYING');
@@ -292,12 +292,12 @@
                     setShowSuccess(true);
                     setScore(s => s + 1);
                     
-                    speak("Hoan hô, đúng rồi!");
+                    speak("Hoan hô con, đúng rồi!");
 
                     setTimeout(() => {
                         if (score + 1 >= 5) {
                             setGameState('END');
-                            speak("Chúc mừng con đã hoàn thành bài học xuất sắc! Con được thưởng 5 ngôi sao luôn!");
+                            speak("Cô chúc mừng con đã hoàn thành xuất sắc! Cô thưởng cho con 5 ngôi sao nhé!");
                         } else {
                             generateQuestion();
                         }
@@ -342,13 +342,13 @@
                 return (
                     <div className="min-h-screen bg-yellow-100 flex flex-col items-center justify-center p-4 font-sans">
                         <div className="bg-white p-8 rounded-3xl shadow-xl text-center max-w-md w-full border-4 border-yellow-400">
-                            <h1 className="text-4xl font-bold text-yellow-500 mb-4">Bé Giỏi Quá!</h1>
+                            <h1 className="text-4xl font-bold text-yellow-500 mb-4">Con Giỏi Quá!</h1>
                             <div className="flex justify-center gap-2 mb-8">
                                 {[1, 2, 3, 4, 5].map(i => (
                                     <IconStar key={i} size={48} className="text-yellow-400 animate-spin-slow" fill="currentColor" />
                                 ))}
                             </div>
-                            <p className="text-2xl text-gray-700 mb-8">Bé đã hoàn thành xuất sắc!</p>
+                            <p className="text-2xl text-gray-700 mb-8">Con đã hoàn thành xuất sắc!</p>
                             <div className="flex flex-col gap-4">
                                 <button 
                                     onClick={startGame}
@@ -386,7 +386,7 @@
 
                     <div className="flex-1 w-full max-w-2xl flex flex-col items-center justify-center gap-8 my-8">
                         <h2 className={`text-4xl md:text-5xl font-bold text-center drop-shadow-sm ${lessonInfo.color.replace('bg-', 'text-').replace('-400', '-600')}`}>
-                            {targetItem && `Bé tìm: ${targetItem.name.toUpperCase()}`}
+                            {targetItem && `Cô đố con tìm: ${targetItem.name.toUpperCase()}`}
                         </h2>
 
                         <div className="flex flex-col sm:flex-row gap-6 w-full px-4 justify-center">
@@ -518,7 +518,7 @@
                             Bé Vui Học 
                             <IconStar className="text-yellow-400" size={48} fill="currentColor"/>
                         </h1>
-                        <p className="text-xl text-gray-500 font-medium">Bé hãy chọn một bài học bên dưới nhé!</p>
+                        <p className="text-xl text-gray-500 font-medium">Con hãy chọn một bài học bên dưới nhé!</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-7xl">
