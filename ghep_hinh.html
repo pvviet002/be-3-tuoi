@@ -109,10 +109,7 @@
                 const items = LESSON_DATA.items;
                 let availableItems = items.filter(item => !usedItemsRef.current.includes(item.id));
                 
-                if (availableItems.length < 3) {
-                    usedItemsRef.current = [];
-                    availableItems = items;
-                }
+                if (availableItems.length === 0) return;
 
                 const targetIndex = Math.floor(Math.random() * availableItems.length);
                 const target = availableItems[targetIndex];
@@ -195,9 +192,9 @@
 
                         speak(successMessage, 0.85, () => {
                             setSafeTimeout(() => {
-                                if (score + 1 >= 5) {
+                                if (usedItemsRef.current.length >= LESSON_DATA.items.length) {
                                     setGameState('END');
-                                    speak("Cô chúc mừng con đã hoàn thành xuất sắc! Cô thưởng cho con 5 ngôi sao nhé!");
+                                    speak("Cô chúc mừng con đã hoàn thành xuất sắc tất cả các hình! Con thật tuyệt vời!");
                                 } else {
                                     generateQuestion();
                                 }
@@ -267,7 +264,10 @@
                     <div className="w-full max-w-2xl flex justify-between items-center bg-white p-4 rounded-2xl shadow-md border-2 border-slate-200 z-10">
                         <button onClick={goBackMenu} className="text-slate-400 hover:text-red-500 bg-slate-100 p-2 rounded-full active:scale-90 transition"><IconArrowLeft size={28} /></button>
                         <div className="flex gap-1 flex-1 justify-center">
-                            {[...Array(5)].map((_, i) => (<IconStar key={i} size={32} className={i < score ? "text-yellow-400 transform scale-110" : "text-gray-200"} fill={i < score ? "currentColor" : "none"} />))}
+                            {[...Array(5)].map((_, i) => {
+                                const activeStars = score === 0 ? 0 : ((score - 1) % 5) + 1;
+                                return <IconStar key={i} size={32} className={i < activeStars ? "text-yellow-400 transform scale-110" : "text-gray-200"} fill={i < activeStars ? "currentColor" : "none"} />
+                            })}
                         </div>
                         <button onClick={() => speak('Con hãy tìm hình và kéo vào đúng bóng đen nhé!')} className="bg-blue-100 text-blue-600 p-3 rounded-full active:scale-90"><IconVolume2 size={32} /></button>
                     </div>
