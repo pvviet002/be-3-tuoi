@@ -53,6 +53,9 @@
     <script type="text/babel">
         const { useState, useEffect, useCallback, useRef } = React;
 
+        // ==========================================
+        // CÁC COMPONENT ICON (Thay thế cho lucide-react)
+        // ==========================================
         const IconPlay = ({ size=24, className="", fill="none" }) => (
             <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
         );
@@ -72,26 +75,24 @@
             <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         );
 
-        // Khởi tạo âm thanh toàn cục (dùng MP3 để tương thích 100% với iOS/iPadOS)
-        const applauseSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
-        applauseSound.volume = 0.6;
-
+        // ==========================================
+        // DỮ LIỆU CÁC BÀI HỌC
+        // ==========================================
         const LESSONS_DATA = {
             do_vat: {
                 id: 'do_vat', title: 'Đồ vật quanh con', color: 'bg-sky-400', icon: '🪑',
                 items: [
                     { id: 'ghe', name: 'cái ghế', emoji: '🪑' }, { id: 'giuong', name: 'cái giường', emoji: '🛏️' },
-                    { id: 'tivi', name: 'ti vi', emoji: '📺' }, { id: 'coc', name: 'cái cốc', emoji: '🥤' }, // Đổi thành ly nước
+                    { id: 'tivi', name: 'ti vi', emoji: '📺' }, { id: 'coc', name: 'cái cốc', emoji: '🥤' },
                     { id: 'quat', name: 'cái quạt', emoji: '🪭' }, { id: 'den', name: 'cái đèn', emoji: '💡' },
                     { id: 'dongho', name: 'đồng hồ', emoji: '⏰' }, { id: 'chia_khoa', name: 'cái chìa khóa', emoji: '🔑' },
-                    { id: 'bat', name: 'cái bát', emoji: '🍚' }, // Đổi thành bát cơm
-                    { id: 'thia', name: 'cái thìa', emoji: '🥄' }, { id: 'dua', name: 'đôi đũa', emoji: '🥢' },
-                    { id: 'choi', name: 'cái chổi', emoji: '🧹' }, { id: 'guong', name: 'cái gương', emoji: '🪞' }, 
-                    { id: 'o', name: 'cái ô', emoji: '☂️' }, { id: 'cap_sach', name: 'cặp sách', emoji: '🎒' }, 
-                    { id: 'mu', name: 'cái mũ', emoji: '🧢' }, { id: 'dep', name: 'đôi dép', emoji: '🩴' }, // Đổi thành đôi dép tông/lê
-                    { id: 'ao', name: 'cái áo', emoji: '👕' }, { id: 'quan', name: 'cái quần', emoji: '👖' }, 
-                    { id: 'dien_thoai', name: 'điện thoại', emoji: '📱' }, { id: 'ban_chai', name: 'bàn chải', emoji: '🪥' }, 
-                    { id: 'xa_phong', name: 'cục xà phòng', emoji: '🧼' }
+                    { id: 'bat', name: 'cái bát', emoji: '🍚' }, { id: 'thia', name: 'cái thìa', emoji: '🥄' },
+                    { id: 'dua', name: 'đôi đũa', emoji: '🥢' }, { id: 'choi', name: 'cái chổi', emoji: '🧹' },
+                    { id: 'guong', name: 'cái gương', emoji: '🪞' }, { id: 'o', name: 'cái ô', emoji: '☂️' },
+                    { id: 'cap_sach', name: 'cặp sách', emoji: '🎒' }, { id: 'mu', name: 'cái mũ', emoji: '🧢' },
+                    { id: 'dep', name: 'đôi dép', emoji: '🩴' }, { id: 'ao', name: 'cái áo', emoji: '👕' },
+                    { id: 'quan', name: 'cái quần', emoji: '👖' }, { id: 'dien_thoai', name: 'điện thoại', emoji: '📱' },
+                    { id: 'ban_chai', name: 'bàn chải', emoji: '🪥' }, { id: 'xa_phong', name: 'cục xà phòng', emoji: '🧼' }
                 ]
             },
             con_vat: {
@@ -108,7 +109,7 @@
                     { id: 'ech', name: 'con ếch', emoji: '🐸' }, { id: 'rua', name: 'con rùa', emoji: '🐢' },
                     { id: 'tho', name: 'con thỏ', emoji: '🐰' }, { id: 'chuot', name: 'con chuột', emoji: '🐭' },
                     { id: 'ho', name: 'con hổ', emoji: '🐯' }, { id: 'voi', name: 'con voi', emoji: '🐘' }, 
-                    { id: 'khi', name: 'con khỉ', emoji: '🐒' }, { id: 'muoi', name: 'con muỗi', emoji: '🦟' } // Thêm con muỗi
+                    { id: 'khi', name: 'con khỉ', emoji: '🐒' }, { id: 'muoi', name: 'con muỗi', emoji: '🦟' }
                 ]
             },
             trai_cay: {
@@ -118,7 +119,7 @@
                     { id: 'cam', name: 'quả cam', emoji: '🍊' }, { id: 'dua_hau', name: 'dưa hấu', emoji: '🍉' },
                     { id: 'nho', name: 'chùm nho', emoji: '🍇' }, { id: 'dau_tay', name: 'dâu tây', emoji: '🍓' },
                     { id: 'xoai', name: 'quả xoài', emoji: '🥭' }, { id: 'dua_qua', name: 'quả dứa', emoji: '🍍' },
-                    { id: 'dua_nuoc', name: 'quả dừa', emoji: '🥥' }, { id: 'chanh', name: 'quả chanh', emoji: '🍋‍🟩' }, // Chanh xanh (Lime)
+                    { id: 'dua_nuoc', name: 'quả dừa', emoji: '🥥' }, { id: 'chanh', name: 'quả chanh', emoji: '🍋‍🟩' }, 
                     { id: 'le', name: 'quả lê', emoji: '🍐' }, { id: 'ca_chua', name: 'quả cà chua', emoji: '🍅' },
                     { id: 'dao', name: 'quả đào', emoji: '🍑' }
                 ]
@@ -126,9 +127,9 @@
             phuong_tien: {
                 id: 'phuong_tien', title: 'Phương tiện giao thông', color: 'bg-cyan-500', icon: '🚗',
                 items: [
-                    { id: 'o_to', name: 'ô tô', emoji: '🚗' }, { id: 'xe_may', name: 'xe máy', emoji: '🛵' }, // Đổi thành xe tay ga
+                    { id: 'o_to', name: 'ô tô', emoji: '🚗' }, { id: 'xe_may', name: 'xe máy', emoji: '🛵' },
                     { id: 'xe_dap', name: 'xe đạp', emoji: '🚲' }, { id: 'xe_tai', name: 'xe tải', emoji: '🚚' }, 
-                    { id: 'xe_khach', name: 'xe khách', emoji: '🚌' }, { id: 'tau_hoa', name: 'tàu hỏa', emoji: '🚂' }, // Đổi thành tàu chạy bằng hơi nước
+                    { id: 'xe_khach', name: 'xe khách', emoji: '🚌' }, { id: 'tau_hoa', name: 'tàu hỏa', emoji: '🚂' }, 
                     { id: 'may_bay', name: 'máy bay', emoji: '✈️' }, { id: 'thuyen', name: 'cái thuyền', emoji: '⛵' },
                     { id: 'xuong', name: 'chiếc xuồng', emoji: '🛶' }, { id: 'xe_cuu_hoa', name: 'xe cứu hỏa', emoji: '🚒' }, 
                     { id: 'xe_canh_sat', name: 'xe cảnh sát', emoji: '🚓' }
@@ -181,41 +182,9 @@
             }
         };
 
-        const ItemCard = ({ item, isWrong, isCorrectTarget, showSuccess, onClick, lessonId }) => {
-            const [imgError, setImgError] = useState(false);
-            const isTextLesson = lessonId === 'chu_cai' || lessonId === 'chu_so';
-            
-            return (
-                <button
-                    onClick={onClick}
-                    className={`
-                        flex-1 aspect-square max-w-[320px] mx-auto flex items-center justify-center transition-all duration-300 bg-transparent rounded-full
-                        ${isWrong ? 'animate-shake opacity-75' : 'hover:scale-110'}
-                        ${isCorrectTarget ? 'scale-125 z-10' : ''}
-                        ${showSuccess && !isCorrectTarget ? 'opacity-20 scale-75' : ''}
-                        active:scale-95 text-slate-800 relative
-                    `}
-                >
-                    {/* Hỗ trợ hiển thị ảnh thật từ thư mục nếu có, nếu không thì dùng Emoji mượt mà */}
-                    {item.image && !imgError && !isTextLesson ? (
-                        <img 
-                            src={item.image} 
-                            alt={item.name} 
-                            className="w-full h-full object-cover rounded-3xl drop-shadow-2xl"
-                            onError={() => setImgError(true)}
-                        />
-                    ) : (
-                        <span 
-                            className={isTextLesson ? "text-[140px] sm:text-[180px] md:text-[220px] font-black drop-shadow-xl" : "text-[140px] sm:text-[180px] md:text-[220px] drop-shadow-2xl"}
-                            style={lessonId === 'chu_cai' ? { fontFamily: '"Times New Roman", Times' } : {}}
-                        >
-                            {item.emoji}
-                        </span>
-                    )}
-                </button>
-            );
-        };
-
+        // ==========================================
+        // COMPONENT TRÒ CHƠI CHUNG
+        // ==========================================
         const LessonGame = ({ lessonInfo, onBack }) => {
             const [gameState, setGameState] = useState('START'); // START, PLAYING, END
             const [targetItem, setTargetItem] = useState(null);
@@ -257,7 +226,7 @@
 
                     window.speechSynthesis.speak(utterance);
                     
-                    // Dự phòng an toàn nếu trình duyệt (như Safari) bị lỗi không bắn sự kiện onend
+                    // Dự phòng an toàn nếu trình duyệt bị lỗi không bắn sự kiện onend
                     const estimatedTime = text.length * 120 + 2000;
                     setTimeout(safeCallback, estimatedTime);
                 } else {
@@ -317,10 +286,11 @@
                     const newScore = score + 1;
                     setScore(newScore);
                     
-                    // Phát tiếng trẻ em reo hò vỗ tay
-                    if (applauseSound) {
-                        applauseSound.currentTime = 0;
-                        applauseSound.play().catch(e => console.log("Lỗi phát âm thanh:", e));
+                    // Phát tiếng trẻ em reo hò vỗ tay thông qua thẻ Audio có sẵn trong DOM
+                    const audioEl = document.getElementById('applause-audio-player');
+                    if (audioEl) {
+                        audioEl.currentTime = 0;
+                        audioEl.play().catch(e => console.log("Lỗi phát tiếng vỗ tay:", e));
                     }
                     
                     // Danh sách các lời khen ngẫu nhiên
@@ -336,7 +306,6 @@
 
                     // Khen bé và ĐỢI ĐỌC XONG mới chuyển layout
                     speak(randomPraise, 0.85, () => {
-                        // Nghỉ thêm 0.8 giây để con tận hưởng niềm vui chiến thắng
                         setTimeout(() => {
                             if (newScore >= 5) {
                                 setGameState('END');
@@ -349,7 +318,6 @@
 
                 } else {
                     setWrongClickedId(item.id);
-                    // Dùng callback để nhả hiệu ứng lắc khi đọc xong
                     speak(`Đây là ${item.name}, con hãy chọn lại nhé!`, 0.85, () => {
                         setTimeout(() => setWrongClickedId(null), 500);
                     });
@@ -441,15 +409,24 @@
                                 const isCorrectTarget = showSuccess && item.id === targetItem?.id;
                                 
                                 return (
-                                    <ItemCard 
+                                    <button
                                         key={item.id}
-                                        item={item}
-                                        isWrong={isWrong}
-                                        isCorrectTarget={isCorrectTarget}
-                                        showSuccess={showSuccess}
                                         onClick={() => handleItemClick(item)}
-                                        lessonId={lessonInfo.id}
-                                    />
+                                        className={`
+                                            flex-1 aspect-square max-w-[320px] mx-auto flex items-center justify-center transition-all duration-300 bg-transparent rounded-full
+                                            ${isWrong ? 'animate-shake opacity-75' : 'hover:scale-110'}
+                                            ${isCorrectTarget ? 'scale-125 z-10' : ''}
+                                            ${showSuccess && !isCorrectTarget ? 'opacity-20 scale-75' : ''}
+                                            active:scale-95 text-slate-800 relative
+                                        `}
+                                    >
+                                        <span 
+                                            className={lessonInfo.id === 'chu_cai' || lessonInfo.id === 'chu_so' ? "text-[140px] sm:text-[180px] md:text-[220px] font-black drop-shadow-xl" : "text-[140px] sm:text-[180px] md:text-[220px] drop-shadow-2xl"}
+                                            style={lessonInfo.id === 'chu_cai' ? { fontFamily: '"Times New Roman", Times' } : {}}
+                                        >
+                                            {item.emoji}
+                                        </span>
+                                    </button>
                                 );
                             })}
                         </div>
@@ -464,6 +441,9 @@
             );
         };
 
+        // ==========================================
+        // COMPONENT CHÍNH (MENU MỤC LỤC)
+        // ==========================================
         const App = () => {
             const [selectedLessonId, setSelectedLessonId] = useState(null);
             const [ttsWarning, setTtsWarning] = useState('');
@@ -477,12 +457,15 @@
                     window.speechSynthesis.speak(utterance);
                 }
                 
-                // Mồi âm thanh vỗ tay để iOS cấp quyền phát audio sau này
-                if (applauseSound) {
-                    applauseSound.play().then(() => {
-                        applauseSound.pause();
-                        applauseSound.currentTime = 0;
-                    }).catch(e => console.log("Đợi tương tác cấp quyền âm thanh", e));
+                // Mồi âm thanh vỗ tay (phát với âm lượng 0) để iOS/Brave cho phép thẻ Audio chạy sau này
+                const audioEl = document.getElementById('applause-audio-player');
+                if (audioEl) {
+                    audioEl.volume = 0;
+                    audioEl.play().then(() => {
+                        audioEl.pause();
+                        audioEl.currentTime = 0;
+                        audioEl.volume = 0.6; // Đặt lại âm lượng bình thường
+                    }).catch(e => console.log("Đợi tương tác", e));
                 }
             };
 
@@ -504,78 +487,80 @@
                 }
             }, []);
 
-            if (!userInteracted) {
-                return (
-                    <div className="min-h-screen bg-sky-50 flex flex-col items-center justify-center p-4 font-sans">
-                        <div className="text-center mb-12">
-                            <h1 className="text-5xl md:text-7xl font-bold text-sky-600 mb-4 drop-shadow-sm flex items-center justify-center gap-4">
-                                <IconStar className="text-yellow-400 animate-pulse" size={56} fill="currentColor"/> 
-                                Bé Vui Học 
-                                <IconStar className="text-yellow-400 animate-pulse" size={56} fill="currentColor"/>
-                            </h1>
-                            <p className="text-2xl text-gray-500 font-medium mt-6">Cùng chơi và học nhé!</p>
-                        </div>
-                        <button 
-                            onClick={handleStartApp}
-                            className="bg-green-500 hover:bg-green-600 text-white text-4xl md:text-5xl font-bold py-8 px-16 rounded-[3rem] shadow-xl animate-bounce active:scale-95 transition-transform border-4 border-green-300"
-                        >
-                            Vào Chơi Ngay!
-                        </button>
-                    </div>
-                );
-            }
-
-            if (selectedLessonId) {
-                const lessonInfo = LESSONS_DATA[selectedLessonId];
-                return (
-                    <LessonGame 
-                        lessonInfo={lessonInfo} 
-                        onBack={() => {
-                            window.speechSynthesis.cancel();
-                            setSelectedLessonId(null);
-                        }} 
-                    />
-                );
-            }
-
             return (
-                <div className="min-h-screen bg-sky-50 flex flex-col items-center py-10 px-4 font-sans relative">
-                    {ttsWarning && (
-                        <div className="w-full max-w-3xl bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6 rounded shadow-md text-sm md:text-base">
-                            <p><strong>Lưu ý:</strong> {ttsWarning}</p>
+                <>
+                    {/* Thẻ audio ẩn nằm cứng trong DOM, dùng nguồn Pixabay cực uy tín và định dạng mp3 chuẩn cho iOS */}
+                    <audio 
+                        id="applause-audio-player" 
+                        src="https://cdn.pixabay.com/audio/2021/08/04/audio_bb630cc098.mp3" 
+                        preload="auto"
+                    ></audio>
+
+                    {!userInteracted ? (
+                        <div className="min-h-screen bg-sky-50 flex flex-col items-center justify-center p-4 font-sans">
+                            <div className="text-center mb-12">
+                                <h1 className="text-5xl md:text-7xl font-bold text-sky-600 mb-4 drop-shadow-sm flex items-center justify-center gap-4">
+                                    <IconStar className="text-yellow-400 animate-pulse" size={56} fill="currentColor"/> 
+                                    Bé Vui Học 
+                                    <IconStar className="text-yellow-400 animate-pulse" size={56} fill="currentColor"/>
+                                </h1>
+                                <p className="text-2xl text-gray-500 font-medium mt-6">Cùng chơi và học nhé!</p>
+                            </div>
+                            <button 
+                                onClick={handleStartApp}
+                                className="bg-green-500 hover:bg-green-600 text-white text-4xl md:text-5xl font-bold py-8 px-16 rounded-[3rem] shadow-xl animate-bounce active:scale-95 transition-transform border-4 border-green-300"
+                            >
+                                Vào Chơi Ngay!
+                            </button>
+                        </div>
+                    ) : selectedLessonId ? (
+                        <LessonGame 
+                            lessonInfo={LESSONS_DATA[selectedLessonId]} 
+                            onBack={() => {
+                                window.speechSynthesis.cancel();
+                                setSelectedLessonId(null);
+                            }} 
+                        />
+                    ) : (
+                        <div className="min-h-screen bg-sky-50 flex flex-col items-center py-10 px-4 font-sans relative">
+                            {ttsWarning && (
+                                <div className="w-full max-w-3xl bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6 rounded shadow-md text-sm md:text-base">
+                                    <p><strong>Lưu ý:</strong> {ttsWarning}</p>
+                                </div>
+                            )}
+
+                            <div className="text-center mb-10">
+                                <h1 className="text-5xl md:text-6xl font-bold text-sky-600 mb-4 drop-shadow-sm flex items-center justify-center gap-4">
+                                    <IconStar className="text-yellow-400" size={48} fill="currentColor"/> 
+                                    Bé Vui Học 
+                                    <IconStar className="text-yellow-400" size={48} fill="currentColor"/>
+                                </h1>
+                                <p className="text-xl text-gray-500 font-medium">Con hãy chọn một bài học bên dưới nhé!</p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-7xl">
+                                {Object.values(LESSONS_DATA).map((lesson) => (
+                                    <button
+                                        key={lesson.id}
+                                        onClick={() => setSelectedLessonId(lesson.id)}
+                                        className={`${lesson.color} hover:opacity-90 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl shadow-lg rounded-3xl p-6 flex flex-col items-center justify-center gap-4 text-white group active:scale-95`}
+                                    >
+                                        <div className="text-7xl group-hover:scale-110 transition-transform duration-300 drop-shadow-lg">
+                                            {lesson.icon}
+                                        </div>
+                                        <h2 className="text-2xl font-bold text-center">
+                                            {lesson.title}
+                                        </h2>
+                                    </button>
+                                ))}
+                            </div>
+                            
+                            <div className="mt-12 text-gray-400 text-sm font-medium">
+                                Ứng dụng thiết kế đặc biệt cho trẻ mầm non
+                            </div>
                         </div>
                     )}
-
-                    <div className="text-center mb-10">
-                        <h1 className="text-5xl md:text-6xl font-bold text-sky-600 mb-4 drop-shadow-sm flex items-center justify-center gap-4">
-                            <IconStar className="text-yellow-400" size={48} fill="currentColor"/> 
-                            Bé Vui Học 
-                            <IconStar className="text-yellow-400" size={48} fill="currentColor"/>
-                        </h1>
-                        <p className="text-xl text-gray-500 font-medium">Con hãy chọn một bài học bên dưới nhé!</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-7xl">
-                        {Object.values(LESSONS_DATA).map((lesson) => (
-                            <button
-                                key={lesson.id}
-                                onClick={() => setSelectedLessonId(lesson.id)}
-                                className={`${lesson.color} hover:opacity-90 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl shadow-lg rounded-3xl p-6 flex flex-col items-center justify-center gap-4 text-white group active:scale-95`}
-                            >
-                                <div className="text-7xl group-hover:scale-110 transition-transform duration-300 drop-shadow-lg">
-                                    {lesson.icon}
-                                </div>
-                                <h2 className="text-2xl font-bold text-center">
-                                    {lesson.title}
-                                </h2>
-                            </button>
-                        ))}
-                    </div>
-                    
-                    <div className="mt-12 text-gray-400 text-sm font-medium">
-                        Ứng dụng thiết kế đặc biệt cho trẻ mầm non
-                    </div>
-                </div>
+                </>
             );
         };
 
