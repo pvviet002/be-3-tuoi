@@ -209,18 +209,25 @@
             // Sử dụng useRef để lưu trữ các ID của đồ vật đã được hỏi trong suốt lượt chơi này
             const usedItemsRef = useRef([]);
 
-            // Hàm đọc Text-to-Speech
-            const speak = useCallback((text, rate = 0.8) => {
+            // Hàm đọc Text-to-Speech đã được nâng cấp để tìm giọng tự nhiên nhất
+            const speak = useCallback((text, rate = 0.85) => {
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.cancel();
                     const utterance = new SpeechSynthesisUtterance(text);
                     const voices = window.speechSynthesis.getVoices();
-                    const viVoice = voices.find(v => v.lang.includes('vi') || v.lang.includes('VN'));
-                    if (viVoice) utterance.voice = viVoice;
+                    
+                    // 1. Ưu tiên tìm giọng AI (Neural) siêu tự nhiên của Microsoft Edge (như HoaiMy)
+                    // 2. Nếu không có, tìm giọng cao cấp của Google Chrome
+                    // 3. Cuối cùng mới dùng giọng mặc định của hệ thống
+                    const bestVoice = voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && (v.name.includes('Neural') || v.name.includes('HoaiMy')))
+                                   || voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && v.name.includes('Google'))
+                                   || voices.find(v => v.lang.includes('vi') || v.lang.includes('VN'));
+                                   
+                    if (bestVoice) utterance.voice = bestVoice;
                     
                     utterance.lang = 'vi-VN';
-                    utterance.rate = rate;
-                    utterance.pitch = 1.2;
+                    utterance.rate = rate; // Tốc độ vừa phải, ngắt nghỉ rõ ràng
+                    utterance.pitch = 1.1; // Hạ độ cao xuống một chút để giọng ấm và có cảm xúc hơn (bớt chóe)
 
                     // Hạ âm lượng nhạc nền khi đọc để bé nghe rõ (Audio Ducking)
                     utterance.onstart = () => {
