@@ -198,7 +198,7 @@
         // ==========================================
         // COMPONENT TRÒ CHƠI CHUNG
         // ==========================================
-        const LessonGame = ({ lessonInfo, onBack, audioRef, musicVolume }) => {
+        const LessonGame = ({ lessonInfo, onBack }) => {
             const [gameState, setGameState] = useState('START'); // START, PLAYING, END
             const [targetItem, setTargetItem] = useState(null);
             const [options, setOptions] = useState([]);
@@ -234,21 +234,9 @@
                     utterance.rate = rate; // Tốc độ vừa phải, ngắt nghỉ rõ ràng
                     utterance.pitch = 1.15; // Nâng pitch lên một chút cho giống giọng cô giáo mầm non
 
-                    // Hạ âm lượng nhạc nền khi đọc để bé nghe rõ (Audio Ducking)
-                    utterance.onstart = () => {
-                        if (audioRef && audioRef.current) audioRef.current.volume = Math.max(0, musicVolume * 0.15); 
-                    };
-                    // Khôi phục âm lượng khi đọc xong
-                    utterance.onend = () => {
-                        if (audioRef && audioRef.current) audioRef.current.volume = musicVolume;
-                    };
-                    utterance.onerror = () => {
-                        if (audioRef && audioRef.current) audioRef.current.volume = musicVolume;
-                    };
-
                     window.speechSynthesis.speak(utterance);
                 }
-            }, [audioRef, musicVolume]);
+            }, []);
 
             const generateQuestion = useCallback(() => {
                 const items = lessonInfo.items;
@@ -285,12 +273,12 @@
                 setShowSuccess(false);
 
                 setTimeout(() => {
-                    speak(`Bé ơi, ${target.name} ở đâu nhỉ?`);
+                    speak(`Con ơi, ${target.name} ở đâu nhỉ?`);
                 }, 500);
             }, [speak, lessonInfo]);
 
             const startGame = () => {
-                speak(`Chào mừng bé đến với bài học: ${lessonInfo.title}!`);
+                speak(`Chào mừng con đến với bài học: ${lessonInfo.title}!`);
                 setScore(0);
                 usedItemsRef.current = []; // Xóa toàn bộ lịch sử khi bắt đầu một lượt chơi mới
                 setGameState('PLAYING');
@@ -309,7 +297,7 @@
                     setTimeout(() => {
                         if (score + 1 >= 5) {
                             setGameState('END');
-                            speak("Chúc mừng bé đã hoàn thành bài học xuất sắc! Bé được thưởng 5 ngôi sao luôn!");
+                            speak("Chúc mừng con đã hoàn thành bài học xuất sắc! Con được thưởng 5 ngôi sao luôn!");
                         } else {
                             generateQuestion();
                         }
@@ -317,14 +305,14 @@
 
                 } else {
                     setWrongClickedId(item.id);
-                    speak(`Đây là ${item.name}, bé hãy chọn lại nhé!`);
+                    speak(`Đây là ${item.name}, con hãy chọn lại nhé!`);
                     setTimeout(() => setWrongClickedId(null), 1000);
                 }
             };
 
             const repeatQuestion = () => {
                 if (targetItem) {
-                    speak(`Bé tìm giúp cô, ${targetItem.name} ở đâu nhỉ?`);
+                    speak(`Con tìm giúp cô, ${targetItem.name} ở đâu nhỉ?`);
                 }
             };
 
@@ -445,33 +433,9 @@
         const App = () => {
             const [selectedLessonId, setSelectedLessonId] = useState(null);
             const [ttsWarning, setTtsWarning] = useState('');
-            const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-            const [musicVolume, setMusicVolume] = useState(0.15); // Mặc định âm lượng 15%
             const [userInteracted, setUserInteracted] = useState(false); // Đánh dấu bé đã vào ứng dụng chưa
             
-            const audioRef = useRef(null);
             const interactionDone = useRef(false); // Đánh dấu người dùng đã thao tác chưa
-
-            // Khởi tạo Audio và cơ chế Tự động phát
-            useEffect(() => {
-                // Đổi sang nguồn nhạc Archive.org ổn định hơn
-                const audio = new Audio('https://ia801400.us.archive.org/16/items/bensound-music/Bensound-LittleIdea.mp3');
-                audio.loop = true;
-                audio.volume = musicVolume;
-                audioRef.current = audio;
-
-                return () => {
-                    audio.pause();
-                    audio.src = '';
-                };
-            }, []); 
-
-            // Cập nhật âm lượng nếu musicVolume thay đổi
-            useEffect(() => {
-                if (audioRef.current) {
-                    audioRef.current.volume = musicVolume;
-                }
-            }, [musicVolume]);
 
             const handleStartApp = () => {
                 setUserInteracted(true);
@@ -483,35 +447,6 @@
                     const prime = new SpeechSynthesisUtterance('');
                     window.speechSynthesis.speak(prime);
                 }
-
-                // Bật nhạc ngay khi bé bấm "Vào chơi" để vượt qua giới hạn Autoplay của trình duyệt
-                if (audioRef.current) {
-                    audioRef.current.play().then(() => {
-                        setIsMusicPlaying(true);
-                    }).catch(e => console.log("Lỗi phát nhạc:", e));
-                }
-            };
-
-            const toggleMusic = () => {
-                if (!audioRef.current) return;
-                if (isMusicPlaying) {
-                    audioRef.current.pause();
-                    setIsMusicPlaying(false);
-                } else {
-                    audioRef.current.play().then(() => {
-                        setIsMusicPlaying(true);
-                    }).catch(e => console.log("Lỗi phát nhạc:", e));
-                }
-            };
-
-            const increaseVolume = (e) => {
-                e.stopPropagation(); // Ngăn chặn sự kiện click nổi bọt ra ngoài
-                setMusicVolume(prev => Math.min(1, Number((prev + 0.1).toFixed(2))));
-            };
-
-            const decreaseVolume = (e) => {
-                e.stopPropagation();
-                setMusicVolume(prev => Math.max(0, Number((prev - 0.1).toFixed(2))));
             };
 
             useEffect(() => {
@@ -554,34 +489,16 @@
                 );
             }
 
-            // Nút điều khiển nhạc chung
-            const MusicControls = () => (
-                <div className="fixed top-4 right-4 z-50 flex items-center bg-white/90 backdrop-blur rounded-full shadow-lg border-2 border-sky-100 p-1">
-                    <button onClick={decreaseVolume} className="p-2 text-sky-500 hover:bg-sky-100 rounded-full active:scale-90 transition-transform" aria-label="Giảm âm lượng">
-                        <IconMinus size={20} />
-                    </button>
-                    <button onClick={(e) => { e.stopPropagation(); toggleMusic(); }} className="p-2 mx-1 text-sky-500 hover:bg-sky-100 rounded-full active:scale-90 transition-transform" aria-label="Bật/Tắt Nhạc">
-                        {isMusicPlaying ? <IconMusic size={28} /> : <IconMusicOff size={28} className="text-gray-400" />}
-                    </button>
-                    <button onClick={increaseVolume} className="p-2 text-sky-500 hover:bg-sky-100 rounded-full active:scale-90 transition-transform" aria-label="Tăng âm lượng">
-                        <IconPlus size={20} />
-                    </button>
-                </div>
-            );
-
             if (selectedLessonId) {
                 const lessonInfo = LESSONS_DATA[selectedLessonId];
                 return (
                     <>
-                        <MusicControls />
                         <LessonGame 
                             lessonInfo={lessonInfo} 
                             onBack={() => {
                                 window.speechSynthesis.cancel();
                                 setSelectedLessonId(null);
                             }} 
-                            audioRef={audioRef}
-                            musicVolume={musicVolume}
                         />
                     </>
                 );
@@ -589,8 +506,6 @@
 
             return (
                 <div className="min-h-screen bg-sky-50 flex flex-col items-center py-10 px-4 font-sans relative">
-                    <MusicControls />
-
                     {ttsWarning && (
                         <div className="w-full max-w-3xl bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6 rounded shadow-md text-sm md:text-base">
                             <p><strong>Lưu ý:</strong> {ttsWarning}</p>
