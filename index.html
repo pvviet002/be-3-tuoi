@@ -413,7 +413,10 @@
                                             active:scale-95 text-slate-800
                                         `}
                                     >
-                                        <span className={lessonInfo.id === 'chu_cai' || lessonInfo.id === 'chu_so' ? "text-[140px] sm:text-[180px] md:text-[220px] font-black drop-shadow-xl" : "text-[140px] sm:text-[180px] md:text-[220px] drop-shadow-2xl"}>
+                                        <span 
+                                            className={lessonInfo.id === 'chu_cai' || lessonInfo.id === 'chu_so' ? "text-[140px] sm:text-[180px] md:text-[220px] font-black drop-shadow-xl" : "text-[140px] sm:text-[180px] md:text-[220px] drop-shadow-2xl"}
+                                            style={lessonInfo.id === 'chu_cai' ? { fontFamily: '"Times New Roman", Times' } : {}}
+                                        >
                                             {item.emoji}
                                         </span>
                                     </button>
@@ -439,49 +442,23 @@
             const [ttsWarning, setTtsWarning] = useState('');
             const [isMusicPlaying, setIsMusicPlaying] = useState(false);
             const [musicVolume, setMusicVolume] = useState(0.15); // Mặc định âm lượng 15%
+            const [userInteracted, setUserInteracted] = useState(false); // Đánh dấu bé đã vào ứng dụng chưa
             
             const audioRef = useRef(null);
-            const interactionDone = useRef(false); // Đánh dấu người dùng đã thao tác chưa
 
-            // Khởi tạo Audio và cơ chế Tự động phát
+            // Khởi tạo Audio chỉ 1 lần
             useEffect(() => {
-                const audio = new Audio('https://cdn.pixabay.com/audio/2022/03/10/audio_78f18fa1dd.mp3');
+                // Đổi sang nguồn nhạc Archive.org ổn định hơn
+                const audio = new Audio('https://ia801400.us.archive.org/16/items/bensound-music/Bensound-LittleIdea.mp3');
                 audio.loop = true;
                 audio.volume = musicVolume;
                 audioRef.current = audio;
 
-                // Cố gắng tự động phát ngay (thường bị trình duyệt chặn nếu chưa có tương tác)
-                const playPromise = audio.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        setIsMusicPlaying(true);
-                        interactionDone.current = true;
-                    }).catch(error => {
-                        console.log("Trình duyệt chặn autoplay. Đợi người dùng tương tác...");
-                    });
-                }
-
-                // Lắng nghe tương tác đầu tiên của người dùng để bật nhạc
-                const handleFirstInteraction = () => {
-                    if (!interactionDone.current && audioRef.current) {
-                        audioRef.current.play().then(() => {
-                            setIsMusicPlaying(true);
-                            interactionDone.current = true;
-                        }).catch(e => console.log(e));
-                    }
-                };
-
-                // Bắt sự kiện click hoặc chạm
-                document.addEventListener('click', handleFirstInteraction);
-                document.addEventListener('touchstart', handleFirstInteraction);
-
                 return () => {
-                    document.removeEventListener('click', handleFirstInteraction);
-                    document.removeEventListener('touchstart', handleFirstInteraction);
                     audio.pause();
                     audio.src = '';
                 };
-            }, []); // Chỉ chạy 1 lần khi ứng dụng mở
+            }, []); 
 
             // Cập nhật âm lượng nếu musicVolume thay đổi
             useEffect(() => {
@@ -489,6 +466,16 @@
                     audioRef.current.volume = musicVolume;
                 }
             }, [musicVolume]);
+
+            const handleStartApp = () => {
+                setUserInteracted(true);
+                // Bật nhạc ngay khi bé bấm "Vào chơi" để vượt qua giới hạn Autoplay của trình duyệt
+                if (audioRef.current) {
+                    audioRef.current.play().then(() => {
+                        setIsMusicPlaying(true);
+                    }).catch(e => console.log("Lỗi phát nhạc:", e));
+                }
+            };
 
             const toggleMusic = () => {
                 if (!audioRef.current) return;
@@ -498,7 +485,6 @@
                 } else {
                     audioRef.current.play().then(() => {
                         setIsMusicPlaying(true);
-                        interactionDone.current = true;
                     }).catch(e => console.log("Lỗi phát nhạc:", e));
                 }
             };
@@ -530,6 +516,28 @@
                     window.speechSynthesis.onvoiceschanged = checkVoices;
                 }
             }, []);
+
+            // Màn hình Chào Mừng (Để mở khóa quyền phát âm thanh)
+            if (!userInteracted) {
+                return (
+                    <div className="min-h-screen bg-sky-50 flex flex-col items-center justify-center p-4 font-sans">
+                        <div className="text-center mb-12">
+                            <h1 className="text-5xl md:text-7xl font-bold text-sky-600 mb-4 drop-shadow-sm flex items-center justify-center gap-4">
+                                <IconStar className="text-yellow-400 animate-pulse" size={56} fill="currentColor"/> 
+                                Bé Vui Học 
+                                <IconStar className="text-yellow-400 animate-pulse" size={56} fill="currentColor"/>
+                            </h1>
+                            <p className="text-2xl text-gray-500 font-medium mt-6">Cùng chơi và học nhé!</p>
+                        </div>
+                        <button 
+                            onClick={handleStartApp}
+                            className="bg-green-500 hover:bg-green-600 text-white text-4xl md:text-5xl font-bold py-8 px-16 rounded-[3rem] shadow-xl animate-bounce active:scale-95 transition-transform border-4 border-green-300"
+                        >
+                            Vào Chơi Ngay!
+                        </button>
+                    </div>
+                );
+            }
 
             // Nút điều khiển nhạc chung
             const MusicControls = () => (
