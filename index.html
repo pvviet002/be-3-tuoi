@@ -74,6 +74,12 @@
         const IconArrowLeft = ({ size=24, className="" }) => (
             <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         );
+        const IconMusic = ({ size=24, className="" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+        );
+        const IconMusicOff = ({ size=24, className="" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+        );
 
         // ==========================================
         // DỮ LIỆU CÁC BÀI HỌC (ĐÃ LỌC & BỔ SUNG CHO VN)
@@ -186,7 +192,7 @@
         // ==========================================
         // COMPONENT TRÒ CHƠI CHUNG
         // ==========================================
-        const LessonGame = ({ lessonInfo, onBack }) => {
+        const LessonGame = ({ lessonInfo, onBack, audioRef }) => {
             const [gameState, setGameState] = useState('START'); // START, PLAYING, END
             const [targetItem, setTargetItem] = useState(null);
             const [options, setOptions] = useState([]);
@@ -209,9 +215,22 @@
                     utterance.lang = 'vi-VN';
                     utterance.rate = rate;
                     utterance.pitch = 1.2;
+
+                    // Hạ âm lượng nhạc nền khi đọc để bé nghe rõ (Audio Ducking)
+                    utterance.onstart = () => {
+                        if (audioRef && audioRef.current) audioRef.current.volume = 0.02;
+                    };
+                    // Khôi phục âm lượng khi đọc xong
+                    utterance.onend = () => {
+                        if (audioRef && audioRef.current) audioRef.current.volume = 0.15;
+                    };
+                    utterance.onerror = () => {
+                        if (audioRef && audioRef.current) audioRef.current.volume = 0.15;
+                    };
+
                     window.speechSynthesis.speak(utterance);
                 }
-            }, []);
+            }, [audioRef]);
 
             const generateQuestion = useCallback(() => {
                 const items = lessonInfo.items;
@@ -376,14 +395,14 @@
                                         key={item.id}
                                         onClick={() => handleItemClick(item)}
                                         className={`
-                                            flex-1 aspect-square max-w-[250px] mx-auto rounded-3xl shadow-xl flex items-center justify-center text-[100px] sm:text-[120px] transition-all duration-300 border-4 bg-white font-bold
-                                            ${isWrong ? 'border-red-400 animate-shake bg-red-50' : 'border-gray-200 hover:scale-105 hover:border-slate-300'}
-                                            ${isCorrectTarget ? 'border-green-500 bg-green-100 scale-110' : ''}
-                                            ${showSuccess && !isCorrectTarget ? 'opacity-30 scale-90' : ''}
+                                            flex-1 aspect-square max-w-[320px] mx-auto flex items-center justify-center transition-all duration-300 bg-transparent rounded-full
+                                            ${isWrong ? 'animate-shake opacity-75' : 'hover:scale-110'}
+                                            ${isCorrectTarget ? 'scale-125' : ''}
+                                            ${showSuccess && !isCorrectTarget ? 'opacity-20 scale-75' : ''}
                                             active:scale-95 text-slate-800
                                         `}
                                     >
-                                        <span className={lessonInfo.id === 'chu_cai' || lessonInfo.id === 'chu_so' ? "text-8xl md:text-9xl" : "drop-shadow-lg"}>
+                                        <span className={lessonInfo.id === 'chu_cai' || lessonInfo.id === 'chu_so' ? "text-[140px] sm:text-[180px] md:text-[220px] font-black drop-shadow-xl" : "text-[140px] sm:text-[180px] md:text-[220px] drop-shadow-2xl"}>
                                             {item.emoji}
                                         </span>
                                     </button>
@@ -407,6 +426,33 @@
         const App = () => {
             const [selectedLessonId, setSelectedLessonId] = useState(null);
             const [ttsWarning, setTtsWarning] = useState('');
+            const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+            const audioRef = useRef(null);
+
+            useEffect(() => {
+                // Khởi tạo nhạc nền (Sử dụng một bản nhạc royalty-free cho thiếu nhi)
+                const audio = new Audio('https://cdn.pixabay.com/audio/2022/03/10/audio_78f18fa1dd.mp3');
+                audio.loop = true;
+                audio.volume = 0.15; // Mặc định âm lượng rất nhỏ để không lấn át giọng đọc
+                audioRef.current = audio;
+
+                return () => {
+                    audio.pause();
+                    audio.src = '';
+                };
+            }, []);
+
+            const toggleMusic = () => {
+                if (!audioRef.current) return;
+                if (isMusicPlaying) {
+                    audioRef.current.pause();
+                    setIsMusicPlaying(false);
+                } else {
+                    audioRef.current.play().then(() => {
+                        setIsMusicPlaying(true);
+                    }).catch(e => console.log("Lỗi phát nhạc:", e));
+                }
+            };
 
             useEffect(() => {
                 const checkVoices = () => {
@@ -428,14 +474,29 @@
 
             if (selectedLessonId) {
                 const lessonInfo = LESSONS_DATA[selectedLessonId];
-                return <LessonGame lessonInfo={lessonInfo} onBack={() => {
-                    window.speechSynthesis.cancel();
-                    setSelectedLessonId(null);
-                }} />;
+                return (
+                    <>
+                        <button onClick={toggleMusic} className="fixed top-4 right-4 z-50 bg-white/80 backdrop-blur p-3 rounded-full shadow-lg text-sky-500 hover:bg-sky-100 transition-transform active:scale-90">
+                            {isMusicPlaying ? <IconMusic size={28} /> : <IconMusicOff size={28} className="text-gray-400" />}
+                        </button>
+                        <LessonGame 
+                            lessonInfo={lessonInfo} 
+                            onBack={() => {
+                                window.speechSynthesis.cancel();
+                                setSelectedLessonId(null);
+                            }} 
+                            audioRef={audioRef} 
+                        />
+                    </>
+                );
             }
 
             return (
-                <div className="min-h-screen bg-sky-50 flex flex-col items-center py-10 px-4 font-sans">
+                <div className="min-h-screen bg-sky-50 flex flex-col items-center py-10 px-4 font-sans relative">
+                    <button onClick={toggleMusic} className="absolute top-4 right-4 z-50 bg-white/80 backdrop-blur p-3 rounded-full shadow-lg text-sky-500 hover:bg-sky-100 transition-transform active:scale-90">
+                        {isMusicPlaying ? <IconMusic size={28} /> : <IconMusicOff size={28} className="text-gray-400" />}
+                    </button>
+
                     {ttsWarning && (
                         <div className="w-full max-w-3xl bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6 rounded shadow-md text-sm md:text-base">
                             <p><strong>Lưu ý:</strong> {ttsWarning}</p>
