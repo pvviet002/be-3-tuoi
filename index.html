@@ -238,9 +238,18 @@
 
             // Sử dụng useRef để lưu trữ các ID của đồ vật đã được hỏi trong suốt lượt chơi này
             const usedItemsRef = useRef([]);
+            const applauseAudioRef = useRef(null);
 
-            // Hàm đọc Text-to-Speech đã được nâng cấp để tìm giọng tự nhiên nhất
-            const speak = useCallback((text, rate = 0.85) => {
+            useEffect(() => {
+                // Khởi tạo và tải trước âm thanh tiếng vỗ tay
+                applauseAudioRef.current = new Audio('https://actions.google.com/sounds/v1/crowds/light_applause.ogg');
+                if (applauseAudioRef.current) {
+                    applauseAudioRef.current.volume = 0.8;
+                }
+            }, []);
+
+            // Hàm đọc Text-to-Speech đã được nâng cấp để tìm giọng tự nhiên nhất và đồng bộ thời gian (onEndCallback)
+            const speak = useCallback((text, rate = 0.85, onEndCallback = null) => {
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.cancel();
                     const utterance = new SpeechSynthesisUtterance(text);
@@ -259,7 +268,25 @@
                     utterance.rate = rate; // Tốc độ vừa phải, ngắt nghỉ rõ ràng
                     utterance.pitch = 1.1; // Hạ độ cao xuống một chút để giọng ấm và có cảm xúc hơn (bớt chóe)
 
+                    // Cơ chế xử lý khi đọc xong (Kèm fallback chống lỗi treo của trình duyệt)
+                    let callbackCalled = false;
+                    const safeCallback = () => {
+                        if (!callbackCalled && onEndCallback) {
+                            callbackCalled = true;
+                            onEndCallback();
+                        }
+                    };
+
+                    utterance.onend = safeCallback;
+                    utterance.onerror = safeCallback;
+
                     window.speechSynthesis.speak(utterance);
+                    
+                    // Dự phòng: Tự động chuyển sau thời gian ước tính nếu trình duyệt bị lỗi không nhả sự kiện onend
+                    const estimatedTime = text.length * 120 + 2000;
+                    setTimeout(safeCallback, estimatedTime);
+                } else {
+                    if (onEndCallback) setTimeout(onEndCallback, 2000);
                 }
             }, []);
 
@@ -303,11 +330,14 @@
             }, [speak, lessonInfo]);
 
             const startGame = () => {
-                speak(`Cô chào con! Chào mừng con đến với bài học: ${lessonInfo.title}!`);
                 setScore(0);
                 usedItemsRef.current = []; // Xóa toàn bộ lịch sử khi bắt đầu một lượt chơi mới
                 setGameState('PLAYING');
-                setTimeout(generateQuestion, 3000);
+                
+                // Đợi cô giáo đọc xong câu chào mừng thì mới tạo câu hỏi đầu tiên
+                speak(`Cô chào con! Chào mừng con đến với bài học: ${lessonInfo.title}!`, 0.85, () => {
+                    setTimeout(generateQuestion, 500);
+                });
             };
 
             const handleItemClick = (item) => {
@@ -315,18 +345,27 @@
 
                 if (item.id === targetItem.id) {
                     setShowSuccess(true);
-                    setScore(s => s + 1);
+                    const newScore = score + 1;
+                    setScore(newScore);
                     
-                    speak("Hoan hô con, đúng rồi!");
-
-                    setTimeout(() => {
-                        if (score + 1 >= 5) {
-                            setGameState('END');
-                            speak("Cô chúc mừng con đã hoàn thành xuất sắc! Cô thưởng cho con 5 ngôi sao nhé!");
-                        } else {
-                            generateQuestion();
-                        }
-                    }, 3000);
+                    // Phát tiếng vỗ tay
+                    if (applauseAudioRef.current) {
+                        applauseAudioRef.current.currentTime = 0;
+                        applauseAudioRef.current.play().catch(e => console.log("Lỗi phát âm thanh:", e));
+                    }
+                    
+                    // Đợi cô giáo khen xong mới chuyển giao diện
+                    speak("Hoan hô con, đúng rồi!", 0.85, () => {
+                        // Nghỉ thêm 0.8 giây để con tận hưởng niềm vui
+                        setTimeout(() => {
+                            if (newScore >= 5) {
+                                setGameState('END');
+                                speak("Cô chúc mừng con đã hoàn thành xuất sắc! Cô thưởng cho con 5 ngôi sao nhé!");
+                            } else {
+                                generateQuestion();
+                            }
+                        }, 800);
+                    });
 
                 } else {
                     setWrongClickedId(item.id);
