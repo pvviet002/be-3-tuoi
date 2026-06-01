@@ -190,7 +190,10 @@
                         recentPraisesRef.current.push(selectedPraise);
                         if (recentPraisesRef.current.length > 2) recentPraisesRef.current.shift();
 
-                        speak(selectedPraise, 0.85, () => {
+                        // Nối thêm tên đồ vật vào lời khen ngợi
+                        const successMessage = `${selectedPraise} Đây là ${targetItem.name}.`;
+
+                        speak(successMessage, 0.85, () => {
                             setSafeTimeout(() => {
                                 if (score + 1 >= 5) {
                                     setGameState('END');
@@ -198,7 +201,7 @@
                                 } else {
                                     generateQuestion();
                                 }
-                            }, 500);
+                            }, 1000); // Tăng thời gian chờ lên 1s để bé nhìn kỹ hình đã ghép
                         });
                     } else {
                         // Sai hình
