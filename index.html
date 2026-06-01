@@ -196,26 +196,15 @@
                     { id: 'ngon_10', name: 'mười ngón tay', emoji: '👐' }
                 ]
             },
-            hinh_khoi: {
-                id: 'hinh_khoi', title: 'Hình khối cơ bản', color: 'bg-purple-400', icon: '🔺',
+            ghep_hinh: {
+                id: 'ghep_hinh', title: 'Bé ghép bóng', color: 'bg-rose-400', icon: '🧩', type: 'drag_drop',
                 items: [
-                    { id: 'tron', name: 'hình tròn', emoji: '🔴' }, { id: 'vuong', name: 'hình vuông', emoji: '🟩' },
-                    { id: 'tamgiac', name: 'hình tam giác', emoji: '🔺' }, { id: 'traitim', name: 'hình trái tim', emoji: '❤️' },
-                    { id: 'ngoisao', name: 'hình ngôi sao', emoji: '⭐' }, { id: 'chunhat', name: 'hình chữ nhật', emoji: '🟦' },
-                    { id: 'kimcuong', name: 'hình thoi', emoji: '♦️' }, { id: 'mattrang', name: 'mặt trăng', emoji: '🌙' },
-                    { id: 'cau_vong', name: 'cầu vồng', emoji: '🌈' }, { id: 'dam_may', name: 'đám mây', emoji: '☁️' },
-                    { id: 'mat_troi', name: 'mặt trời', emoji: '☀️' }, { id: 'bong_tuyet', name: 'bông tuyết', emoji: '❄️' },
-                    { id: 'giot_nuoc', name: 'giọt nước', emoji: '💧' }, { id: 'sam_set', name: 'tia chớp', emoji: '⚡' }
-                ]
-            },
-            mau_sac: {
-                id: 'mau_sac', title: 'Nhận biết màu sắc', color: 'bg-violet-400', icon: '🎨',
-                items: [
-                    { id: 'mau_do', name: 'màu đỏ', emoji: '🟥' }, { id: 'mau_vang', name: 'màu vàng', emoji: '🟨' },
-                    { id: 'mau_luc', name: 'màu xanh lá', emoji: '🟩' }, { id: 'mau_lam', name: 'màu xanh dương', emoji: '🟦' },
-                    { id: 'mau_cam', name: 'màu cam', emoji: '🟧' }, { id: 'mau_tim', name: 'màu tím', emoji: '🟪' },
-                    { id: 'mau_hong', name: 'màu hồng', emoji: '🩷' }, { id: 'mau_nau', name: 'màu nâu', emoji: '🟫' },
-                    { id: 'mau_den', name: 'màu đen', emoji: '⬛' }, { id: 'mau_trang', name: 'màu trắng', emoji: '⬜' }
+                    { id: 'tao', name: 'quả táo', emoji: '🍎' }, { id: 'cho', name: 'con chó', emoji: '🐶' },
+                    { id: 'o_to', name: 'ô tô', emoji: '🚗' }, { id: 'ngoisao', name: 'ngôi sao', emoji: '⭐' },
+                    { id: 'ghe', name: 'cái ghế', emoji: '🪑' }, { id: 'meo', name: 'con mèo', emoji: '🐱' },
+                    { id: 'may_bay', name: 'máy bay', emoji: '✈️' }, { id: 'chuoi', name: 'quả chuối', emoji: '🍌' },
+                    { id: 'con_ca', name: 'con cá', emoji: '🐟' }, { id: 'bong_tuyet', name: 'bông tuyết', emoji: '❄️' },
+                    { id: 'xe_dap', name: 'xe đạp', emoji: '🚲' }, { id: 'qua_cam', name: 'quả cam', emoji: '🍊' }
                 ]
             }
         };
@@ -539,6 +528,320 @@
         };
 
         // ==========================================
+        // COMPONENT TRÒ CHƠI KÉO THẢ (GHÉP BÓNG)
+        // ==========================================
+        const DragDropGame = ({ lessonInfo, onBack }) => {
+            const [gameState, setGameState] = useState('START'); 
+            const [targetItem, setTargetItem] = useState(null);
+            const [options, setOptions] = useState([]);
+            const [score, setScore] = useState(0);
+            const [showSuccess, setShowSuccess] = useState(false);
+            
+            // Trạng thái cho việc kéo thả
+            const [draggedId, setDraggedId] = useState(null);
+            const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
+            const [wrongDragId, setWrongDragId] = useState(null);
+
+            const dropZoneRef = useRef(null);
+            const usedItemsRef = useRef([]);
+            const activeTimeoutsRef = useRef([]);
+
+            useEffect(() => {
+                return () => {
+                    activeTimeoutsRef.current.forEach(clearTimeout);
+                    window.speechSynthesis.cancel();
+                };
+            }, []);
+
+            const setSafeTimeout = (callback, delay) => {
+                const timer = setTimeout(callback, delay);
+                activeTimeoutsRef.current.push(timer);
+                return timer;
+            };
+
+            const speak = useCallback((text, rate = 0.85, onEndCallback = null) => {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    const voices = window.speechSynthesis.getVoices();
+                    
+                    const bestVoice = voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && (v.name.includes('Neural') || v.name.includes('HoaiMy')))
+                                   || voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && v.name.includes('Google'))
+                                   || voices.find(v => v.lang.includes('vi') || v.lang.includes('VN'));
+                                   
+                    if (bestVoice) utterance.voice = bestVoice;
+                    
+                    utterance.lang = 'vi-VN';
+                    utterance.rate = rate; 
+                    utterance.pitch = 1.1; 
+
+                    if (onEndCallback) {
+                        let isEnded = false;
+                        const handleEnd = () => {
+                            if (!isEnded) {
+                                isEnded = true;
+                                onEndCallback();
+                            }
+                        };
+                        utterance.onend = handleEnd;
+                        utterance.onerror = handleEnd;
+                        setSafeTimeout(handleEnd, text.length * 150 + 1500); 
+                    }
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    if (onEndCallback) setSafeTimeout(onEndCallback, 2000);
+                }
+            }, []);
+
+            const generateQuestion = useCallback(() => {
+                const items = lessonInfo.items;
+                let availableItems = items.filter(item => !usedItemsRef.current.includes(item.id));
+                
+                // Trò chơi cần 3 lựa chọn, nếu gần hết thì reset lại lịch sử
+                if (availableItems.length < 3) {
+                    usedItemsRef.current = [];
+                    availableItems = items;
+                }
+
+                const targetIndex = Math.floor(Math.random() * availableItems.length);
+                const target = availableItems[targetIndex];
+                usedItemsRef.current.push(target.id);
+
+                // Chọn 2 đáp án sai
+                let wrongItems = items.filter(item => item.id !== target.id);
+                wrongItems.sort(() => Math.random() - 0.5);
+                
+                const newOptions = [target, wrongItems[0], wrongItems[1]];
+                newOptions.sort(() => Math.random() - 0.5); // Đảo vị trí 3 thẻ
+                
+                setTargetItem(target);
+                setOptions(newOptions);
+                setShowSuccess(false);
+                setWrongDragId(null);
+
+                setSafeTimeout(() => {
+                    speak(`Cô đố con tìm hình, và kéo vào đúng bóng đen nhé!`);
+                }, 500);
+            }, [speak, lessonInfo]);
+
+            const startGame = () => {
+                setScore(0);
+                usedItemsRef.current = [];
+                speak(`Cô chào con! Chào mừng con đến với bài học: ${lessonInfo.title}!`, 0.85, () => {
+                    setGameState('PLAYING');
+                    generateQuestion();
+                });
+            };
+
+            // Sự kiện khi bắt đầu chạm ngón tay vào hình
+            const handlePointerDown = (e, item) => {
+                if (showSuccess) return;
+                setDraggedId(item.id);
+                setDragPos({ x: e.clientX, y: e.clientY });
+            };
+
+            // Sự kiện khi di chuyển ngón tay (kéo đi)
+            const handlePointerMove = (e) => {
+                if (draggedId) {
+                    setDragPos({ x: e.clientX, y: e.clientY });
+                }
+            };
+
+            // Sự kiện khi nhấc ngón tay lên (Thả ra)
+            const handlePointerUp = (e) => {
+                if (!draggedId) return;
+
+                let isDroppedInside = false;
+                if (dropZoneRef.current) {
+                    const rect = dropZoneRef.current.getBoundingClientRect();
+                    const padding = 30; // Mở rộng vùng nhận diện thả (Hitbox) ra một chút để bé dễ thả
+                    if (
+                        e.clientX >= rect.left - padding && e.clientX <= rect.right + padding &&
+                        e.clientY >= rect.top - padding && e.clientY <= rect.bottom + padding
+                    ) {
+                        isDroppedInside = true;
+                    }
+                }
+
+                if (isDroppedInside) {
+                    if (draggedId === targetItem.id) {
+                        // Kéo thả ĐÚNG
+                        setShowSuccess(true);
+                        setScore(s => s + 1);
+                        setDraggedId(null);
+                        
+                        const applause = document.getElementById('applauseSound');
+                        if (applause) {
+                            applause.currentTime = 0;
+                            applause.play().catch(e => console.log(e));
+                        }
+
+                        speak("Hoan hô con, đúng rồi!", 0.85, () => {
+                            setSafeTimeout(() => {
+                                if (score + 1 >= 5) {
+                                    setGameState('END');
+                                    speak("Cô chúc mừng con đã hoàn thành xuất sắc! Cô thưởng cho con 5 ngôi sao nhé!");
+                                } else {
+                                    generateQuestion();
+                                }
+                            }, 1000);
+                        });
+                    } else {
+                        // Kéo thả SAI
+                        const draggedObj = options.find(o => o.id === draggedId);
+                        setWrongDragId(draggedId);
+                        setDraggedId(null);
+                        speak(`Đây là ${draggedObj.name}, chưa khớp bóng rồi con ạ!`);
+                        setSafeTimeout(() => setWrongDragId(null), 1000);
+                    }
+                } else {
+                    // Thả ra bên ngoài bóng đen (hủy kéo)
+                    setDraggedId(null);
+                }
+            };
+
+            const repeatQuestion = () => {
+                speak(`Con hãy tìm hình và kéo vào đúng bóng đen nhé!`);
+            };
+
+            if (gameState === 'START') {
+                return (
+                    <div className="min-h-screen bg-indigo-50 flex flex-col items-center justify-center p-4 font-sans relative">
+                        <button onClick={onBack} className="absolute top-6 left-6 flex items-center gap-2 bg-white text-indigo-500 hover:bg-indigo-100 px-4 py-2 rounded-xl shadow-md font-bold transition-transform active:scale-90">
+                            <IconArrowLeft size={24} /> Quay lại
+                        </button>
+                        <div className={`bg-white p-8 rounded-3xl shadow-xl text-center max-w-md w-full border-4 ${lessonInfo.color.replace('bg-', 'border-')} transform transition hover:scale-105`}>
+                            <div className="text-6xl mb-4">{lessonInfo.icon}</div>
+                            <h1 className={`text-4xl font-bold mb-8 font-sans ${lessonInfo.color.replace('bg-', 'text-').replace('-400', '-600')}`}>
+                                {lessonInfo.title}
+                            </h1>
+                            <button 
+                                onClick={startGame}
+                                className={`w-full ${lessonInfo.color} hover:opacity-90 text-white text-3xl font-bold py-6 px-8 rounded-2xl shadow-lg flex items-center justify-center gap-4 transition-transform active:scale-95`}
+                            >
+                                <IconPlay size={40} fill="currentColor" /> Bắt đầu học
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (gameState === 'END') {
+                return (
+                    <div className="min-h-screen bg-yellow-100 flex flex-col items-center justify-center p-4 font-sans">
+                        <div className="bg-white p-8 rounded-3xl shadow-xl text-center max-w-md w-full border-4 border-yellow-400">
+                            <h1 className="text-4xl font-bold text-yellow-500 mb-4">Con Giỏi Quá!</h1>
+                            <div className="flex justify-center gap-2 mb-8">
+                                {[1, 2, 3, 4, 5].map(i => (
+                                    <IconStar key={i} size={48} className="text-yellow-400 animate-spin-slow" fill="currentColor" />
+                                ))}
+                            </div>
+                            <p className="text-2xl text-gray-700 mb-8">Con đã hoàn thành xuất sắc!</p>
+                            <div className="flex flex-col gap-4">
+                                <button onClick={startGame} className="w-full bg-sky-500 hover:bg-sky-600 text-white text-2xl font-bold py-4 rounded-2xl shadow flex items-center justify-center gap-2 active:scale-95">
+                                    <IconRefresh size={28} /> Chơi lại bài này
+                                </button>
+                                <button onClick={onBack} className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 text-2xl font-bold py-4 rounded-2xl shadow flex items-center justify-center gap-2 active:scale-95">
+                                    <IconHome size={28} /> Về màn hình chính
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div 
+                    className="min-h-screen bg-slate-50 flex flex-col items-center justify-between p-6 font-sans select-none overflow-hidden"
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerLeave={handlePointerUp} // Nếu lỡ trượt tay ra ngoài màn hình
+                    style={{ touchAction: draggedId ? 'none' : 'auto' }} // Khoá cuộn màn hình khi đang kéo
+                >
+                    <div className="w-full max-w-2xl flex justify-between items-center bg-white p-4 rounded-2xl shadow-md border-2 border-slate-200 z-10">
+                        <button onClick={onBack} className="text-slate-400 hover:text-red-500 bg-slate-100 p-2 rounded-full active:scale-90 transition">
+                            <IconArrowLeft size={28} />
+                        </button>
+                        <div className="flex gap-1 flex-1 justify-center">
+                            {[...Array(5)].map((_, i) => (
+                                <IconStar key={i} size={32} className={i < score ? "text-yellow-400 transform scale-110" : "text-gray-200"} fill={i < score ? "currentColor" : "none"} />
+                            ))}
+                        </div>
+                        <button onClick={repeatQuestion} className="bg-blue-100 hover:bg-blue-200 text-blue-600 p-3 rounded-full active:scale-90 transition">
+                            <IconVolume2 size={32} />
+                        </button>
+                    </div>
+
+                    <div className="flex-1 w-full max-w-2xl flex flex-col items-center justify-center gap-4 my-4 relative">
+                        <h2 className="text-3xl md:text-4xl font-bold text-center drop-shadow-sm text-rose-600 mb-8">
+                            Kéo hình vào bóng đen
+                        </h2>
+
+                        {/* VÙNG THẢ (BÓNG ĐEN) */}
+                        {targetItem && (
+                            <div 
+                                ref={dropZoneRef} 
+                                className={`w-48 h-48 sm:w-64 sm:h-64 rounded-full flex items-center justify-center mb-12 transition-all duration-500
+                                    ${showSuccess ? 'bg-green-100 border-4 border-green-400 scale-110 shadow-2xl' : 'bg-slate-200 border-8 border-dashed border-slate-300'}
+                                `}
+                            >
+                                <span 
+                                    className="text-[120px] sm:text-[160px] drop-shadow-md transition-all duration-500" 
+                                    style={{ filter: showSuccess ? 'none' : 'brightness(0) opacity(0.15)' }} // Biến thành bóng đen
+                                >
+                                    {targetItem.emoji}
+                                </span>
+                            </div>
+                        )}
+
+                        {/* DANH SÁCH 3 LỰA CHỌN */}
+                        <div className="flex justify-center gap-4 sm:gap-8 w-full px-2 z-20">
+                            {options.map((item) => {
+                                const isDragging = draggedId === item.id;
+                                const isWrong = wrongDragId === item.id;
+                                // Ẩn hình gốc đi khi bé kéo thả thành công (để tạo cảm giác đã lắp vào bóng đen)
+                                const isCorrectAndSuccess = showSuccess && item.id === targetItem.id;
+
+                                return (
+                                    <div key={item.id} className="w-[90px] h-[90px] sm:w-[120px] sm:h-[120px] relative">
+                                        {!isCorrectAndSuccess && (
+                                            <button
+                                                onPointerDown={(e) => handlePointerDown(e, item)}
+                                                style={{
+                                                    position: isDragging ? 'fixed' : 'relative',
+                                                    left: isDragging ? dragPos.x : 'auto',
+                                                    top: isDragging ? dragPos.y : 'auto',
+                                                    transform: isDragging ? 'translate(-50%, -50%) scale(1.3)' : 'none',
+                                                    zIndex: isDragging ? 1000 : 1,
+                                                    touchAction: 'none'
+                                                }}
+                                                className={`
+                                                    w-full h-full flex items-center justify-center bg-white rounded-3xl shadow-lg border-4 
+                                                    ${isWrong ? 'border-red-400 animate-shake bg-red-50' : 'border-gray-200'}
+                                                    transition-colors duration-200 active:scale-110 cursor-grab
+                                                `}
+                                            >
+                                                <span className="text-[50px] sm:text-[70px] drop-shadow-lg pointer-events-none">
+                                                    {item.emoji}
+                                                </span>
+                                            </button>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {showSuccess && (
+                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-50">
+                             <div className="text-6xl animate-bounce">🎉 🎈 🎉</div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // ==========================================
         // COMPONENT CHÍNH (MENU MỤC LỤC)
         // ==========================================
         const App = () => {
@@ -607,13 +910,23 @@
                 return (
                     <>
                         <audio id="applauseSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_1067517c5b.mp3" preload="auto"></audio>
-                        <LessonGame 
-                            lessonInfo={lessonInfo} 
-                            onBack={() => {
-                                window.speechSynthesis.cancel();
-                                setSelectedLessonId(null);
-                            }} 
-                        />
+                        {lessonInfo.type === 'drag_drop' ? (
+                            <DragDropGame 
+                                lessonInfo={lessonInfo} 
+                                onBack={() => {
+                                    window.speechSynthesis.cancel();
+                                    setSelectedLessonId(null);
+                                }} 
+                            />
+                        ) : (
+                            <LessonGame 
+                                lessonInfo={lessonInfo} 
+                                onBack={() => {
+                                    window.speechSynthesis.cancel();
+                                    setSelectedLessonId(null);
+                                }} 
+                            />
+                        )}
                     </>
                 );
             }
