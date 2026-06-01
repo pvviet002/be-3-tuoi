@@ -286,9 +286,7 @@
                     setShowSuccess(true);
                     setScore(s => s + 1);
                     
-                    const praises = ["Bé giỏi quá!", "Tuyệt vời!", "Đúng rồi!", "Hoan hô bé!"];
-                    const randomPraise = praises[Math.floor(Math.random() * praises.length)];
-                    speak(`${randomPraise} Đây là ${targetItem.name}.`);
+                    speak("Hoan hô, đúng rồi!");
 
                     setTimeout(() => {
                         if (score + 1 >= 5) {
@@ -301,7 +299,7 @@
 
                 } else {
                     setWrongClickedId(item.id);
-                    speak(`Chưa đúng rồi. Đây là ${item.name}. Bé tìm lại ${targetItem.name} nhé!`);
+                    speak(`Đây là ${item.name}, bé hãy chọn lại nhé!`);
                     setTimeout(() => setWrongClickedId(null), 1000);
                 }
             };
