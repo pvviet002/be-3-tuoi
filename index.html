@@ -80,6 +80,12 @@
         const IconMusicOff = ({ size=24, className="" }) => (
             <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
         );
+        const IconMinus = ({ size=24, className="" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        );
+        const IconPlus = ({ size=24, className="" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        );
 
         // ==========================================
         // DỮ LIỆU CÁC BÀI HỌC (ĐÃ LỌC & BỔ SUNG CHO VN)
@@ -192,7 +198,7 @@
         // ==========================================
         // COMPONENT TRÒ CHƠI CHUNG
         // ==========================================
-        const LessonGame = ({ lessonInfo, onBack, audioRef }) => {
+        const LessonGame = ({ lessonInfo, onBack, audioRef, musicVolume }) => {
             const [gameState, setGameState] = useState('START'); // START, PLAYING, END
             const [targetItem, setTargetItem] = useState(null);
             const [options, setOptions] = useState([]);
@@ -218,19 +224,19 @@
 
                     // Hạ âm lượng nhạc nền khi đọc để bé nghe rõ (Audio Ducking)
                     utterance.onstart = () => {
-                        if (audioRef && audioRef.current) audioRef.current.volume = 0.02;
+                        if (audioRef && audioRef.current) audioRef.current.volume = Math.max(0, musicVolume * 0.15); 
                     };
                     // Khôi phục âm lượng khi đọc xong
                     utterance.onend = () => {
-                        if (audioRef && audioRef.current) audioRef.current.volume = 0.15;
+                        if (audioRef && audioRef.current) audioRef.current.volume = musicVolume;
                     };
                     utterance.onerror = () => {
-                        if (audioRef && audioRef.current) audioRef.current.volume = 0.15;
+                        if (audioRef && audioRef.current) audioRef.current.volume = musicVolume;
                     };
 
                     window.speechSynthesis.speak(utterance);
                 }
-            }, [audioRef]);
+            }, [audioRef, musicVolume]);
 
             const generateQuestion = useCallback(() => {
                 const items = lessonInfo.items;
@@ -425,20 +431,57 @@
             const [selectedLessonId, setSelectedLessonId] = useState(null);
             const [ttsWarning, setTtsWarning] = useState('');
             const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+            const [musicVolume, setMusicVolume] = useState(0.15); // Mặc định âm lượng 15%
+            
             const audioRef = useRef(null);
+            const interactionDone = useRef(false); // Đánh dấu người dùng đã thao tác chưa
 
+            // Khởi tạo Audio và cơ chế Tự động phát
             useEffect(() => {
-                // Khởi tạo nhạc nền (Sử dụng một bản nhạc royalty-free cho thiếu nhi)
                 const audio = new Audio('https://cdn.pixabay.com/audio/2022/03/10/audio_78f18fa1dd.mp3');
                 audio.loop = true;
-                audio.volume = 0.15; // Mặc định âm lượng rất nhỏ để không lấn át giọng đọc
+                audio.volume = musicVolume;
                 audioRef.current = audio;
 
+                // Cố gắng tự động phát ngay (thường bị trình duyệt chặn nếu chưa có tương tác)
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        setIsMusicPlaying(true);
+                        interactionDone.current = true;
+                    }).catch(error => {
+                        console.log("Trình duyệt chặn autoplay. Đợi người dùng tương tác...");
+                    });
+                }
+
+                // Lắng nghe tương tác đầu tiên của người dùng để bật nhạc
+                const handleFirstInteraction = () => {
+                    if (!interactionDone.current && audioRef.current) {
+                        audioRef.current.play().then(() => {
+                            setIsMusicPlaying(true);
+                            interactionDone.current = true;
+                        }).catch(e => console.log(e));
+                    }
+                };
+
+                // Bắt sự kiện click hoặc chạm
+                document.addEventListener('click', handleFirstInteraction);
+                document.addEventListener('touchstart', handleFirstInteraction);
+
                 return () => {
+                    document.removeEventListener('click', handleFirstInteraction);
+                    document.removeEventListener('touchstart', handleFirstInteraction);
                     audio.pause();
                     audio.src = '';
                 };
-            }, []);
+            }, []); // Chỉ chạy 1 lần khi ứng dụng mở
+
+            // Cập nhật âm lượng nếu musicVolume thay đổi
+            useEffect(() => {
+                if (audioRef.current) {
+                    audioRef.current.volume = musicVolume;
+                }
+            }, [musicVolume]);
 
             const toggleMusic = () => {
                 if (!audioRef.current) return;
@@ -448,8 +491,19 @@
                 } else {
                     audioRef.current.play().then(() => {
                         setIsMusicPlaying(true);
+                        interactionDone.current = true;
                     }).catch(e => console.log("Lỗi phát nhạc:", e));
                 }
+            };
+
+            const increaseVolume = (e) => {
+                e.stopPropagation(); // Ngăn chặn sự kiện click nổi bọt ra ngoài
+                setMusicVolume(prev => Math.min(1, Number((prev + 0.1).toFixed(2))));
+            };
+
+            const decreaseVolume = (e) => {
+                e.stopPropagation();
+                setMusicVolume(prev => Math.max(0, Number((prev - 0.1).toFixed(2))));
             };
 
             useEffect(() => {
@@ -470,20 +524,34 @@
                 }
             }, []);
 
+            // Nút điều khiển nhạc chung
+            const MusicControls = () => (
+                <div className="fixed top-4 right-4 z-50 flex items-center bg-white/90 backdrop-blur rounded-full shadow-lg border-2 border-sky-100 p-1">
+                    <button onClick={decreaseVolume} className="p-2 text-sky-500 hover:bg-sky-100 rounded-full active:scale-90 transition-transform" aria-label="Giảm âm lượng">
+                        <IconMinus size={20} />
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); toggleMusic(); }} className="p-2 mx-1 text-sky-500 hover:bg-sky-100 rounded-full active:scale-90 transition-transform" aria-label="Bật/Tắt Nhạc">
+                        {isMusicPlaying ? <IconMusic size={28} /> : <IconMusicOff size={28} className="text-gray-400" />}
+                    </button>
+                    <button onClick={increaseVolume} className="p-2 text-sky-500 hover:bg-sky-100 rounded-full active:scale-90 transition-transform" aria-label="Tăng âm lượng">
+                        <IconPlus size={20} />
+                    </button>
+                </div>
+            );
+
             if (selectedLessonId) {
                 const lessonInfo = LESSONS_DATA[selectedLessonId];
                 return (
                     <>
-                        <button onClick={toggleMusic} className="fixed top-4 right-4 z-50 bg-white/80 backdrop-blur p-3 rounded-full shadow-lg text-sky-500 hover:bg-sky-100 transition-transform active:scale-90">
-                            {isMusicPlaying ? <IconMusic size={28} /> : <IconMusicOff size={28} className="text-gray-400" />}
-                        </button>
+                        <MusicControls />
                         <LessonGame 
                             lessonInfo={lessonInfo} 
                             onBack={() => {
                                 window.speechSynthesis.cancel();
                                 setSelectedLessonId(null);
                             }} 
-                            audioRef={audioRef} 
+                            audioRef={audioRef}
+                            musicVolume={musicVolume}
                         />
                     </>
                 );
@@ -491,9 +559,7 @@
 
             return (
                 <div className="min-h-screen bg-sky-50 flex flex-col items-center py-10 px-4 font-sans relative">
-                    <button onClick={toggleMusic} className="absolute top-4 right-4 z-50 bg-white/80 backdrop-blur p-3 rounded-full shadow-lg text-sky-500 hover:bg-sky-100 transition-transform active:scale-90">
-                        {isMusicPlaying ? <IconMusic size={28} /> : <IconMusicOff size={28} className="text-gray-400" />}
-                    </button>
+                    <MusicControls />
 
                     {ttsWarning && (
                         <div className="w-full max-w-3xl bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6 rounded shadow-md text-sm md:text-base">
