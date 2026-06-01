@@ -216,18 +216,23 @@
                     const utterance = new SpeechSynthesisUtterance(text);
                     const voices = window.speechSynthesis.getVoices();
                     
-                    // 1. Ưu tiên tìm giọng AI (Neural) siêu tự nhiên của Microsoft Edge (như HoaiMy)
-                    // 2. Nếu không có, tìm giọng cao cấp của Google Chrome
-                    // 3. Cuối cùng mới dùng giọng mặc định của hệ thống
-                    const bestVoice = voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && (v.name.includes('Neural') || v.name.includes('HoaiMy')))
-                                   || voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && v.name.includes('Google'))
-                                   || voices.find(v => v.lang.includes('vi') || v.lang.includes('VN'));
+                    // Lọc ra các giọng Tiếng Việt
+                    const viVoices = voices.filter(v => v.lang.includes('vi') || v.lang.includes('VN'));
+                    
+                    // 1. Ưu tiên 1: Giọng Cao cấp của Apple (iPhone/iPad)
+                    // 2. Ưu tiên 2: Giọng AI của Microsoft Edge
+                    // 3. Ưu tiên 3: Giọng mặc định tốt nhất
+                    const bestVoice = viVoices.find(v => v.name.includes('Premium') || v.name.includes('Enhanced'))
+                                   || viVoices.find(v => v.name.includes('Linh')) // Giọng iOS
+                                   || viVoices.find(v => v.name.includes('Neural') || v.name.includes('HoaiMy'))
+                                   || viVoices.find(v => v.name.includes('Google'))
+                                   || viVoices[0];
                                    
                     if (bestVoice) utterance.voice = bestVoice;
                     
                     utterance.lang = 'vi-VN';
                     utterance.rate = rate; // Tốc độ vừa phải, ngắt nghỉ rõ ràng
-                    utterance.pitch = 1.1; // Hạ độ cao xuống một chút để giọng ấm và có cảm xúc hơn (bớt chóe)
+                    utterance.pitch = 1.15; // Nâng pitch lên một chút cho giống giọng cô giáo mầm non
 
                     // Hạ âm lượng nhạc nền khi đọc để bé nghe rõ (Audio Ducking)
                     utterance.onstart = () => {
@@ -445,8 +450,9 @@
             const [userInteracted, setUserInteracted] = useState(false); // Đánh dấu bé đã vào ứng dụng chưa
             
             const audioRef = useRef(null);
+            const interactionDone = useRef(false); // Đánh dấu người dùng đã thao tác chưa
 
-            // Khởi tạo Audio chỉ 1 lần
+            // Khởi tạo Audio và cơ chế Tự động phát
             useEffect(() => {
                 // Đổi sang nguồn nhạc Archive.org ổn định hơn
                 const audio = new Audio('https://ia801400.us.archive.org/16/items/bensound-music/Bensound-LittleIdea.mp3');
@@ -469,6 +475,15 @@
 
             const handleStartApp = () => {
                 setUserInteracted(true);
+                interactionDone.current = true;
+
+                // THỦ THUẬT CHO IOS/IPAD: "Mồi" trình đọc giọng nói bằng một chuỗi rỗng ngay lần chạm đầu tiên
+                // Điều này giúp mở khóa API giọng nói trên Safari/Brave iOS.
+                if ('speechSynthesis' in window) {
+                    const prime = new SpeechSynthesisUtterance('');
+                    window.speechSynthesis.speak(prime);
+                }
+
                 // Bật nhạc ngay khi bé bấm "Vào chơi" để vượt qua giới hạn Autoplay của trình duyệt
                 if (audioRef.current) {
                     audioRef.current.play().then(() => {
