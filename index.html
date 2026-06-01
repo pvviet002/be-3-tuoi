@@ -53,9 +53,6 @@
     <script type="text/babel">
         const { useState, useEffect, useCallback, useRef } = React;
 
-        // ==========================================
-        // CÁC COMPONENT ICON
-        // ==========================================
         const IconPlay = ({ size=24, className="", fill="none" }) => (
             <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
         );
@@ -75,70 +72,62 @@
             <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         );
 
-        // ==========================================
-        // DỮ LIỆU CÁC BÀI HỌC (ĐÃ TÍCH HỢP ẢNH THẬT)
-        // ==========================================
         const LESSONS_DATA = {
             do_vat: {
                 id: 'do_vat', title: 'Đồ vật quanh con', color: 'bg-sky-400', icon: '🪑',
                 items: [
-                    { id: 'ghe', name: 'cái ghế', emoji: '🪑', image: 'https://images.pexels.com/photos/116910/pexels-photo-116910.jpeg?auto=compress&cs=tinysrgb&w=400' }, 
-                    { id: 'giuong', name: 'cái giường', emoji: '🛏️', image: 'https://images.pexels.com/photos/262048/pexels-photo-262048.jpeg?auto=compress&cs=tinysrgb&w=400' },
-                    { id: 'tivi', name: 'ti vi', emoji: '📺', image: './images/tivi.jpg' }, { id: 'coc', name: 'cái cốc', emoji: '🥛', image: './images/coc.jpg' },
-                    { id: 'quat', name: 'cái quạt', emoji: '🪭', image: './images/quat.jpg' }, { id: 'den', name: 'cái đèn', emoji: '💡', image: './images/den.jpg' },
-                    { id: 'dongho', name: 'đồng hồ', emoji: '⏰', image: './images/dongho.jpg' }, { id: 'chia_khoa', name: 'cái chìa khóa', emoji: '🔑', image: './images/chia_khoa.jpg' },
-                    { id: 'bat', name: 'cái bát', emoji: '🥣', image: './images/bat.jpg' }, { id: 'thia', name: 'cái thìa', emoji: '🥄', image: './images/thia.jpg' },
-                    { id: 'dua', name: 'đôi đũa', emoji: '🥢', image: './images/dua.jpg' }, { id: 'choi', name: 'cái chổi', emoji: '🧹', image: './images/choi.jpg' },
-                    { id: 'guong', name: 'cái gương', emoji: '🪞', image: './images/guong.jpg' }, { id: 'o', name: 'cái ô', emoji: '☂️', image: './images/o.jpg' },
-                    { id: 'cap_sach', name: 'cặp sách', emoji: '🎒', image: './images/cap_sach.jpg' }, { id: 'mu', name: 'cái mũ', emoji: '🧢', image: './images/mu.jpg' },
-                    { id: 'giay', name: 'đôi giày', emoji: '👟', image: './images/giay.jpg' }, { id: 'ao', name: 'cái áo', emoji: '👕', image: './images/ao.jpg' },
-                    { id: 'quan', name: 'cái quần', emoji: '👖', image: './images/quan.jpg' }, { id: 'dien_thoai', name: 'điện thoại', emoji: '📱', image: './images/dien_thoai.jpg' },
-                    { id: 'ban_chai', name: 'bàn chải', emoji: '🪥', image: './images/ban_chai.jpg' }, { id: 'xa_phong', name: 'cục xà phòng', emoji: '🧼', image: './images/xa_phong.jpg' }
+                    { id: 'ghe', name: 'cái ghế', emoji: '🪑' }, { id: 'giuong', name: 'cái giường', emoji: '🛏️' },
+                    { id: 'tivi', name: 'ti vi', emoji: '📺' }, { id: 'coc', name: 'cái cốc', emoji: '🥤' }, // Đổi thành ly nước
+                    { id: 'quat', name: 'cái quạt', emoji: '🪭' }, { id: 'den', name: 'cái đèn', emoji: '💡' },
+                    { id: 'dongho', name: 'đồng hồ', emoji: '⏰' }, { id: 'chia_khoa', name: 'cái chìa khóa', emoji: '🔑' },
+                    { id: 'bat', name: 'cái bát', emoji: '🍚' }, // Đổi thành bát cơm
+                    { id: 'thia', name: 'cái thìa', emoji: '🥄' }, { id: 'dua', name: 'đôi đũa', emoji: '🥢' },
+                    { id: 'choi', name: 'cái chổi', emoji: '🧹' }, { id: 'guong', name: 'cái gương', emoji: '🪞' }, 
+                    { id: 'o', name: 'cái ô', emoji: '☂️' }, { id: 'cap_sach', name: 'cặp sách', emoji: '🎒' }, 
+                    { id: 'mu', name: 'cái mũ', emoji: '🧢' }, { id: 'dep', name: 'đôi dép', emoji: '🩴' }, // Đổi thành đôi dép tông/lê
+                    { id: 'ao', name: 'cái áo', emoji: '👕' }, { id: 'quan', name: 'cái quần', emoji: '👖' }, 
+                    { id: 'dien_thoai', name: 'điện thoại', emoji: '📱' }, { id: 'ban_chai', name: 'bàn chải', emoji: '🪥' }, 
+                    { id: 'xa_phong', name: 'cục xà phòng', emoji: '🧼' }
                 ]
             },
             con_vat: {
                 id: 'con_vat', title: 'Thế giới động vật', color: 'bg-green-400', icon: '🐶',
                 items: [
-                    { id: 'cho', name: 'con chó', emoji: '🐶', image: 'https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&w=400' }, 
-                    { id: 'meo', name: 'con mèo', emoji: '🐱', image: 'https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&w=400' },
-                    { id: 'ga', name: 'con gà', emoji: '🐔', image: 'https://images.pexels.com/photos/1769279/pexels-photo-1769279.jpeg?auto=compress&cs=tinysrgb&w=400' }, 
-                    { id: 'vit', name: 'con vịt', emoji: '🦆', image: './images/vit.jpg' },
-                    { id: 'bo', name: 'con bò', emoji: '🐮', image: './images/bo.jpg' }, { id: 'lon', name: 'con lợn', emoji: '🐷', image: './images/lon.jpg' },
-                    { id: 'trau', name: 'con trâu', emoji: '🐃', image: './images/trau.jpg' }, { id: 'de', name: 'con dê', emoji: '🐐', image: './images/de.jpg' },
-                    { id: 'chim', name: 'con chim', emoji: '🐦', image: './images/chim.jpg' }, { id: 'ca', name: 'con cá', emoji: '🐟', image: './images/ca.jpg' },
-                    { id: 'tom', name: 'con tôm', emoji: '🦐', image: './images/tom.jpg' }, { id: 'cua', name: 'con cua', emoji: '🦀', image: './images/cua.jpg' },
-                    { id: 'oc', name: 'con ốc', emoji: '🐌', image: './images/oc.jpg' }, { id: 'ong', name: 'con ong', emoji: '🐝', image: './images/ong.jpg' },
-                    { id: 'kien', name: 'con kiến', emoji: '🐜', image: './images/kien.jpg' }, { id: 'buom', name: 'con bướm', emoji: '🦋', image: './images/buom.jpg' },
-                    { id: 'ech', name: 'con ếch', emoji: '🐸', image: './images/ech.jpg' }, { id: 'rua', name: 'con rùa', emoji: '🐢', image: './images/rua.jpg' },
-                    { id: 'tho', name: 'con thỏ', emoji: '🐰', image: './images/tho.jpg' }, { id: 'chuot', name: 'con chuột', emoji: '🐭', image: './images/chuot.jpg' },
-                    { id: 'ho', name: 'con hổ', emoji: '🐯', image: './images/ho.jpg' }, { id: 'voi', name: 'con voi', emoji: '🐘', image: './images/voi.jpg' }, 
-                    { id: 'khi', name: 'con khỉ', emoji: '🐒', image: './images/khi.jpg' }
+                    { id: 'cho', name: 'con chó', emoji: '🐶' }, { id: 'meo', name: 'con mèo', emoji: '🐱' },
+                    { id: 'ga', name: 'con gà', emoji: '🐔' }, { id: 'vit', name: 'con vịt', emoji: '🦆' },
+                    { id: 'bo', name: 'con bò', emoji: '🐮' }, { id: 'lon', name: 'con lợn', emoji: '🐷' },
+                    { id: 'trau', name: 'con trâu', emoji: '🐃' }, { id: 'de', name: 'con dê', emoji: '🐐' },
+                    { id: 'chim', name: 'con chim', emoji: '🐦' }, { id: 'ca', name: 'con cá', emoji: '🐟' },
+                    { id: 'tom', name: 'con tôm', emoji: '🦐' }, { id: 'cua', name: 'con cua', emoji: '🦀' },
+                    { id: 'oc', name: 'con ốc', emoji: '🐌' }, { id: 'ong', name: 'con ong', emoji: '🐝' },
+                    { id: 'kien', name: 'con kiến', emoji: '🐜' }, { id: 'buom', name: 'con bướm', emoji: '🦋' },
+                    { id: 'ech', name: 'con ếch', emoji: '🐸' }, { id: 'rua', name: 'con rùa', emoji: '🐢' },
+                    { id: 'tho', name: 'con thỏ', emoji: '🐰' }, { id: 'chuot', name: 'con chuột', emoji: '🐭' },
+                    { id: 'ho', name: 'con hổ', emoji: '🐯' }, { id: 'voi', name: 'con voi', emoji: '🐘' }, 
+                    { id: 'khi', name: 'con khỉ', emoji: '🐒' }, { id: 'muoi', name: 'con muỗi', emoji: '🦟' } // Thêm con muỗi
                 ]
             },
             trai_cay: {
                 id: 'trai_cay', title: 'Trái cây thơm ngon', color: 'bg-orange-400', icon: '🍎',
                 items: [
-                    { id: 'tao', name: 'quả táo', emoji: '🍎', image: 'https://images.pexels.com/photos/206959/pexels-photo-206959.jpeg?auto=compress&cs=tinysrgb&w=400' }, 
-                    { id: 'chuoi', name: 'quả chuối', emoji: '🍌', image: 'https://images.pexels.com/photos/2872755/pexels-photo-2872755.jpeg?auto=compress&cs=tinysrgb&w=400' },
-                    { id: 'cam', name: 'quả cam', emoji: '🍊', image: './images/cam.jpg' }, { id: 'dua_hau', name: 'dưa hấu', emoji: '🍉', image: './images/dua_hau.jpg' },
-                    { id: 'nho', name: 'chùm nho', emoji: '🍇', image: './images/nho.jpg' }, { id: 'dau_tay', name: 'dâu tây', emoji: '🍓', image: './images/dau_tay.jpg' },
-                    { id: 'xoai', name: 'quả xoài', emoji: '🥭', image: './images/xoai.jpg' }, { id: 'dua_qua', name: 'quả dứa', emoji: '🍍', image: './images/dua_qua.jpg' },
-                    { id: 'dua_nuoc', name: 'quả dừa', emoji: '🥥', image: './images/dua_nuoc.jpg' }, { id: 'chanh', name: 'quả chanh', emoji: '🍋', image: './images/chanh.jpg' },
-                    { id: 'le', name: 'quả lê', emoji: '🍐', image: './images/le.jpg' }, { id: 'ca_chua', name: 'quả cà chua', emoji: '🍅', image: './images/ca_chua.jpg' },
-                    { id: 'dao', name: 'quả đào', emoji: '🍑', image: './images/dao.jpg' }
+                    { id: 'tao', name: 'quả táo', emoji: '🍎' }, { id: 'chuoi', name: 'quả chuối', emoji: '🍌' },
+                    { id: 'cam', name: 'quả cam', emoji: '🍊' }, { id: 'dua_hau', name: 'dưa hấu', emoji: '🍉' },
+                    { id: 'nho', name: 'chùm nho', emoji: '🍇' }, { id: 'dau_tay', name: 'dâu tây', emoji: '🍓' },
+                    { id: 'xoai', name: 'quả xoài', emoji: '🥭' }, { id: 'dua_qua', name: 'quả dứa', emoji: '🍍' },
+                    { id: 'dua_nuoc', name: 'quả dừa', emoji: '🥥' }, { id: 'chanh', name: 'quả chanh', emoji: '🍋‍🟩' }, // Chanh xanh (Lime)
+                    { id: 'le', name: 'quả lê', emoji: '🍐' }, { id: 'ca_chua', name: 'quả cà chua', emoji: '🍅' },
+                    { id: 'dao', name: 'quả đào', emoji: '🍑' }
                 ]
             },
             phuong_tien: {
                 id: 'phuong_tien', title: 'Phương tiện giao thông', color: 'bg-cyan-500', icon: '🚗',
                 items: [
-                    { id: 'o_to', name: 'ô tô', emoji: '🚗', image: 'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=400' }, 
-                    { id: 'xe_may', name: 'xe máy', emoji: '🏍️', image: './images/xe_may.jpg' },
-                    { id: 'xe_dap', name: 'xe đạp', emoji: '🚲', image: './images/xe_dap.jpg' }, { id: 'xe_may_dien', name: 'xe máy điện', emoji: '🛵', image: './images/xe_may_dien.jpg' },
-                    { id: 'xe_tai', name: 'xe tải', emoji: '🚚', image: './images/xe_tai.jpg' }, { id: 'xe_khach', name: 'xe khách', emoji: '🚐', image: './images/xe_khach.jpg' },
-                    { id: 'xe_buyt', name: 'xe buýt', emoji: '🚌', image: './images/xe_buyt.jpg' }, { id: 'tau_hoa', name: 'tàu hỏa', emoji: '🚆', image: './images/tau_hoa.jpg' }, 
-                    { id: 'may_bay', name: 'máy bay', emoji: '✈️', image: './images/may_bay.jpg' }, { id: 'thuyen', name: 'cái thuyền', emoji: '⛵', image: './images/thuyen.jpg' },
-                    { id: 'xuong', name: 'chiếc xuồng', emoji: '🛶', image: './images/xuong.jpg' }, { id: 'xe_cuu_hoa', name: 'xe cứu hỏa', emoji: '🚒', image: './images/xe_cuu_hoa.jpg' }, 
-                    { id: 'xe_canh_sat', name: 'xe cảnh sát', emoji: '🚓', image: './images/xe_canh_sat.jpg' }
+                    { id: 'o_to', name: 'ô tô', emoji: '🚗' }, { id: 'xe_may', name: 'xe máy', emoji: '🛵' }, // Đổi thành xe tay ga
+                    { id: 'xe_dap', name: 'xe đạp', emoji: '🚲' }, { id: 'xe_tai', name: 'xe tải', emoji: '🚚' }, 
+                    { id: 'xe_khach', name: 'xe khách', emoji: '🚌' }, { id: 'tau_hoa', name: 'tàu hỏa', emoji: '🚂' }, // Đổi thành tàu chạy bằng hơi nước
+                    { id: 'may_bay', name: 'máy bay', emoji: '✈️' }, { id: 'thuyen', name: 'cái thuyền', emoji: '⛵' },
+                    { id: 'xuong', name: 'chiếc xuồng', emoji: '🛶' }, { id: 'xe_cuu_hoa', name: 'xe cứu hỏa', emoji: '🚒' }, 
+                    { id: 'xe_canh_sat', name: 'xe cảnh sát', emoji: '🚓' }
                 ]
             },
             chu_cai: {
@@ -188,9 +177,6 @@
             }
         };
 
-        // ==========================================
-        // COMPONENT THẺ HÌNH ẢNH (HỖ TRỢ ẢNH THẬT)
-        // ==========================================
         const ItemCard = ({ item, isWrong, isCorrectTarget, showSuccess, onClick, lessonId }) => {
             const [imgError, setImgError] = useState(false);
             const isTextLesson = lessonId === 'chu_cai' || lessonId === 'chu_so';
@@ -206,6 +192,7 @@
                         active:scale-95 text-slate-800 relative
                     `}
                 >
+                    {/* Hỗ trợ hiển thị ảnh thật từ thư mục nếu có, nếu không thì dùng Emoji mượt mà */}
                     {item.image && !imgError && !isTextLesson ? (
                         <img 
                             src={item.image} 
@@ -225,9 +212,6 @@
             );
         };
 
-        // ==========================================
-        // COMPONENT TRÒ CHƠI CHUNG
-        // ==========================================
         const LessonGame = ({ lessonInfo, onBack }) => {
             const [gameState, setGameState] = useState('START'); // START, PLAYING, END
             const [targetItem, setTargetItem] = useState(null);
@@ -236,7 +220,6 @@
             const [wrongClickedId, setWrongClickedId] = useState(null);
             const [showSuccess, setShowSuccess] = useState(false);
 
-            // Sử dụng useRef để lưu trữ các ID của đồ vật đã được hỏi trong suốt lượt chơi này
             const usedItemsRef = useRef([]);
             const applauseAudioRef = useRef(null);
 
@@ -248,16 +231,13 @@
                 }
             }, []);
 
-            // Hàm đọc Text-to-Speech đã được nâng cấp để tìm giọng tự nhiên nhất và đồng bộ thời gian (onEndCallback)
+            // Hàm đọc Text-to-Speech được thiết kế để đợi đọc xong mới gọi callback
             const speak = useCallback((text, rate = 0.85, onEndCallback = null) => {
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.cancel();
                     const utterance = new SpeechSynthesisUtterance(text);
                     const voices = window.speechSynthesis.getVoices();
                     
-                    // 1. Ưu tiên tìm giọng AI (Neural) siêu tự nhiên của Microsoft Edge (như HoaiMy)
-                    // 2. Nếu không có, tìm giọng cao cấp của Google Chrome
-                    // 3. Cuối cùng mới dùng giọng mặc định của hệ thống
                     const bestVoice = voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && (v.name.includes('Neural') || v.name.includes('HoaiMy')))
                                    || voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && v.name.includes('Google'))
                                    || voices.find(v => v.lang.includes('vi') || v.lang.includes('VN'));
@@ -265,10 +245,9 @@
                     if (bestVoice) utterance.voice = bestVoice;
                     
                     utterance.lang = 'vi-VN';
-                    utterance.rate = rate; // Tốc độ vừa phải, ngắt nghỉ rõ ràng
-                    utterance.pitch = 1.1; // Hạ độ cao xuống một chút để giọng ấm và có cảm xúc hơn (bớt chóe)
+                    utterance.rate = rate; 
+                    utterance.pitch = 1.1; 
 
-                    // Cơ chế xử lý khi đọc xong (Kèm fallback chống lỗi treo của trình duyệt)
                     let callbackCalled = false;
                     const safeCallback = () => {
                         if (!callbackCalled && onEndCallback) {
@@ -277,12 +256,13 @@
                         }
                     };
 
+                    // Gọi callback khi cô đọc xong câu
                     utterance.onend = safeCallback;
                     utterance.onerror = safeCallback;
 
                     window.speechSynthesis.speak(utterance);
                     
-                    // Dự phòng: Tự động chuyển sau thời gian ước tính nếu trình duyệt bị lỗi không nhả sự kiện onend
+                    // Dự phòng an toàn nếu trình duyệt (như Safari) bị lỗi không bắn sự kiện onend
                     const estimatedTime = text.length * 120 + 2000;
                     setTimeout(safeCallback, estimatedTime);
                 } else {
@@ -293,30 +273,24 @@
             const generateQuestion = useCallback(() => {
                 const items = lessonInfo.items;
                 
-                // 1. Lọc ra danh sách các đồ vật chưa từng được hỏi
                 let availableItems = items.filter(item => !usedItemsRef.current.includes(item.id));
                 
-                // 2. Nếu đã hỏi hết tất cả các đồ vật, tự động reset lại lịch sử
                 if (availableItems.length === 0) {
                     usedItemsRef.current = [];
                     availableItems = items;
                 }
 
-                // 3. Bốc ngẫu nhiên 1 đồ vật từ danh sách chưa hỏi
                 const randomTargetIndex = Math.floor(Math.random() * availableItems.length);
                 const target = availableItems[randomTargetIndex];
 
-                // 4. Lưu ID vừa chọn vào lịch sử
                 usedItemsRef.current.push(target.id);
 
-                // 5. Chọn 1 đồ vật nhiễu (sai) ngẫu nhiên (có thể là đồ vật cũ để gây nhiễu)
                 let wrongIndex = Math.floor(Math.random() * items.length);
                 while (items[wrongIndex].id === target.id) {
                     wrongIndex = Math.floor(Math.random() * items.length);
                 }
                 const wrong = items[wrongIndex];
 
-                // 6. Trộn vị trí hiển thị
                 const newOptions = Math.random() > 0.5 ? [target, wrong] : [wrong, target];
                 
                 setTargetItem(target);
@@ -331,10 +305,10 @@
 
             const startGame = () => {
                 setScore(0);
-                usedItemsRef.current = []; // Xóa toàn bộ lịch sử khi bắt đầu một lượt chơi mới
+                usedItemsRef.current = []; 
                 setGameState('PLAYING');
                 
-                // Đợi cô giáo đọc xong câu chào mừng thì mới tạo câu hỏi đầu tiên
+                // Đợi cô chào xong mới tạo câu hỏi đầu tiên
                 speak(`Cô chào con! Chào mừng con đến với bài học: ${lessonInfo.title}!`, 0.85, () => {
                     setTimeout(generateQuestion, 500);
                 });
@@ -354,9 +328,9 @@
                         applauseAudioRef.current.play().catch(e => console.log("Lỗi phát âm thanh:", e));
                     }
                     
-                    // Đợi cô giáo khen xong mới chuyển giao diện
+                    // Khen bé và ĐỢI ĐỌC XONG mới chuyển layout
                     speak("Hoan hô con, đúng rồi!", 0.85, () => {
-                        // Nghỉ thêm 0.8 giây để con tận hưởng niềm vui
+                        // Nghỉ thêm 0.8 giây để con tận hưởng niềm vui chiến thắng
                         setTimeout(() => {
                             if (newScore >= 5) {
                                 setGameState('END');
@@ -369,8 +343,10 @@
 
                 } else {
                     setWrongClickedId(item.id);
-                    speak(`Đây là ${item.name}, con hãy chọn lại nhé!`);
-                    setTimeout(() => setWrongClickedId(null), 1000);
+                    // Dùng callback để nhả hiệu ứng lắc khi đọc xong
+                    speak(`Đây là ${item.name}, con hãy chọn lại nhé!`, 0.85, () => {
+                        setTimeout(() => setWrongClickedId(null), 500);
+                    });
                 }
             };
 
@@ -482,17 +458,14 @@
             );
         };
 
-        // ==========================================
-        // COMPONENT CHÍNH (MENU MỤC LỤC)
-        // ==========================================
         const App = () => {
             const [selectedLessonId, setSelectedLessonId] = useState(null);
             const [ttsWarning, setTtsWarning] = useState('');
-            const [userInteracted, setUserInteracted] = useState(false); // Đánh dấu bé đã vào ứng dụng chưa
+            const [userInteracted, setUserInteracted] = useState(false);
 
             const handleStartApp = () => {
                 setUserInteracted(true);
-                // "Mồi" giọng nói rỗng để hệ điều hành iOS/Apple mở khóa quyền phát âm thanh
+                // Mồi giọng nói rỗng để hệ điều hành iOS/Apple mở khóa quyền phát âm thanh
                 if ('speechSynthesis' in window) {
                     const utterance = new SpeechSynthesisUtterance('');
                     window.speechSynthesis.speak(utterance);
@@ -517,7 +490,6 @@
                 }
             }, []);
 
-            // Màn hình Chào Mừng (Để mở khóa quyền phát âm thanh)
             if (!userInteracted) {
                 return (
                     <div className="min-h-screen bg-sky-50 flex flex-col items-center justify-center p-4 font-sans">
