@@ -76,7 +76,76 @@
         );
 
         // ==========================================
-        // DỮ LIỆU CÁC BÀI HỌC (ĐÃ LỌC & BỔ SUNG)
+        // COMPONENT BÀN TAY HOẠT HÌNH
+        // ==========================================
+        const HandIcon = ({ count }) => {
+            const skin = "#ffcda3"; // Màu da
+            const outline = "#2d1b11"; // Viền đen/nâu đậm
+            const sw = 3.5; // Độ dày viền
+
+            const i1 = count >= 1; // Ngón trỏ
+            const i2 = count >= 2; // Ngón giữa
+            const i3 = count >= 3; // Ngón áp út
+            const i4 = count >= 4; // Ngón út
+            const i5 = count === 5; // Ngón cái
+
+            return (
+                <svg viewBox="0 0 100 130" className="w-full h-full drop-shadow-2xl transition-transform duration-300">
+                    {/* 1. CÁC NGÓN TAY ĐỨNG THẲNG (Nằm sau lồng bàn tay) */}
+                    {i4 && <rect x="69" y="25" width="15" height="45" rx="7.5" fill={skin} stroke={outline} strokeWidth={sw} />}
+                    {i3 && <rect x="52" y="10" width="15" height="60" rx="7.5" fill={skin} stroke={outline} strokeWidth={sw} />}
+                    {i2 && <rect x="35" y="2" width="15" height="68" rx="7.5" fill={skin} stroke={outline} strokeWidth={sw} />}
+                    {i1 && <rect x="18" y="10" width="15" height="60" rx="7.5" fill={skin} stroke={outline} strokeWidth={sw} />}
+
+                    {/* 2. LỒNG BÀN TAY */}
+                    <path d="M 14 60 L 86 60 C 95 60 95 95 80 115 C 65 125 35 125 20 115 C 5 100 5 60 14 60 Z" fill={skin} stroke={outline} strokeWidth={sw} strokeLinejoin="round" />
+
+                    {/* Xóa vạch kẻ ngang chia cắt ngón thẳng và lồng bàn tay */}
+                    {i4 && <path d="M 69 60 L 84 60" stroke={skin} strokeWidth={sw + 2} />}
+                    {i3 && <path d="M 52 60 L 67 60" stroke={skin} strokeWidth={sw + 2} />}
+                    {i2 && <path d="M 35 60 L 50 60" stroke={skin} strokeWidth={sw + 2} />}
+                    {i1 && <path d="M 18 60 L 33 60" stroke={skin} strokeWidth={sw + 2} />}
+                    
+                    {/* Nếp gấp đốt ngón tay cho các ngón thẳng */}
+                    {i4 && <path d="M 73 40 Q 76 42 79 40" fill="none" stroke={outline} strokeWidth="2" strokeLinecap="round"/>}
+                    {i3 && <path d="M 56 30 Q 59 32 63 30" fill="none" stroke={outline} strokeWidth="2" strokeLinecap="round"/>}
+                    {i2 && <path d="M 39 25 Q 42 27 46 25" fill="none" stroke={outline} strokeWidth="2" strokeLinecap="round"/>}
+                    {i1 && <path d="M 22 30 Q 25 32 29 30" fill="none" stroke={outline} strokeWidth="2" strokeLinecap="round"/>}
+
+                    {/* 3. CÁC NGÓN TAY GẬP XUỐNG (Nằm đè lên lồng bàn tay) */}
+                    {!i4 && <rect x="69" y="55" width="15" height="25" rx="7.5" fill={skin} stroke={outline} strokeWidth={sw} />}
+                    {!i3 && <rect x="52" y="55" width="15" height="28" rx="7.5" fill={skin} stroke={outline} strokeWidth={sw} />}
+                    {!i2 && <rect x="35" y="55" width="15" height="30" rx="7.5" fill={skin} stroke={outline} strokeWidth={sw} />}
+                    {!i1 && <rect x="18" y="55" width="15" height="28" rx="7.5" fill={skin} stroke={outline} strokeWidth={sw} />}
+
+                    {/* 4. NGÓN CÁI (Linh hồn của cấu trúc bàn tay) */}
+                    {i5 ? (
+                        // Đếm 5: Ngón cái xòe ra ngoài
+                        <path d="M 18 75 C -5 65 -5 45 10 45 C 15 45 25 55 25 60" fill={skin} stroke={outline} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
+                    ) : count === 4 ? (
+                        // Đếm 4: Ngón cái gập vắt ngang lồng bàn tay (Giống hình 1)
+                        <g>
+                            <path d="M 15 85 C 10 75 25 70 45 75 C 55 78 55 90 45 90 C 30 90 20 95 15 85 Z" fill={skin} stroke={outline} strokeWidth={sw} strokeLinejoin="round" />
+                            {/* Móng tay */}
+                            <path d="M 40 78 C 46 78 48 85 43 87 C 40 88 38 85 40 78 Z" fill="#ffa8a8" stroke={outline} strokeWidth="1.5" /> 
+                        </g>
+                    ) : (
+                        // Đếm 1,2,3: Ngón cái gập dài vươn qua ôm các ngón khác (Giống hình 2)
+                        <g>
+                            <path d="M 15 85 C 10 70 40 60 65 65 C 75 68 70 80 60 80 C 40 80 20 95 15 85 Z" fill={skin} stroke={outline} strokeWidth={sw} strokeLinejoin="round" />
+                            {/* Móng tay */}
+                            <path d="M 59 67 C 65 67 67 74 62 76 C 59 77 57 74 59 67 Z" fill="#ffa8a8" stroke={outline} strokeWidth="1.5" />
+                        </g>
+                    )}
+
+                    {/* Đường chỉ tay trong lồng bàn tay */}
+                    <path d="M 35 105 C 50 115 70 100 80 90" fill="none" stroke={outline} strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+            );
+        };
+
+        // ==========================================
+        // DỮ LIỆU CÁC BÀI HỌC
         // ==========================================
         const LESSONS_DATA = {
             do_vat: {
@@ -181,11 +250,11 @@
             dem_ngon_tay: {
                 id: 'dem_ngon_tay', title: 'Bé đếm ngón tay', color: 'bg-teal-500', icon: '🖐️',
                 items: [
-                    { id: 'ngon_1', name: 'một ngón tay', emoji: '☝️' },
-                    { id: 'ngon_2', name: 'hai ngón tay', emoji: '✌️' },
-                    { id: 'ngon_3', name: 'ba ngón tay', emoji: '🤟' },
-                    { id: 'ngon_4', name: 'bốn ngón tay', emoji: '🖖' },
-                    { id: 'ngon_5', name: 'năm ngón tay', emoji: '🖐️' }
+                    { id: 'ngon_1', name: 'một ngón tay', count: 1 },
+                    { id: 'ngon_2', name: 'hai ngón tay', count: 2 },
+                    { id: 'ngon_3', name: 'ba ngón tay', count: 3 },
+                    { id: 'ngon_4', name: 'bốn ngón tay', count: 4 },
+                    { id: 'ngon_5', name: 'năm ngón tay', count: 5 }
                 ]
             },
             ghep_hinh: {
@@ -202,7 +271,7 @@
         };
 
         // ==========================================
-        // COMPONENT TRÒ CHƠI CHUNG
+        // COMPONENT TRÒ CHƠI BẤM CHỌN CHUNG
         // ==========================================
         const LessonGame = ({ lessonInfo, onBack }) => {
             const [gameState, setGameState] = useState('START'); // START, PLAYING, END
@@ -215,13 +284,12 @@
             // Ref lưu trữ lịch sử để chống lặp
             const usedItemsRef = useRef([]);
             const recentPraisesRef = useRef([]);
-            const recentQuestionsRef = useRef([]); // Chống lặp câu hỏi
-            const currentQuestionRef = useRef(""); // Lưu lại câu hỏi hiện tại để lặp lại khi cần
+            const recentQuestionsRef = useRef([]); 
+            const currentQuestionRef = useRef(""); 
             
-            // Ref quản lý các timeout chờ thao tác (để xóa ngay khi bấm thoát)
+            // Ref quản lý các timeout chờ thao tác
             const activeTimeoutsRef = useRef([]);
 
-            // Ngừng đọc và xóa các timeout chờ đọc khi thoát khỏi Component
             useEffect(() => {
                 return () => {
                     activeTimeoutsRef.current.forEach(clearTimeout);
@@ -229,22 +297,18 @@
                 };
             }, []);
 
-            // Hàm an toàn để thiết lập timeout, tự động dọn dẹp khi thoát
             const setSafeTimeout = (callback, delay) => {
                 const timer = setTimeout(callback, delay);
                 activeTimeoutsRef.current.push(timer);
                 return timer;
             };
 
-            // Hàm đọc Text-to-Speech được nâng cấp (Tìm giọng AI hay, tự động callback khi đọc xong)
             const speak = useCallback((text, rate = 0.85, onEndCallback = null) => {
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.cancel();
                     const utterance = new SpeechSynthesisUtterance(text);
                     const voices = window.speechSynthesis.getVoices();
                     
-                    // Ưu tiên tìm giọng AI (Neural) siêu tự nhiên của Microsoft Edge (như HoaiMy)
-                    // Nếu không có thì tìm giọng Google Chrome, cuối cùng là giọng mặc định
                     const bestVoice = voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && (v.name.includes('Neural') || v.name.includes('HoaiMy')))
                                    || voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && v.name.includes('Google'))
                                    || voices.find(v => v.lang.includes('vi') || v.lang.includes('VN'));
@@ -265,14 +329,11 @@
                         };
                         utterance.onend = handleEnd;
                         utterance.onerror = handleEnd;
-                        // Phương án dự phòng an toàn: Đôi khi trình duyệt bị kẹt không gửi sự kiện onend, 
-                        // ta dùng timeout ước tính để chắc chắn callback luôn được gọi.
                         setSafeTimeout(handleEnd, text.length * 150 + 1500); 
                     }
 
                     window.speechSynthesis.speak(utterance);
                 } else {
-                    // Nếu máy hoàn toàn không hỗ trợ giọng đọc, vẫn phải chuyển cảnh được
                     if (onEndCallback) setSafeTimeout(onEndCallback, 2000);
                 }
             }, []);
@@ -280,30 +341,24 @@
             const generateQuestion = useCallback(() => {
                 const items = lessonInfo.items;
                 
-                // 1. Lọc ra danh sách các đồ vật chưa từng được hỏi
                 let availableItems = items.filter(item => !usedItemsRef.current.includes(item.id));
                 
-                // 2. Nếu đã hỏi hết tất cả các đồ vật, tự động reset lại lịch sử
                 if (availableItems.length === 0) {
                     usedItemsRef.current = [];
                     availableItems = items;
                 }
 
-                // 3. Bốc ngẫu nhiên 1 đồ vật từ danh sách chưa hỏi
                 const randomTargetIndex = Math.floor(Math.random() * availableItems.length);
                 const target = availableItems[randomTargetIndex];
 
-                // 4. Lưu ID vừa chọn vào lịch sử
                 usedItemsRef.current.push(target.id);
 
-                // 5. Chọn 1 đồ vật nhiễu (sai) ngẫu nhiên (có thể là đồ vật cũ để gây nhiễu)
                 let wrongIndex = Math.floor(Math.random() * items.length);
                 while (items[wrongIndex].id === target.id) {
                     wrongIndex = Math.floor(Math.random() * items.length);
                 }
                 const wrong = items[wrongIndex];
 
-                // 6. Trộn vị trí hiển thị
                 const newOptions = Math.random() > 0.5 ? [target, wrong] : [wrong, target];
                 
                 setTargetItem(target);
@@ -311,7 +366,6 @@
                 setWrongClickedId(null);
                 setShowSuccess(false);
 
-                // Tạo danh sách các mẫu câu hỏi ngẫu nhiên
                 const questionTemplates = [
                     (name) => `Cô đố con tìm thấy, ${name} ở đâu nhỉ?`,
                     (name) => `Con chỉ cho cô xem, ${name} ở đâu nào?`,
@@ -320,7 +374,6 @@
                     (name) => `${name} đang trốn ở đâu nhỉ?`
                 ];
 
-                // Chọn ngẫu nhiên 1 mẫu câu hỏi không trùng với 2 câu vừa hỏi
                 let availableIndices = [0, 1, 2, 3, 4].filter(idx => !recentQuestionsRef.current.includes(idx));
                 if (availableIndices.length === 0) availableIndices = [0, 1, 2, 3, 4];
                 const selectedIdx = availableIndices[Math.floor(Math.random() * availableIndices.length)];
@@ -329,9 +382,8 @@
                 if (recentQuestionsRef.current.length > 2) recentQuestionsRef.current.shift();
                 
                 const questionText = questionTemplates[selectedIdx](target.name);
-                currentQuestionRef.current = questionText; // Lưu lại câu hỏi hiện tại
+                currentQuestionRef.current = questionText; 
 
-                // Delay 1 chút rồi mới đọc câu hỏi
                 setSafeTimeout(() => {
                     speak(questionText);
                 }, 500);
@@ -339,60 +391,52 @@
 
             const startGame = () => {
                 setScore(0);
-                usedItemsRef.current = []; // Xóa toàn bộ lịch sử khi bắt đầu một lượt chơi mới
+                usedItemsRef.current = []; 
                 recentQuestionsRef.current = [];
                 speak(`Cô chào con! Chào mừng con đến với bài học: ${lessonInfo.title}!`, 0.85, () => {
-                    // Chỉ chuyển sang màn hình PLAYING sau khi cô giáo đã chào xong
                     setGameState('PLAYING');
                     generateQuestion();
                 });
             };
 
             const handleItemClick = (item) => {
-                if (showSuccess) return; // Khóa màn hình không cho bấm khi đang ăn mừng
+                if (showSuccess) return; 
 
                 if (item.id === targetItem.id) {
                     setShowSuccess(true);
                     setScore(s => s + 1);
                     
-                    // Phát tiếng vỗ tay trẻ em
                     const applause = document.getElementById('applauseSound');
                     if (applause) {
                         applause.currentTime = 0;
                         applause.play().catch(e => console.log("Lỗi phát audio:", e));
                     }
 
-                    // Danh sách các câu khen
                     const praisesList = [
                         "Tuyệt vời quá, con chọn đúng rồi!",
                         "Con của cô xuất sắc quá!",
                         "Hoan hô con, đúng rồi!",
                         "Giỏi quá, con làm tốt lắm!",
-                        "Chính xác luôn, con thật thông minh!",
-                        "Đúng rồi, con giỏi quá đi mất!"
+                        "Chính xác luôn, con thật thông minh!"
                     ];
 
-                    // Lọc ra các câu khen chưa được dùng trong 2 lần gần nhất để tránh trùng lặp
                     let availablePraises = praisesList.filter(p => !recentPraisesRef.current.includes(p));
                     if (availablePraises.length === 0) availablePraises = praisesList;
                     
-                    // Bốc ngẫu nhiên 1 câu
                     const selectedPraise = availablePraises[Math.floor(Math.random() * availablePraises.length)];
                     
-                    // Lưu lại lịch sử 2 câu khen gần nhất
                     recentPraisesRef.current.push(selectedPraise);
                     if (recentPraisesRef.current.length > 2) recentPraisesRef.current.shift();
 
-                    // Đọc lời khen, đợi đọc xong thì mới chuyển câu hỏi
-                    speak(selectedPraise, 0.85, () => {
+                    speak(`${selectedPraise} Đây là ${targetItem.name}.`, 0.85, () => {
                         setSafeTimeout(() => {
-                            if (score + 1 >= 5) {
+                            if (score + 1 >= lessonInfo.items.length) {
                                 setGameState('END');
-                                speak("Cô chúc mừng con đã hoàn thành xuất sắc! Cô thưởng cho con 5 ngôi sao nhé!");
+                                speak("Cô chúc mừng con đã hoàn thành xuất sắc toàn bộ bài học! Cô thưởng cho con 5 ngôi sao nhé!");
                             } else {
                                 generateQuestion();
                             }
-                        }, 500); // Trễ một chút sau khi nói xong để chuyển màn hình nhẹ nhàng hơn
+                        }, 800);
                     });
 
                 } else {
@@ -467,9 +511,10 @@
                             <IconArrowLeft size={28} />
                         </button>
                         <div className="flex gap-1 flex-1 justify-center">
-                            {[...Array(5)].map((_, i) => (
-                                <IconStar key={i} size={32} className={i < score ? "text-yellow-400 transform scale-110" : "text-gray-200"} fill={i < score ? "currentColor" : "none"} />
-                            ))}
+                            {[...Array(5)].map((_, i) => {
+                                const activeStars = score === 0 ? 0 : ((score - 1) % 5) + 1;
+                                return <IconStar key={i} size={32} className={i < activeStars ? "text-yellow-400 transform scale-110" : "text-gray-200"} fill={i < activeStars ? "currentColor" : "none"} />
+                            })}
                         </div>
                         <button onClick={repeatQuestion} className="bg-blue-100 hover:bg-blue-200 text-blue-600 p-3 rounded-full active:scale-90 transition">
                             <IconVolume2 size={32} />
@@ -498,12 +543,18 @@
                                             active:scale-95 text-slate-800
                                         `}
                                     >
-                                        <span 
-                                            className={lessonInfo.id === 'chu_cai' || lessonInfo.id === 'chu_so' ? "text-[140px] sm:text-[180px] md:text-[220px] font-black drop-shadow-xl" : "text-[140px] sm:text-[180px] md:text-[220px] drop-shadow-2xl"}
-                                            style={lessonInfo.id === 'chu_cai' ? { fontFamily: '"Times New Roman"' } : {}}
-                                        >
-                                            {item.emoji}
-                                        </span>
+                                        {lessonInfo.id === 'dem_ngon_tay' ? (
+                                            <div className="w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] md:w-[220px] md:h-[220px] flex items-center justify-center">
+                                                <HandIcon count={item.count} />
+                                            </div>
+                                        ) : (
+                                            <span 
+                                                className={lessonInfo.id === 'chu_cai' || lessonInfo.id === 'chu_so' ? "text-[140px] sm:text-[180px] md:text-[220px] font-black drop-shadow-xl" : "text-[140px] sm:text-[180px] md:text-[220px] drop-shadow-2xl"}
+                                                style={lessonInfo.id === 'chu_cai' ? { fontFamily: '"Times New Roman"' } : {}}
+                                            >
+                                                {item.emoji}
+                                            </span>
+                                        )}
                                     </button>
                                 );
                             })}
@@ -537,6 +588,7 @@
             const dropZoneRef = useRef(null);
             const usedItemsRef = useRef([]);
             const activeTimeoutsRef = useRef([]);
+            const recentPraisesRef = useRef([]);
 
             useEffect(() => {
                 return () => {
@@ -589,8 +641,8 @@
                 const items = lessonInfo.items;
                 let availableItems = items.filter(item => !usedItemsRef.current.includes(item.id));
                 
-                // Trò chơi cần 3 lựa chọn, nếu gần hết thì reset lại lịch sử
-                if (availableItems.length < 3) {
+                // Nếu đã hỏi hết, reset lại ngân hàng câu hỏi
+                if (availableItems.length === 0) {
                     usedItemsRef.current = [];
                     availableItems = items;
                 }
@@ -599,7 +651,7 @@
                 const target = availableItems[targetIndex];
                 usedItemsRef.current.push(target.id);
 
-                // Chọn 2 đáp án sai
+                // Chọn 2 đáp án sai ngẫu nhiên
                 let wrongItems = items.filter(item => item.id !== target.id);
                 wrongItems.sort(() => Math.random() - 0.5);
                 
@@ -646,7 +698,7 @@
                 let isDroppedInside = false;
                 if (dropZoneRef.current) {
                     const rect = dropZoneRef.current.getBoundingClientRect();
-                    const padding = 30; // Mở rộng vùng nhận diện thả (Hitbox) ra một chút để bé dễ thả
+                    const padding = 30; // Mở rộng vùng nhận diện thả
                     if (
                         e.clientX >= rect.left - padding && e.clientX <= rect.right + padding &&
                         e.clientY >= rect.top - padding && e.clientY <= rect.bottom + padding
@@ -668,9 +720,24 @@
                             applause.play().catch(e => console.log(e));
                         }
 
-                        speak("Hoan hô con, đúng rồi!", 0.85, () => {
+                        const praisesList = [
+                            "Tuyệt vời quá, đúng khớp luôn!",
+                            "Con của cô xuất sắc quá!",
+                            "Hoan hô con, chuẩn luôn!",
+                            "Giỏi quá, con ghép tốt lắm!",
+                            "Chính xác luôn, con thật thông minh!"
+                        ];
+
+                        let availablePraises = praisesList.filter(p => !recentPraisesRef.current.includes(p));
+                        if (availablePraises.length === 0) availablePraises = praisesList;
+                        const selectedPraise = availablePraises[Math.floor(Math.random() * availablePraises.length)];
+                        
+                        recentPraisesRef.current.push(selectedPraise);
+                        if (recentPraisesRef.current.length > 2) recentPraisesRef.current.shift();
+
+                        speak(`${selectedPraise} Đây là ${targetItem.name}.`, 0.85, () => {
                             setSafeTimeout(() => {
-                                if (score + 1 >= 5) {
+                                if (score + 1 >= lessonInfo.items.length) {
                                     setGameState('END');
                                     speak("Cô chúc mừng con đã hoàn thành xuất sắc! Cô thưởng cho con 5 ngôi sao nhé!");
                                 } else {
@@ -755,9 +822,10 @@
                             <IconArrowLeft size={28} />
                         </button>
                         <div className="flex gap-1 flex-1 justify-center">
-                            {[...Array(5)].map((_, i) => (
-                                <IconStar key={i} size={32} className={i < score ? "text-yellow-400 transform scale-110" : "text-gray-200"} fill={i < score ? "currentColor" : "none"} />
-                            ))}
+                            {[...Array(5)].map((_, i) => {
+                                const activeStars = score === 0 ? 0 : ((score - 1) % 5) + 1;
+                                return <IconStar key={i} size={32} className={i < activeStars ? "text-yellow-400 transform scale-110" : "text-gray-200"} fill={i < activeStars ? "currentColor" : "none"} />
+                            })}
                         </div>
                         <button onClick={repeatQuestion} className="bg-blue-100 hover:bg-blue-200 text-blue-600 p-3 rounded-full active:scale-90 transition">
                             <IconVolume2 size={32} />
@@ -791,7 +859,6 @@
                             {options.map((item) => {
                                 const isDragging = draggedId === item.id;
                                 const isWrong = wrongDragId === item.id;
-                                // Ẩn hình gốc đi khi bé kéo thả thành công (để tạo cảm giác đã lắp vào bóng đen)
                                 const isCorrectAndSuccess = showSuccess && item.id === targetItem.id;
 
                                 return (
@@ -803,9 +870,10 @@
                                                     position: isDragging ? 'fixed' : 'relative',
                                                     left: isDragging ? dragPos.x : 'auto',
                                                     top: isDragging ? dragPos.y : 'auto',
-                                                    transform: isDragging ? 'translate(-50%, -50%) scale(1.3)' : 'none',
+                                                    transform: isDragging ? 'translate(-50%, -50%) scale(0.7)' : 'none',
                                                     zIndex: isDragging ? 1000 : 1,
-                                                    touchAction: 'none'
+                                                    touchAction: 'none',
+                                                    opacity: isDragging ? 0.85 : 1
                                                 }}
                                                 className={`
                                                     w-[90px] h-[90px] sm:w-[120px] sm:h-[120px] flex items-center justify-center bg-white rounded-3xl shadow-lg border-4 
