@@ -79,8 +79,8 @@
         /* Style chữ mục tiêu viền vàng nổi bật */
         .text-target-outline {
             color: #ef4444;
-            -webkit-text-stroke: 3px #fde047;
-            text-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            -webkit-text-stroke: 4px #fde047;
+            text-shadow: 0px 6px 12px rgba(0,0,0,0.15);
         }
     </style>
 </head>
@@ -198,13 +198,12 @@
                 }
                 const target = availableTargets[Math.floor(Math.random() * availableTargets.length)];
                 recentTargetsRef.current.push(target.lower);
-                if (recentTargetsRef.current.length > 5) recentTargetsRef.current.shift();
 
                 setTargetLetter(target);
 
                 // GIẢM SỐ LƯỢNG CHỮ ĐỂ Con ĐỠ RỐI
-                const BOARD_SIZE = 7; // 12 chữ tạo thành lưới 3x4
-                const TARGET_AMOUNT = 2; // Cần tìm 4 chữ (2 hoa, 2 thường)
+                const BOARD_SIZE = 7; // Tổng 7 chữ
+                const TARGET_AMOUNT = 2; // Cần tìm 2 chữ (1 hoa, 1 thường hoặc ngẫu nhiên)
                 setTotalTargets(TARGET_AMOUNT);
                 setFoundCount(0);
 
@@ -257,6 +256,7 @@
                     }).catch(e => console.log("Lỗi mồi audio:", e));
                 }
                 setStarCount(0);
+                recentTargetsRef.current = [];
                 speak(`Cùng chơi Săn chữ nhé!`, 0.9, () => {
                     setGameState('PLAYING');
                     generateBoard();
@@ -288,9 +288,9 @@
                         setStarCount(s => s + 1);
                         speak(`Hoan hô!`, 0.9, () => {
                             setSafeTimeout(() => {
-                                if (starCount + 1 >= 5) {
+                                if (starCount + 1 >= ALPHABET.length) {
                                     setGameState('END');
-                                    speak("Con giỏi quá! Tặng con 5 sao!");
+                                    speak("Con giỏi quá! Con đã tìm được toàn bộ bảng chữ cái rồi!");
                                 } else {
                                     generateBoard();
                                 }
@@ -351,11 +351,15 @@
                             <div className="text-[100px] mb-4 animate-bounce-slow">🏆</div>
                             <h1 className="text-4xl font-black text-rose-500 mb-6">Con Giỏi Quá!</h1>
                             
-                            <div className="flex justify-center gap-2 mb-10 bg-slate-50 py-5 rounded-[2rem] border-2 border-slate-100">
+                            <div className="flex justify-center gap-2 mb-4 bg-slate-50 py-5 rounded-[2rem] border-2 border-slate-100">
                                 {[1, 2, 3, 4, 5].map(i => (
                                     <IconStar key={i} size={48} className="text-yellow-400 drop-shadow-md" fill="currentColor" />
                                 ))}
                             </div>
+                            
+                            <p className="text-xl text-sky-600 font-bold mb-8">
+                                Con đã hoàn thành {ALPHABET.length}/{ALPHABET.length} chữ cái!
+                            </p>
                             
                             <div className="flex flex-col gap-4">
                                 <button onClick={handleStartApp} className="w-full bg-sky-400 hover:bg-sky-500 text-white text-2xl font-black py-5 rounded-2xl shadow-[0_6px_0_#0284c7] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
@@ -382,11 +386,14 @@
                             <IconArrowLeft size={28} />
                         </button>
                         
-                        <div className="flex gap-1 md:gap-2 flex-1 justify-center bg-sky-50 py-2 px-6 rounded-full w-fit mx-auto border-2 border-sky-100">
+                        <div className="flex gap-1 md:gap-2 flex-1 items-center justify-center bg-sky-50 py-2 px-6 rounded-full w-fit mx-auto border-2 border-sky-100">
                             {[...Array(5)].map((_, i) => {
                                 const activeStars = starCount === 0 ? 0 : ((starCount - 1) % 5) + 1;
                                 return <IconStar key={i} size={28} className={i < activeStars ? "text-yellow-400 transform scale-110 drop-shadow-sm" : "text-slate-200"} fill={i < activeStars ? "currentColor" : "none"} />
                             })}
+                            <div className="ml-2 font-black text-sky-500 text-xl border-l-2 border-sky-200 pl-3">
+                                {starCount}/{ALPHABET.length}
+                            </div>
                         </div>
                         
                         <button onClick={repeatQuestion} className="bg-green-100 hover:bg-green-200 text-green-600 p-3 rounded-full active:scale-90 transition shadow-sm border border-green-200">
@@ -397,7 +404,7 @@
                     {/* Vùng trò chơi Worksheet */}
                     <div className="flex-1 w-full max-w-3xl flex flex-col items-center mt-6 md:mt-8 z-10 relative">
                         
-                        {/* HÌNH TRANG TRÍ MÉP VỞ: Z-30 để nằm đè lên trên mép giấy trắng */}
+                        {/* HÌNH TRANG TRÍ MÉP VỞ */}
                         <div className="absolute -top-10 -left-6 md:-left-10 text-7xl md:text-[90px] animate-bounce-slow z-30 pointer-events-none hidden sm:block">🐝</div>
                         <div className="absolute -bottom-10 -right-8 md:-right-12 text-[120px] md:text-[160px] z-30 pointer-events-none hidden sm:block">🐻</div>
                         <div className="absolute bottom-16 -left-6 md:-left-10 text-6xl md:text-[80px] z-30 pointer-events-none hidden sm:block">🍯</div>
@@ -405,22 +412,22 @@
                         {/* TỜ BÀI TẬP TRẮNG */}
                         <div className="w-full bg-white rounded-[2.5rem] shadow-xl border-4 border-slate-100 p-6 md:p-10 flex flex-col items-center z-10">
                             
-                            {/* Tiêu đề & Mục tiêu */}
-                            <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center px-2 mb-8 md:mb-12 border-b-4 border-slate-50 pb-6 gap-6">
-                                <div className="flex flex-col text-left">
+                            {/* Tiêu đề & Mục tiêu: Căn chỉnh lại cho iPad */}
+                            <div className="w-full flex flex-col md:flex-row justify-between items-center text-center md:text-left px-2 mb-8 md:mb-12 border-b-4 border-slate-50 pb-6 gap-6">
+                                <div className="flex flex-col">
                                     <h2 className="text-4xl md:text-5xl font-black text-sky-500 tracking-wider">SĂN CHỮ</h2>
                                     <p className="text-lg md:text-xl text-slate-500 font-semibold mt-1">Con tìm và chọn chữ cái</p>
                                 </div>
                                 
                                 {targetLetter && (
-                                    <div className="flex gap-4 items-baseline text-target-outline font-black">
-                                        <span className="text-[80px] md:text-[100px] leading-none">{targetLetter.upper}</span>
-                                        <span className="text-[60px] md:text-[80px] leading-none">{targetLetter.lower}</span>
+                                    <div className="flex gap-4 md:gap-8 items-end text-target-outline font-black bg-yellow-50 px-6 py-2 md:px-8 md:py-3 rounded-[2rem] border-4 border-yellow-200 shadow-sm">
+                                        <span className="text-[75px] md:text-[110px] leading-none transform -rotate-3">{targetLetter.upper}</span>
+                                        <span className="text-[60px] md:text-[85px] leading-none transform rotate-3">{targetLetter.lower}</span>
                                     </div>
                                 )}
                             </div>
 
-                            {/* Lưới chữ cái rải rác (Giảm từ 20 xuống 12 ô) */}
+                            {/* Lưới chữ cái rải rác */}
                             <div className="grid grid-cols-3 sm:grid-cols-4 gap-y-10 gap-x-4 md:gap-x-8 w-full max-w-2xl mx-auto">
                                 {boardLetters.map((letterObj) => {
                                     const isWrong = wrongClickedId === letterObj.id;
