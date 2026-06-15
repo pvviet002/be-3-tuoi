@@ -13,6 +13,11 @@
     <!-- Import Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Import Google Font dễ thương cho bé -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
     <style>
         body {
             -webkit-user-select: none;
@@ -20,8 +25,15 @@
             -ms-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #cffafe 0%, #eff6ff 50%, #dcfce3 100%);
+            font-family: 'Nunito', sans-serif;
+            /* Nền họa tiết chấm bi giống cuốn vở */
+            background-color: #fdfbfb;
+            background-image: radial-gradient(#cbd5e1 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        .font-kid {
+            font-family: 'Nunito', sans-serif;
         }
 
         @keyframes shake {
@@ -31,19 +43,9 @@
             40%, 60% { transform: translate3d(8px, 0, 0); }
         }
         
-        @keyframes spin-slow {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-
-        @keyframes float-delay {
-            0%, 100% { transform: translateY(0) rotate(5deg); }
-            50% { transform: translateY(-12px) rotate(-5deg); }
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
+            50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
         }
 
         @keyframes popCircle {
@@ -52,27 +54,33 @@
             100% { transform: scale(1); opacity: 1; }
         }
         
-        .animate-spin-slow { animation: spin-slow 8s linear infinite; }
         .animate-shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-        .animate-float { animation: float 3s ease-in-out infinite; }
-        .animate-float-delay { animation: float-delay 4s ease-in-out infinite; }
+        .animate-bounce-slow { animation: bounce-slow 2s infinite; }
 
-        /* Hiệu ứng vẽ vòng tròn khoanh đỏ mộc mạc như vẽ tay */
+        /* Hiệu ứng vẽ nét bút đỏ khoanh chữ (viền hơi méo tự nhiên) */
         .circled {
             position: relative;
-            color: #ef4444 !important;
-            transition: all 0.3s;
+            color: #ef4444 !important; /* Đổi màu chữ thành đỏ khi được khoanh */
+            font-weight: 900;
         }
         
         .circled::after {
             content: '';
             position: absolute;
-            top: -5px; left: -5px; right: -5px; bottom: -5px;
-            border: 5px solid #ef4444;
-            /* Tạo hình dạng méo nhẹ để giống nét bút khoanh tay */
-            border-radius: 50% 40% 60% 50% / 50% 50% 40% 60%;
+            top: -10px; left: -15px; right: -15px; bottom: -10px;
+            border: 5px solid #ef4444; /* Bút lông đỏ */
+            /* Tạo hình dạng méo nhẹ để giống nét bút khoanh bằng tay */
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
             animation: popCircle 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Style chữ mục tiêu viền vàng nổi bật */
+        .text-target-outline {
+            color: #ef4444;
+            -webkit-text-stroke: 3px #fde047;
+            text-shadow: 0px 4px 10px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -133,7 +141,7 @@
             const [starCount, setStarCount] = useState(0);
 
             const activeTimeoutsRef = useRef([]);
-            const recentTargetsRef = useRef([]); // Chống lặp đề bài
+            const recentTargetsRef = useRef([]);
 
             useEffect(() => {
                 return () => {
@@ -161,7 +169,7 @@
                     if (bestVoice) utterance.voice = bestVoice;
                     
                     utterance.lang = 'vi-VN';
-                    utterance.rate = rate; // Đọc nhanh hơn một chút để bé không đợi lâu
+                    utterance.rate = rate; 
                     utterance.pitch = 1.1; 
 
                     if (onEndCallback) {
@@ -194,27 +202,29 @@
 
                 setTargetLetter(target);
 
-                const BOARD_SIZE = 20; 
-                const TARGET_AMOUNT = 6; 
+                // GIẢM SỐ LƯỢNG CHỮ ĐỂ BÉ ĐỠ RỐI
+                const BOARD_SIZE = 7; // 12 chữ tạo thành lưới 3x4
+                const TARGET_AMOUNT = 2; // Cần tìm 4 chữ (2 hoa, 2 thường)
                 setTotalTargets(TARGET_AMOUNT);
                 setFoundCount(0);
 
                 let newBoard = [];
                 
+                // Thêm các chữ mục tiêu
                 for (let i = 0; i < TARGET_AMOUNT; i++) {
                     newBoard.push({
                         id: `target_${i}`,
                         char: i % 2 === 0 ? target.upper : target.lower,
                         isTarget: true,
                         isFound: false,
-                        rot: Math.floor(Math.random() * 30) - 15, // Giảm độ nghiêng xuống một chút cho dễ nhìn
-                        tx: Math.floor(Math.random() * 14) - 7,
-                        ty: Math.floor(Math.random() * 14) - 7
+                        rot: Math.floor(Math.random() * 20) - 10, // Độ nghiêng nhỏ
+                        tx: Math.floor(Math.random() * 10) - 5,
+                        ty: Math.floor(Math.random() * 10) - 5
                     });
                 }
 
+                // Thêm các chữ nhiễu
                 const distractors = ALPHABET.filter(item => item.lower !== target.lower);
-                
                 for (let i = 0; i < (BOARD_SIZE - TARGET_AMOUNT); i++) {
                     const randomDistractor = distractors[Math.floor(Math.random() * distractors.length)];
                     newBoard.push({
@@ -222,16 +232,16 @@
                         char: Math.random() > 0.5 ? randomDistractor.upper : randomDistractor.lower,
                         isTarget: false,
                         isFound: false,
-                        rot: Math.floor(Math.random() * 30) - 15,
-                        tx: Math.floor(Math.random() * 14) - 7,
-                        ty: Math.floor(Math.random() * 14) - 7
+                        rot: Math.floor(Math.random() * 20) - 10,
+                        tx: Math.floor(Math.random() * 10) - 5,
+                        ty: Math.floor(Math.random() * 10) - 5
                     });
                 }
 
+                // Trộn đều
                 newBoard.sort(() => Math.random() - 0.5);
                 setBoardLetters(newBoard);
 
-                // Lời đọc siêu ngắn
                 setSafeTimeout(() => {
                     speak(`Bé tìm ${target.name} nhé!`);
                 }, 300);
@@ -308,27 +318,23 @@
                         <audio id="applauseSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_1067517c5b.mp3" preload="auto"></audio>
                         <audio id="pingSound" src="https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3" preload="auto"></audio>
 
-                        <button onClick={() => window.location.href='index.html'} className="absolute top-6 left-6 flex items-center gap-2 bg-white/80 backdrop-blur text-indigo-600 hover:bg-white px-4 py-2 rounded-xl shadow-md font-bold transition-transform active:scale-90 z-20">
+                        <button onClick={() => window.location.href='index.html'} className="absolute top-6 left-6 flex items-center gap-2 bg-white text-indigo-500 border-2 border-indigo-100 hover:bg-indigo-50 px-4 py-2 rounded-xl shadow-sm font-bold transition-transform active:scale-90 z-20">
                             <IconArrowLeft size={24} /> Về Menu
                         </button>
                         
-                        <div className="bg-white/90 backdrop-blur-md p-8 rounded-[2.5rem] shadow-2xl text-center max-w-md w-full border-4 border-white transform transition hover:scale-105 z-10 relative overflow-hidden">
-                            {/* Nền hoạt hình mờ cho banner */}
-                            <div className="absolute -top-10 -right-10 text-9xl opacity-20 pointer-events-none transform rotate-12">🐝</div>
-                            <div className="absolute -bottom-10 -left-10 text-9xl opacity-20 pointer-events-none transform -rotate-12">🐻</div>
-                            
-                            <div className="text-7xl mb-4 relative animate-float">
+                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-center max-w-md w-full border-4 border-slate-100 transform transition hover:scale-105 z-10 relative">
+                            <div className="text-7xl mb-6 relative animate-bounce-slow">
                                 🐝<span className="absolute -top-2 -right-4 text-4xl">🔍</span>
                             </div>
-                            <h1 className="text-5xl font-bold mb-4 font-sans text-blue-600 tracking-wide drop-shadow-sm">
+                            <h1 className="text-5xl font-black mb-2 font-kid text-sky-500 tracking-wider">
                                 SĂN CHỮ
                             </h1>
-                            <p className="text-lg text-slate-500 mb-8 italic">Bé tinh mắt tìm chữ cái nha</p>
+                            <p className="text-lg text-slate-500 mb-8 font-semibold">Bé tinh mắt tìm chữ cái nha!</p>
                             <button 
                                 onClick={handleStartApp}
-                                className="w-full bg-gradient-to-r from-blue-500 to-sky-400 hover:from-blue-600 hover:to-sky-500 text-white text-3xl font-bold py-6 px-8 rounded-2xl shadow-xl flex items-center justify-center gap-4 transition-transform active:scale-95 border-2 border-blue-300"
+                                className="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-800 text-3xl font-black py-5 px-8 rounded-3xl shadow-[0_8px_0_#ca8a04] active:translate-y-2 active:shadow-none flex items-center justify-center gap-4 transition-all"
                             >
-                                <IconPlay size={40} fill="currentColor" /> Bắt đầu ngay
+                                <IconPlay size={36} fill="currentColor" /> Bắt đầu ngay
                             </button>
                         </div>
                     </div>
@@ -341,20 +347,21 @@
             if (gameState === 'END') {
                 return (
                     <div className="min-h-screen flex flex-col items-center justify-center p-4 font-sans">
-                        <div className="bg-white/95 backdrop-blur p-8 rounded-[2.5rem] shadow-2xl text-center max-w-md w-full border-4 border-white">
-                            <div className="text-7xl mb-4 animate-bounce">🏆</div>
-                            <h1 className="text-4xl font-bold text-yellow-500 mb-4 drop-shadow-md">Con Giỏi Quá!</h1>
-                            <div className="flex justify-center gap-2 mb-8 bg-yellow-50 py-4 rounded-3xl border border-yellow-200">
+                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-center max-w-md w-full border-4 border-slate-100 relative">
+                            <div className="text-[100px] mb-4 animate-bounce-slow">🏆</div>
+                            <h1 className="text-4xl font-black text-rose-500 mb-6">Con Giỏi Quá!</h1>
+                            
+                            <div className="flex justify-center gap-2 mb-10 bg-slate-50 py-5 rounded-[2rem] border-2 border-slate-100">
                                 {[1, 2, 3, 4, 5].map(i => (
-                                    <IconStar key={i} size={48} className="text-yellow-400 animate-spin-slow drop-shadow" fill="currentColor" />
+                                    <IconStar key={i} size={48} className="text-yellow-400 drop-shadow-md" fill="currentColor" />
                                 ))}
                             </div>
-                            <p className="text-2xl text-gray-700 mb-8 font-medium">Bé đã săn được rất nhiều chữ!</p>
+                            
                             <div className="flex flex-col gap-4">
-                                <button onClick={handleStartApp} className="w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white text-2xl font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 active:scale-95 border-2 border-green-300">
+                                <button onClick={handleStartApp} className="w-full bg-sky-400 hover:bg-sky-500 text-white text-2xl font-black py-5 rounded-2xl shadow-[0_6px_0_#0284c7] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
                                     <IconRefresh size={28} /> Chơi lại bài này
                                 </button>
-                                <button onClick={() => window.location.href='index.html'} className="w-full bg-white hover:bg-gray-50 text-slate-700 text-2xl font-bold py-4 rounded-2xl shadow flex items-center justify-center gap-2 active:scale-95 border-2 border-slate-200">
+                                <button onClick={() => window.location.href='index.html'} className="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 text-2xl font-bold py-5 rounded-2xl shadow-[0_6px_0_#94a3b8] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 mt-2">
                                     <IconHome size={28} /> Về màn hình chính
                                 </button>
                             </div>
@@ -367,70 +374,71 @@
             // GIAO DIỆN PLAYING
             // ========================================
             return (
-                <div className="min-h-screen flex flex-col items-center justify-between p-4 md:p-6 font-sans relative overflow-hidden">
+                <div className="min-h-screen flex flex-col items-center p-4 md:p-6 font-sans relative overflow-hidden">
                     
-                    {/* HÌNH TRANG TRÍ CHỐNG ĐÈ: Dính chặt vào các góc màn hình, nằm bên dưới (z-0) */}
-                    <div className="absolute top-16 left-2 lg:left-12 text-7xl lg:text-[120px] animate-float opacity-80 pointer-events-none z-0">🐝</div>
-                    <div className="absolute top-4 right-4 lg:right-16 text-6xl lg:text-8xl animate-float-delay opacity-60 pointer-events-none z-0">☁️</div>
-                    <div className="absolute bottom-4 right-4 lg:right-12 text-8xl lg:text-[150px] animate-float-delay opacity-90 pointer-events-none z-0 transform -scale-x-100">🐻</div>
-                    <div className="absolute bottom-6 left-6 lg:left-16 text-7xl lg:text-9xl animate-float opacity-80 pointer-events-none z-0">🌻</div>
-
                     {/* Header Controls */}
-                    <div className="w-full max-w-4xl flex justify-between items-center bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-sm border border-white/50 z-20">
-                        <button onClick={() => window.location.href='index.html'} className="text-slate-500 hover:text-red-500 bg-white shadow-sm p-2 rounded-full active:scale-90 transition border border-slate-100">
+                    <div className="w-full max-w-4xl flex justify-between items-center bg-white p-3 md:p-4 rounded-3xl shadow-sm border-2 border-slate-100 z-20">
+                        <button onClick={() => window.location.href='index.html'} className="text-slate-400 hover:text-rose-500 bg-slate-50 p-3 rounded-full active:scale-90 transition">
                             <IconArrowLeft size={28} />
                         </button>
                         
-                        <div className="flex gap-1 flex-1 justify-center bg-slate-50/50 py-1 px-4 rounded-full w-fit mx-auto">
+                        <div className="flex gap-1 md:gap-2 flex-1 justify-center bg-sky-50 py-2 px-6 rounded-full w-fit mx-auto border-2 border-sky-100">
                             {[...Array(5)].map((_, i) => {
                                 const activeStars = starCount === 0 ? 0 : ((starCount - 1) % 5) + 1;
-                                return <IconStar key={i} size={32} className={i < activeStars ? "text-yellow-400 transform scale-110 drop-shadow-sm" : "text-slate-300"} fill={i < activeStars ? "currentColor" : "none"} />
+                                return <IconStar key={i} size={28} className={i < activeStars ? "text-yellow-400 transform scale-110 drop-shadow-sm" : "text-slate-200"} fill={i < activeStars ? "currentColor" : "none"} />
                             })}
                         </div>
                         
-                        <button onClick={repeatQuestion} className="bg-sky-100 hover:bg-sky-200 text-sky-600 p-3 rounded-full active:scale-90 transition shadow-sm border border-sky-200">
-                            <IconVolume2 size={32} />
+                        <button onClick={repeatQuestion} className="bg-green-100 hover:bg-green-200 text-green-600 p-3 rounded-full active:scale-90 transition shadow-sm border border-green-200">
+                            <IconVolume2 size={28} />
                         </button>
                     </div>
 
-                    {/* Khung chứa trò chơi chính: Đổ nền kính mờ để tách biệt hoàn toàn với hình trang trí ở dưới */}
-                    <div className="flex-1 w-full max-w-4xl flex flex-col items-center justify-center my-6 z-10 relative">
-                        <div className="w-full bg-white/60 backdrop-blur-xl rounded-[2.5rem] shadow-xl border-4 border-white p-6 md:p-8 flex flex-col items-center">
+                    {/* Vùng trò chơi Worksheet */}
+                    <div className="flex-1 w-full max-w-3xl flex flex-col items-center mt-6 md:mt-8 z-10 relative">
+                        
+                        {/* HÌNH TRANG TRÍ MÉP VỞ: Z-30 để nằm đè lên trên mép giấy trắng */}
+                        <div className="absolute -top-10 -left-6 md:-left-10 text-7xl md:text-[90px] animate-bounce-slow z-30 pointer-events-none hidden sm:block">🐝</div>
+                        <div className="absolute -bottom-10 -right-8 md:-right-12 text-[120px] md:text-[160px] z-30 pointer-events-none hidden sm:block">🐻</div>
+                        <div className="absolute bottom-16 -left-6 md:-left-10 text-6xl md:text-[80px] z-30 pointer-events-none hidden sm:block">🍯</div>
+
+                        {/* TỜ BÀI TẬP TRẮNG */}
+                        <div className="w-full bg-white rounded-[2.5rem] shadow-xl border-4 border-slate-100 p-6 md:p-10 flex flex-col items-center z-10">
                             
-                            {/* Đề bài */}
-                            <div className="w-full flex justify-between items-center px-2 mb-6 border-b-2 border-slate-200/50 pb-4">
-                                <div className="flex flex-col">
-                                    <h2 className="text-3xl md:text-5xl font-bold text-sky-600 tracking-wide uppercase drop-shadow-sm">SĂN CHỮ</h2>
-                                    <p className="text-base md:text-xl text-slate-600 font-medium">Bé tìm và khoanh tròn nhé</p>
+                            {/* Tiêu đề & Mục tiêu */}
+                            <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center px-2 mb-8 md:mb-12 border-b-4 border-slate-50 pb-6 gap-6">
+                                <div className="flex flex-col text-left">
+                                    <h2 className="text-4xl md:text-5xl font-black text-sky-500 tracking-wider">SĂN CHỮ</h2>
+                                    <p className="text-lg md:text-xl text-slate-500 font-semibold mt-1">Bé tìm và chọn chữ cái</p>
                                 </div>
                                 
                                 {targetLetter && (
-                                    <div className="flex gap-3 md:gap-4 items-baseline bg-white px-5 py-2 md:px-8 md:py-3 rounded-2xl shadow-md border-4 border-yellow-300 text-amber-500 transform rotate-2">
-                                        <span className="text-5xl md:text-7xl font-bold">{targetLetter.upper}</span>
-                                        <span className="text-4xl md:text-6xl font-bold">{targetLetter.lower}</span>
+                                    <div className="flex gap-4 items-baseline text-target-outline font-black">
+                                        <span className="text-[80px] md:text-[100px] leading-none">{targetLetter.upper}</span>
+                                        <span className="text-[60px] md:text-[80px] leading-none">{targetLetter.lower}</span>
                                     </div>
                                 )}
                             </div>
 
-                            {/* Lưới chữ cái */}
-                            <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 sm:gap-6 md:gap-8 w-full">
+                            {/* Lưới chữ cái rải rác (Giảm từ 20 xuống 12 ô) */}
+                            <div className="grid grid-cols-3 sm:grid-cols-4 gap-y-10 gap-x-4 md:gap-x-8 w-full max-w-2xl mx-auto">
                                 {boardLetters.map((letterObj) => {
                                     const isWrong = wrongClickedId === letterObj.id;
                                     
                                     return (
-                                        <div key={letterObj.id} className="flex justify-center items-center h-[65px] w-[65px] sm:h-[85px] sm:w-[85px] md:h-[100px] md:w-[100px] mx-auto">
+                                        <div key={letterObj.id} className="flex justify-center items-center h-[80px] w-[80px] sm:h-[100px] sm:w-[100px] md:h-[130px] md:w-[130px] mx-auto">
                                             <button
                                                 onClick={() => handleLetterClick(letterObj)}
                                                 style={{
                                                     transform: `rotate(${letterObj.rot}deg) translate(${letterObj.tx}px, ${letterObj.ty}px)`
                                                 }}
                                                 className={`
-                                                    w-full h-full flex items-center justify-center font-sans font-bold bg-transparent transition-all duration-300
-                                                    ${isWrong ? 'animate-shake text-slate-300/50' : 'hover:scale-110 active:scale-90'}
-                                                    ${letterObj.isFound ? 'circled bg-red-50/80 scale-110 rotate-0 translate-x-0 translate-y-0' : 'text-slate-700 drop-shadow-sm'}
+                                                    w-full h-full flex items-center justify-center font-kid font-bold bg-transparent transition-all duration-300 outline-none
+                                                    ${isWrong ? 'animate-shake text-slate-300' : 'hover:scale-110 active:scale-95'}
+                                                    ${letterObj.isFound ? 'circled rotate-0 translate-x-0 translate-y-0 text-red-500' : 'text-slate-800'}
                                                 `}
                                             >
-                                                <span className="text-[45px] sm:text-[60px] md:text-[75px] leading-none pointer-events-none">
+                                                <span className="text-[60px] sm:text-[75px] md:text-[95px] leading-none pointer-events-none">
                                                     {letterObj.char}
                                                 </span>
                                             </button>
@@ -441,10 +449,10 @@
                         </div>
                     </div>
 
-                    {/* Hiệu ứng pháo hoa khi qua bài */}
+                    {/* Hiệu ứng qua bài */}
                     {foundCount >= totalTargets && totalTargets > 0 && (
-                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-50 bg-white/20 backdrop-blur-sm">
-                             <div className="text-[100px] animate-bounce drop-shadow-2xl">🎉⭐🎉</div>
+                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-50 bg-white/40 backdrop-blur-sm">
+                             <div className="text-[120px] animate-bounce drop-shadow-2xl">🌟</div>
                         </div>
                     )}
                 </div>
