@@ -118,6 +118,9 @@
         const IconArrowLeft = ({ size=24, className="" }) => (
             <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         );
+        const IconCheck = ({ size=24, className="" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"></polyline></svg>
+        );
 
         // ==========================================
         // DỮ LIỆU BẢNG CHỮ CÁI
@@ -146,6 +149,7 @@
             const [totalTargets, setTotalTargets] = useState(0);
             const [wrongClickedId, setWrongClickedId] = useState(null);
             const [starCount, setStarCount] = useState(0);
+            const [showTargetLetter, setShowTargetLetter] = useState(true);
 
             const activeTimeoutsRef = useRef([]);
             const recentTargetsRef = useRef([]);
@@ -421,13 +425,20 @@
                             
                             {/* Tiêu đề & Mục tiêu: Căn chỉnh lại cho iPad */}
                             <div className="w-full flex flex-col md:flex-row justify-between items-center text-center md:text-left px-2 mb-8 md:mb-12 border-b-4 border-slate-50 pb-6 gap-6">
-                                <div className="flex flex-col">
+                                <div className="flex flex-col items-center md:items-start">
                                     <h2 className="text-4xl md:text-5xl font-black text-sky-500 tracking-wider">SĂN CHỮ</h2>
                                     <p className="text-lg md:text-xl text-slate-500 font-semibold mt-1">Con tìm và chọn chữ cái</p>
+                                    
+                                    <label className="flex items-center gap-3 mt-4 cursor-pointer group" onClick={() => setShowTargetLetter(!showTargetLetter)}>
+                                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center border-2 transition-colors ${showTargetLetter ? 'bg-green-400 border-green-500' : 'bg-slate-100 border-slate-300'}`}>
+                                            {showTargetLetter && <IconCheck size={20} className="text-white" />}
+                                        </div>
+                                        <span className="text-slate-500 font-bold text-lg group-hover:text-slate-700 transition-colors">Hiện chữ mẫu</span>
+                                    </label>
                                 </div>
                                 
                                 {targetLetter && (
-                                    <div className="flex gap-4 md:gap-8 items-end text-target-outline font-black bg-yellow-50 px-6 py-2 md:px-8 md:py-3 rounded-[2rem] border-4 border-yellow-200 shadow-sm">
+                                    <div className={`flex gap-4 md:gap-8 items-end text-target-outline font-black bg-yellow-50 px-6 py-2 md:px-8 md:py-3 rounded-[2rem] border-4 border-yellow-200 shadow-sm transition-opacity duration-300 ${showTargetLetter ? 'opacity-100' : 'opacity-0 select-none pointer-events-none'}`}>
                                         <span className="text-[75px] md:text-[110px] leading-none transform -rotate-3">{targetLetter.upper}</span>
                                         <span className="text-[60px] md:text-[85px] leading-none transform rotate-3">{targetLetter.lower}</span>
                                     </div>
