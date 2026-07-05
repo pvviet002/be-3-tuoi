@@ -338,7 +338,7 @@
         <!-- Huy hiệu khen lớn -->
         <div id="praise-badge" class="absolute left-1/2 top-1/2 z-[70] pointer-events-none hidden">
             <div class="bg-gradient-to-b from-yellow-300 to-orange-400 text-white font-extrabold text-2xl md:text-4xl px-7 py-4 rounded-3xl border-4 border-white shadow-[0_0_35px_rgba(250,204,21,0.9)] whitespace-nowrap text-center" style="text-shadow: 0 2px 0 rgba(0,0,0,0.15);">
-                <span id="praise-text">🌟 Bé giỏi quá! 🌟</span>
+                <span id="praise-text">🌟 con giỏi quá! 🌟</span>
             </div>
         </div>
 
@@ -610,7 +610,7 @@
         function openExplore() {
             ensureAudio(); sfxClick();
             showScreen('explore');
-            playTTS('Bé chạm vào chữ nào cũng được nhé!');
+            playTTS('con chạm vào chữ nào cũng được nhé!');
         }
 
         function openDetail(i) {
@@ -722,17 +722,17 @@
             document.getElementById('quiz-prompt').innerText = 'Tìm chữ ' + L.up + ' nào!';
 
             const intro = isFirst ? 'Cùng chơi tìm chữ nhé! ' : '';
-            playTTS(`${intro}Bé hãy tìm chữ ${L.sound}! Chữ ${L.sound} như trong từ ${L.word}.`);
+            playTTS(`${intro}con hãy tìm chữ ${L.sound}! Chữ ${L.sound} trong từ ${L.word}.`);
         }
 
         function repeatQuizQuestion() {
             if (quizAnswer === null) return;
             ensureAudio(); sfxClick();
             const L = LETTERS[quizAnswer];
-            playTTS(`Bé hãy tìm chữ ${L.sound}! Chữ ${L.sound} như trong từ ${L.word}.`);
+            playTTS(`con hãy tìm chữ ${L.sound}! Chữ ${L.sound} trong từ ${L.word}.`);
         }
 
-        const PRAISES = ['Giỏi quá', 'Tuyệt vời', 'Đúng rồi', 'Hoan hô bé', 'Xuất sắc', 'Bé thông minh quá'];
+        const PRAISES = ['Giỏi quá', 'Tuyệt vời', 'Đúng rồi', 'Hoan hô', 'Xuất sắc', 'Con thông minh quá'];
 
         function answerQuiz(idx, cardEl) {
             if (quizLocked) return;
@@ -793,7 +793,7 @@
                 cardEl.classList.add('wiggle');
 
                 const wrongL = LETTERS[idx];
-                playTTS(`Đây là chữ ${wrongL.sound}. Bé thử tìm chữ ${L.sound} lần nữa nhé!`);
+                playTTS(`Đây là chữ ${wrongL.sound}. Con thử tìm chữ ${L.sound} lần nữa nhé!`);
             }
         }
 
