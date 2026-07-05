@@ -2,490 +2,828 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Con Vui Học - Săn Chữ</title>
-
-    <!-- Import React, ReactDOM, và Babel -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script>
-        // Cấu hình Babel để ép sử dụng React Classic Runtime, tránh lỗi require react/jsx-runtime
-        Babel.registerPreset('react-classic', {
-            presets: [
-                [Babel.availablePresets['react'], { "runtime": "classic" }]
-            ]
-        });
-    </script>
-    
-    <!-- Import Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bé Học Chữ Cái - Vườn Chữ Vui Vẻ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Import Google Font dễ thương cho Con -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --sky-1: #8fd3ff;
+            --sky-2: #cdeeff;
+            --grass-1: #9ce79c;
+            --grass-2: #7ed67e;
+        }
+
         body {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
-            font-family: 'Nunito', sans-serif;
-            /* Nền họa tiết chấm bi giống cuốn vở */
-            background-color: #fdfbfb;
-            background-image: radial-gradient(#cbd5e1 2px, transparent 2px);
-            background-size: 30px 30px;
+            font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+            background: linear-gradient(180deg, #a5dcff 0%, #d8f1ff 55%, #ffeef7 100%);
+            overscroll-behavior-y: none;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        .font-kid {
-            font-family: 'Nunito', sans-serif;
-        }
+        .no-select { user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
 
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-2px, 0, 0); }
-            20%, 80% { transform: translate3d(4px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
-            40%, 60% { transform: translate3d(8px, 0, 0); }
-        }
-        
-        @keyframes bounce-slow {
-            0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
-            50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
-        }
+        .btn-press { transition: transform 0.12s ease, box-shadow 0.12s ease; }
+        .btn-press:active:not(:disabled) { transform: translateY(4px) scale(0.98); box-shadow: 0 1px 0 0 rgba(0,0,0,0.1) !important; }
 
-        @keyframes popCircle {
-            0% { transform: scale(0.5); opacity: 0; }
-            50% { transform: scale(1.15); opacity: 1; }
+        /* ══ Hiệu ứng xuất hiện (đã tách riêng để không đè nhau) ══ */
+        .bounce-in {
+            animation-name: bounceIn;
+            animation-duration: 0.55s;
+            animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            animation-fill-mode: both;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.7); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-        
-        .animate-shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-        .animate-bounce-slow { animation: bounce-slow 2s infinite; }
 
-        /* Hiệu ứng vẽ nét bút đỏ khoanh chữ (viền hơi méo tự nhiên) */
-        .circled {
+        .pop-in {
+            animation-name: popIn;
+            animation-duration: 0.4s;
+            animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation-fill-mode: both;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Lơ lửng nhẹ - dùng ở PHẦN TỬ CON, không bao giờ trùng với pop-in */
+        .floaty {
+            animation-name: floaty;
+            animation-duration: 2.6s;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+            animation-direction: alternate;
+        }
+        @keyframes floaty {
+            0% { transform: translateY(-4px); }
+            100% { transform: translateY(4px); }
+        }
+
+        .wiggle { animation: wiggle 0.5s ease-in-out; }
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-6deg); }
+            50% { transform: rotate(6deg); }
+            75% { transform: rotate(-4deg); }
+        }
+
+        .happy-dance { animation: happyDance 0.7s ease-in-out; }
+        @keyframes happyDance {
+            0%, 100% { transform: scale(1) rotate(0); }
+            25% { transform: scale(1.18) rotate(-7deg); }
+            50% { transform: scale(1.22) rotate(7deg); }
+            75% { transform: scale(1.12) rotate(-3deg); }
+        }
+
+        .sway {
+            animation: sway 3.5s ease-in-out infinite alternate;
+            transform-origin: bottom center;
+            display: inline-block;
+        }
+        @keyframes sway {
+            0% { transform: rotate(-7deg); }
+            100% { transform: rotate(7deg); }
+        }
+
+        .bob-slow { animation: floaty 3.5s ease-in-out infinite alternate; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .floaty, .sway, .bob-slow, .cloud-move, .sun-spin { animation: none !important; }
+        }
+
+        /* ══ SÂN KHẤU VƯỜN CHỮ ══ */
+        .garden-stage {
             position: relative;
-            color: #ef4444 !important; /* Đổi màu chữ thành đỏ khi được khoanh */
-            font-weight: 900;
-        }
-        
-        .circled::after {
-            content: '';
-            position: absolute;
-            top: -10px; left: -15px; right: -15px; bottom: -10px;
-            border: 5px solid #ef4444; /* Bút lông đỏ */
-            /* Tạo hình dạng méo nhẹ để giống nét bút khoanh bằng tay */
-            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-            animation: popCircle 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            pointer-events: none;
-            z-index: -1;
+            background: linear-gradient(180deg, #7ecbff 0%, #b5e3ff 40%, #e6f9ff 62%, #b9eeb0 78%, #8ddd8d 100%);
+            border: 7px solid #ffffff;
+            box-shadow: 0 14px 34px rgba(90, 160, 220, 0.4), inset 0 0 50px rgba(255,255,255,0.4);
+            border-radius: 2.5rem;
+            overflow: hidden;
         }
 
-        /* Style chữ mục tiêu nổi bật (Đã bỏ viền vàng) */
-        .text-target-outline {
-            color: #ef4444;
-            text-shadow: 0px 6px 12px rgba(0,0,0,0.15);
+        .cloud-move { animation: cloudMove linear infinite; }
+        @keyframes cloudMove {
+            0% { transform: translateX(-20%); }
+            100% { transform: translateX(120vw); }
         }
+
+        .sun-spin { animation: sunSpin 24s linear infinite; transform-origin: center; }
+        @keyframes sunSpin { 100% { transform: rotate(360deg); } }
+
+        /* ══ THẺ CHỮ KIỂU STICKER ══ */
+        .sticker-card {
+            border-radius: 26px;
+            border: 5px solid #ffffff;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.15s ease, filter 0.15s ease;
+        }
+        .sticker-card:hover { transform: scale(1.07); filter: brightness(1.05); }
+        .sticker-card:active { transform: scale(0.95); }
+
+        /* Chữ kiểu sticker: viền trắng dày quanh chữ */
+        .sticker-text {
+            text-shadow:
+                3px 0 0 #fff, -3px 0 0 #fff, 0 3px 0 #fff, 0 -3px 0 #fff,
+                2px 2px 0 #fff, -2px 2px 0 #fff, 2px -2px 0 #fff, -2px -2px 0 #fff,
+                0 7px 12px rgba(60, 90, 140, 0.35);
+        }
+        .sticker-text-lg {
+            text-shadow:
+                4px 0 0 #fff, -4px 0 0 #fff, 0 4px 0 #fff, 0 -4px 0 #fff,
+                3px 3px 0 #fff, -3px 3px 0 #fff, 3px -3px 0 #fff, -3px -3px 0 #fff,
+                0 9px 14px rgba(60, 90, 140, 0.35);
+        }
+
+        /* Bảng gỗ mềm cho câu hỏi */
+        .candy-sign {
+            background: linear-gradient(180deg, #ffffff, #fff6e3);
+            border: 5px solid #ffc46b;
+            box-shadow: 0 7px 0 0 #f5a623, 0 14px 22px rgba(190, 120, 20, 0.25);
+            border-radius: 999px;
+        }
+
+        .star-fly { animation: starFly 1s ease-out forwards; }
+        @keyframes starFly {
+            0% { transform: translate(-50%, 0) scale(0.6); opacity: 1; }
+            100% { transform: translate(-50%, -90px) scale(1.5); opacity: 0; }
+        }
+
+        .praise-pop { animation: praisePop 1.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes praisePop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            15% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+            30% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            80% { transform: translate(-50%, -60%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -90%) scale(0.9); opacity: 0; }
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="p-2 md:p-4 flex flex-col min-h-screen relative no-select">
 
-    <script type="text/babel" data-presets="react-classic,env">
-        const { useState, useEffect, useCallback, useRef } = React;
+    <!-- Thanh công cụ -->
+    <div class="max-w-4xl mx-auto w-full mb-2.5 flex justify-between items-center z-20 relative gap-2">
+        <div class="flex items-center gap-1.5 md:gap-2">
+            <button onclick="goHome()" title="Về trang bìa" class="w-11 h-11 md:w-12 md:h-12 flex items-center justify-center bg-white text-xl md:text-2xl rounded-2xl shadow-[0_4px_0_0_#b9dcf7] border-2 border-sky-100 hover:bg-sky-50 btn-press">🏠</button>
+            <button onclick="toggleSound()" title="Bật/tắt âm thanh" class="w-11 h-11 md:w-12 md:h-12 flex items-center justify-center bg-white text-xl md:text-2xl rounded-2xl shadow-[0_4px_0_0_#b9dcf7] border-2 border-sky-100 hover:bg-sky-50 btn-press"><span id="sound-label">🔊</span></button>
+            <button onclick="toggleFullScreen()" title="Toàn màn hình" class="w-11 h-11 md:w-12 md:h-12 flex items-center justify-center bg-white text-xl md:text-2xl rounded-2xl shadow-[0_4px_0_0_#b9dcf7] border-2 border-sky-100 hover:bg-sky-50 btn-press"><span id="fullscreen-label">🔲</span></button>
+        </div>
 
-        // ==========================================
-        // CÁC COMPONENT ICON
-        // ==========================================
-        const IconPlay = ({ size=24, className="", fill="none" }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-        );
-        const IconVolume2 = ({ size=24, className="" }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
-        );
-        const IconStar = ({ size=24, className="", fill="none" }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-        );
-        const IconRefresh = ({ size=24, className="" }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
-        );
-        const IconHome = ({ size=24, className="" }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-        );
-        const IconArrowLeft = ({ size=24, className="" }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-        );
-        const IconCheck = ({ size=24, className="" }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"></polyline></svg>
-        );
+        <div class="bg-white px-4 py-2 md:px-5 rounded-2xl shadow-[0_4px_0_0_#b9dcf7] border-2 border-sky-100 flex items-center gap-1.5" title="Sao bé đã thu thập">
+            <span class="text-lg md:text-2xl">🌟</span>
+            <span id="star-display" class="font-extrabold text-amber-500 text-lg md:text-2xl">0</span>
+        </div>
+    </div>
 
-        // ==========================================
-        // DỮ LIỆU BẢNG CHỮ CÁI
-        // ==========================================
-        const ALPHABET = [
-            { lower: 'a', upper: 'A', name: 'chữ a' }, { lower: 'ă', upper: 'Ă', name: 'chữ á' }, { lower: 'â', upper: 'Â', name: 'chữ ớ' },
-            { lower: 'b', upper: 'B', name: 'chữ bờ' }, { lower: 'c', upper: 'C', name: 'chữ cờ' }, { lower: 'd', upper: 'D', name: 'chữ dờ' },
-            { lower: 'đ', upper: 'Đ', name: 'chữ đờ' }, { lower: 'e', upper: 'E', name: 'chữ e' }, { lower: 'ê', upper: 'Ê', name: 'chữ ê' },
-            { lower: 'g', upper: 'G', name: 'chữ gờ' }, { lower: 'h', upper: 'H', name: 'chữ hờ' }, { lower: 'i', upper: 'I', name: 'chữ i ngắn' },
-            { lower: 'k', upper: 'K', name: 'chữ ca' }, { lower: 'l', upper: 'L', name: 'chữ lờ' }, { lower: 'm', upper: 'M', name: 'chữ mờ' },
-            { lower: 'n', upper: 'N', name: 'chữ nờ' }, { lower: 'o', upper: 'O', name: 'chữ o' }, { lower: 'ô', upper: 'Ô', name: 'chữ ô' },
-            { lower: 'ơ', upper: 'Ơ', name: 'chữ ơ' }, { lower: 'p', upper: 'P', name: 'chữ pờ' }, { lower: 'q', upper: 'Q', name: 'chữ quờ' },
-            { lower: 'r', upper: 'R', name: 'chữ rờ' }, { lower: 's', upper: 'S', name: 'chữ sờ' }, { lower: 't', upper: 'T', name: 'chữ tờ' },
-            { lower: 'u', upper: 'U', name: 'chữ u' }, { lower: 'ư', upper: 'Ư', name: 'chữ ư' }, { lower: 'v', upper: 'V', name: 'chữ vờ' },
-            { lower: 'x', upper: 'X', name: 'chữ xờ' }, { lower: 'y', upper: 'Y', name: 'chữ y dài' }
+    <!-- SÂN KHẤU CHÍNH -->
+    <div class="max-w-4xl mx-auto w-full flex-grow relative z-10 garden-stage flex flex-col">
+
+        <!-- ── Bối cảnh vườn (SVG nền, chung cho mọi màn) ── -->
+        <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 800 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+            <!-- Cầu vồng -->
+            <g opacity="0.55">
+                <path d="M 490 250 A 210 210 0 0 1 910 250" fill="none" stroke="#ff8fab" stroke-width="22"/>
+                <path d="M 512 250 A 188 188 0 0 1 888 250" fill="none" stroke="#ffd166" stroke-width="22"/>
+                <path d="M 534 250 A 166 166 0 0 1 866 250" fill="none" stroke="#8ce99a" stroke-width="22"/>
+                <path d="M 556 250 A 144 144 0 0 1 844 250" fill="none" stroke="#74c0fc" stroke-width="22"/>
+            </g>
+            <!-- Mặt trời -->
+            <g transform="translate(90, 84)">
+                <g class="sun-spin">
+                    <g stroke="#ffd43b" stroke-width="9" stroke-linecap="round" opacity="0.9">
+                        <line x1="0" y1="-58" x2="0" y2="-70"/><line x1="0" y1="58" x2="0" y2="70"/>
+                        <line x1="-58" y1="0" x2="-70" y2="0"/><line x1="58" y1="0" x2="70" y2="0"/>
+                        <line x1="-41" y1="-41" x2="-50" y2="-50"/><line x1="41" y1="41" x2="50" y2="50"/>
+                        <line x1="-41" y1="41" x2="-50" y2="50"/><line x1="41" y1="-41" x2="50" y2="-50"/>
+                    </g>
+                </g>
+                <circle r="44" fill="#ffe066"/>
+                <circle r="44" fill="url(#sunshine)"/>
+                <circle cx="-14" cy="-4" r="5" fill="#7a5c00"/>
+                <circle cx="14" cy="-4" r="5" fill="#7a5c00"/>
+                <path d="M -12 12 Q 0 22 12 12" stroke="#7a5c00" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+                <circle cx="-24" cy="8" r="6" fill="#ffb3c1" opacity="0.9"/>
+                <circle cx="24" cy="8" r="6" fill="#ffb3c1" opacity="0.9"/>
+            </g>
+            <defs>
+                <radialGradient id="sunshine" cx="0.35" cy="0.3" r="0.9">
+                    <stop offset="0%" stop-color="#fff7cc"/>
+                    <stop offset="60%" stop-color="#ffe066" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+            <!-- Đồi cỏ -->
+            <ellipse cx="150" cy="640" rx="420" ry="180" fill="#8ddd8d"/>
+            <ellipse cx="680" cy="660" rx="460" ry="200" fill="#7ed67e"/>
+            <ellipse cx="400" cy="700" rx="560" ry="200" fill="#6fcf6f"/>
+            <!-- Hoa cỏ -->
+            <g font-size="30">
+                <text x="60" y="560">🌷</text>
+                <text x="710" y="545">🌼</text>
+                <text x="200" y="590">🌱</text>
+                <text x="590" y="588">🍄</text>
+                <text x="360" y="565" font-size="24">🌸</text>
+            </g>
+        </svg>
+
+        <!-- Mây trôi -->
+        <div class="absolute top-[6%] text-5xl opacity-90 pointer-events-none cloud-move" style="animation-duration: 55s;">☁️</div>
+        <div class="absolute top-[16%] text-3xl opacity-75 pointer-events-none cloud-move" style="animation-duration: 80s; animation-delay: -35s;">☁️</div>
+
+        <!-- ═══════ MÀN HÌNH TRANG BÌA ═══════ -->
+        <div id="screen-home" class="relative z-10 flex-grow flex flex-col items-center justify-center p-4">
+
+            <!-- Gà con mascot -->
+            <div class="w-28 h-28 md:w-40 md:h-40 bounce-in bob-slow" style="animation-delay: 0.1s, 0s;">
+                <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_10px_10px_rgba(120,90,20,0.25)]">
+                    <ellipse cx="100" cy="186" rx="48" ry="8" fill="rgba(120,90,20,0.15)"/>
+                    <g stroke="#f59e0b" stroke-width="5.5" stroke-linecap="round" fill="none">
+                        <path d="M 80 168 l -7 13 M 80 168 l 0 14 M 80 168 l 7 13"/>
+                        <path d="M 120 168 l -7 13 M 120 168 l 0 14 M 120 168 l 7 13"/>
+                    </g>
+                    <circle cx="100" cy="106" r="64" fill="#ffdf5e"/>
+                    <path d="M 52 78 A 64 64 0 0 1 116 44" stroke="#fff3b0" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.8"/>
+                    <ellipse cx="41" cy="116" rx="15" ry="25" fill="#fcc419" transform="rotate(18 41 116)"/>
+                    <ellipse cx="159" cy="116" rx="15" ry="25" fill="#fcc419" transform="rotate(-18 159 116)"/>
+                    <path d="M 95 44 Q 88 20 104 15 Q 97 29 107 41 Z" fill="#fcc419"/>
+                    <circle cx="79" cy="96" r="8.5" fill="#3d3a33"/>
+                    <circle cx="121" cy="96" r="8.5" fill="#3d3a33"/>
+                    <circle cx="82" cy="93" r="3" fill="#ffffff"/>
+                    <circle cx="124" cy="93" r="3" fill="#ffffff"/>
+                    <path d="M 91 109 L 109 109 L 100 122 Z" fill="#ff922b"/>
+                    <circle cx="63" cy="112" r="8.5" fill="#ffb3c1" opacity="0.85"/>
+                    <circle cx="137" cy="112" r="8.5" fill="#ffb3c1" opacity="0.85"/>
+                </svg>
+            </div>
+
+            <h1 class="text-3xl md:text-6xl font-extrabold tracking-wide mt-2 mb-1 text-center bounce-in text-pink-400 sticker-text-lg" style="animation-delay: 0.2s;">
+                VƯỜN CHỮ VUI VẺ
+            </h1>
+            <p class="text-sky-600 font-bold text-sm md:text-xl mb-7 bounce-in text-center sticker-text" style="animation-delay: 0.25s">✨ Bé học 29 chữ cái tiếng Việt ✨</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 w-full max-w-2xl">
+                <button onclick="openExplore()" class="btn-press bounce-in bg-gradient-to-b from-sky-300 to-sky-500 border-[5px] border-white rounded-[2rem] p-5 md:p-7 shadow-[0_9px_0_0_#0284c7,0_16px_26px_rgba(56,150,250,0.4)] text-white text-center" style="animation-delay: 0.3s">
+                    <div class="text-5xl md:text-7xl mb-1.5"><span class="sway inline-block">📖</span></div>
+                    <div class="font-extrabold text-2xl md:text-3xl" style="text-shadow: 0 2px 0 rgba(0,0,0,0.15);">Khám Phá Chữ</div>
+                    <div class="font-semibold text-xs md:text-base opacity-95 mt-0.5">Chạm vào chữ để nghe đọc</div>
+                </button>
+
+                <button onclick="openQuiz()" class="btn-press bounce-in bg-gradient-to-b from-pink-300 to-pink-500 border-[5px] border-white rounded-[2rem] p-5 md:p-7 shadow-[0_9px_0_0_#db2777,0_16px_26px_rgba(236,72,153,0.4)] text-white text-center" style="animation-delay: 0.4s">
+                    <div class="text-5xl md:text-7xl mb-1.5"><span class="sway inline-block" style="animation-delay:-1.5s;">🎯</span></div>
+                    <div class="font-extrabold text-2xl md:text-3xl" style="text-shadow: 0 2px 0 rgba(0,0,0,0.15);">Tìm Chữ Cái</div>
+                    <div class="font-semibold text-xs md:text-base opacity-95 mt-0.5">Nghe và chạm đúng chữ</div>
+                </button>
+            </div>
+
+            <p class="mt-6 text-white font-bold text-xs md:text-sm bounce-in text-center bg-emerald-500/70 px-4 py-1.5 rounded-full border-2 border-white/60" style="animation-delay: 0.5s">💡 Nhớ bật loa để bé nghe cô đọc chữ nhé!</p>
+        </div>
+
+        <!-- ═══════ MÀN HÌNH KHÁM PHÁ ═══════ -->
+        <div id="screen-explore" class="relative z-10 flex-grow flex-col p-3 md:p-5 hidden">
+            <h2 class="text-center font-extrabold text-xl md:text-3xl mb-3 text-sky-600 sticker-text">📖 Chạm vào chữ để nghe nào!</h2>
+            <div id="explore-grid" class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2.5 md:gap-4 pb-4">
+                <!-- JS sinh 29 thẻ chữ -->
+            </div>
+        </div>
+
+        <!-- ═══════ MÀN HÌNH TÌM CHỮ ═══════ -->
+        <div id="screen-quiz" class="relative z-10 flex-grow flex-col items-center justify-center p-3 hidden">
+
+            <!-- Gà con dẫn chương trình + câu hỏi -->
+            <div class="flex flex-col items-center mb-5 md:mb-8">
+                <div id="quiz-mascot" class="w-20 h-20 md:w-28 md:h-28 bob-slow">
+                    <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_8px_8px_rgba(120,90,20,0.25)]">
+                        <g stroke="#f59e0b" stroke-width="5.5" stroke-linecap="round" fill="none">
+                            <path d="M 80 168 l -7 13 M 80 168 l 0 14 M 80 168 l 7 13"/>
+                            <path d="M 120 168 l -7 13 M 120 168 l 0 14 M 120 168 l 7 13"/>
+                        </g>
+                        <circle cx="100" cy="106" r="64" fill="#ffdf5e"/>
+                        <path d="M 52 78 A 64 64 0 0 1 116 44" stroke="#fff3b0" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.8"/>
+                        <ellipse cx="41" cy="116" rx="15" ry="25" fill="#fcc419" transform="rotate(18 41 116)"/>
+                        <ellipse cx="159" cy="116" rx="15" ry="25" fill="#fcc419" transform="rotate(-18 159 116)"/>
+                        <path d="M 95 44 Q 88 20 104 15 Q 97 29 107 41 Z" fill="#fcc419"/>
+                        <circle cx="79" cy="96" r="8.5" fill="#3d3a33"/>
+                        <circle cx="121" cy="96" r="8.5" fill="#3d3a33"/>
+                        <circle cx="82" cy="93" r="3" fill="#ffffff"/>
+                        <circle cx="124" cy="93" r="3" fill="#ffffff"/>
+                        <path d="M 91 109 L 109 109 L 100 122 Z" fill="#ff922b"/>
+                        <circle cx="63" cy="112" r="8.5" fill="#ffb3c1" opacity="0.85"/>
+                        <circle cx="137" cy="112" r="8.5" fill="#ffb3c1" opacity="0.85"/>
+                    </svg>
+                </div>
+                <button onclick="repeatQuizQuestion()" class="btn-press mt-2 candy-sign px-6 py-2.5 md:px-9 md:py-3.5 flex items-center gap-2.5">
+                    <span class="text-2xl md:text-3xl">🔊</span>
+                    <span id="quiz-prompt" class="font-extrabold text-xl md:text-3xl text-amber-500">Tìm chữ nào?</span>
+                </button>
+            </div>
+
+            <!-- 3 lựa chọn to đùng -->
+            <div id="quiz-options" class="flex gap-3 md:gap-7 justify-center items-center w-full flex-wrap">
+                <!-- JS sinh 3 thẻ -->
+            </div>
+
+            <!-- Khen thưởng sau khi đúng -->
+            <div id="quiz-reward" class="mt-5 md:mt-8 min-h-[64px] md:min-h-[84px] flex items-center justify-center"></div>
+        </div>
+
+        <!-- Huy hiệu khen lớn -->
+        <div id="praise-badge" class="absolute left-1/2 top-1/2 z-[70] pointer-events-none hidden">
+            <div class="bg-gradient-to-b from-yellow-300 to-orange-400 text-white font-extrabold text-2xl md:text-4xl px-7 py-4 rounded-3xl border-4 border-white shadow-[0_0_35px_rgba(250,204,21,0.9)] whitespace-nowrap text-center" style="text-shadow: 0 2px 0 rgba(0,0,0,0.15);">
+                <span id="praise-text">🌟 Bé giỏi quá! 🌟</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ═══════ THẺ CHI TIẾT CHỮ CÁI (overlay toàn màn) ═══════ -->
+    <div id="letter-detail" class="fixed inset-0 z-50 items-center justify-center bg-sky-900/40 backdrop-blur-sm hidden p-4" onclick="closeDetail(event)">
+        <div id="letter-detail-card" class="rounded-[2.5rem] border-[6px] border-white p-6 md:p-9 max-w-sm w-full text-center shadow-2xl relative overflow-hidden" onclick="event.stopPropagation()">
+            <!-- Hoạ tiết chấm bi -->
+            <div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image: radial-gradient(#ffffff 12%, transparent 13%); background-size: 26px 26px;"></div>
+
+            <button onclick="closeDetail()" class="absolute top-2 right-2 w-11 h-11 bg-white/90 hover:bg-white border-[3px] rounded-full flex items-center justify-center text-xl font-extrabold shadow-lg btn-press z-20" id="detail-close-btn">✕</button>
+
+            <div class="relative z-10">
+                <!-- Chữ to trong vòng tròn kẹo -->
+                <div class="mx-auto w-40 h-40 md:w-48 md:h-48 bg-white rounded-full border-[6px] border-dashed flex items-center justify-center gap-1 shadow-[0_10px_20px_rgba(60,90,140,0.2)]" id="detail-circle">
+                    <span id="detail-upper" class="font-extrabold text-7xl md:text-8xl leading-none"></span>
+                    <span id="detail-lower" class="font-extrabold text-4xl md:text-5xl text-slate-300 leading-none mt-8"></span>
+                </div>
+
+                <!-- Hình minh hoạ trong đám mây -->
+                <div class="mt-4 mb-2 relative inline-block">
+                    <div class="bg-white rounded-[2rem] px-8 py-3 shadow-[0_6px_0_0_rgba(0,0,0,0.06)]">
+                        <span id="detail-emoji" class="text-6xl md:text-7xl inline-block"></span>
+                    </div>
+                </div>
+                <div id="detail-word" class="font-extrabold text-3xl md:text-4xl text-white sticker-text-lg mb-5" style="color:#475569"></div>
+
+                <div class="flex items-center justify-center gap-3">
+                    <button onclick="detailNav(-1)" class="btn-press w-14 h-14 md:w-16 md:h-16 bg-white border-4 border-sky-200 rounded-full text-2xl md:text-3xl shadow-[0_5px_0_0_#bae6fd]">◀️</button>
+                    <button onclick="readDetail()" class="btn-press w-16 h-16 md:w-20 md:h-20 bg-gradient-to-b from-amber-300 to-amber-400 border-4 border-white rounded-full text-3xl md:text-4xl shadow-[0_6px_0_0_#f59e0b,0_12px_20px_rgba(245,158,11,0.4)]">🔊</button>
+                    <button onclick="detailNav(1)" class="btn-press w-14 h-14 md:w-16 md:h-16 bg-white border-4 border-sky-200 rounded-full text-2xl md:text-3xl shadow-[0_5px_0_0_#bae6fd]">▶️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ══════════ ÂM THANH TỨC THÌ (Web Audio) ══════════
+        let audioCtx = null;
+        let soundOn = true;
+
+        function ensureAudio() {
+            if (!soundOn) return;
+            if (!audioCtx) {
+                const AC = window.AudioContext || window.webkitAudioContext;
+                if (AC) audioCtx = new AC();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function sfxPop() {
+            if (!soundOn || !audioCtx) return;
+            const t = audioCtx.currentTime;
+            const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+            o.type = 'triangle';
+            o.frequency.setValueAtTime(420, t);
+            o.frequency.exponentialRampToValueAtTime(950, t + 0.1);
+            g.gain.setValueAtTime(0.35, t);
+            g.gain.exponentialRampToValueAtTime(0.01, t + 0.16);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(t); o.stop(t + 0.18);
+        }
+
+        function sfxClick() {
+            if (!soundOn || !audioCtx) return;
+            const t = audioCtx.currentTime;
+            const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+            o.type = 'sine';
+            o.frequency.setValueAtTime(600, t);
+            g.gain.setValueAtTime(0.25, t);
+            g.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(t); o.stop(t + 0.12);
+        }
+
+        function sfxBoing() {
+            if (!soundOn || !audioCtx) return;
+            const t = audioCtx.currentTime;
+            const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+            o.type = 'sine';
+            o.frequency.setValueAtTime(340, t);
+            o.frequency.exponentialRampToValueAtTime(220, t + 0.12);
+            o.frequency.exponentialRampToValueAtTime(300, t + 0.24);
+            g.gain.setValueAtTime(0.28, t);
+            g.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(t); o.stop(t + 0.32);
+        }
+
+        function sfxFanfare() {
+            if (!soundOn || !audioCtx) return;
+            const notes = [523.25, 659.25, 783.99, 1046.5];
+            const t0 = audioCtx.currentTime;
+            notes.forEach((f, i) => {
+                const t = t0 + i * 0.09;
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+                o.type = 'triangle';
+                o.frequency.setValueAtTime(f, t);
+                g.gain.setValueAtTime(0.3, t);
+                g.gain.exponentialRampToValueAtTime(0.01, t + 0.25);
+                o.connect(g); g.connect(audioCtx.destination);
+                o.start(t); o.stop(t + 0.28);
+            });
+        }
+
+        function sfxSparkle() {
+            if (!soundOn || !audioCtx) return;
+            const t0 = audioCtx.currentTime;
+            [880, 1174.66].forEach((f, i) => {
+                const t = t0 + i * 0.07;
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+                o.type = 'sine';
+                o.frequency.setValueAtTime(f, t);
+                g.gain.setValueAtTime(0.22, t);
+                g.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+                o.connect(g); g.connect(audioCtx.destination);
+                o.start(t); o.stop(t + 0.22);
+            });
+        }
+
+        function toggleSound() {
+            soundOn = !soundOn;
+            document.getElementById('sound-label').innerText = soundOn ? '🔊' : '🔇';
+            if (!soundOn && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+            if (soundOn) { ensureAudio(); sfxClick(); }
+            saveSetting('abc-sound', soundOn ? '1' : '0');
+        }
+
+        // ══════════ LƯU TRỮ AN TOÀN ══════════
+        function saveSetting(key, value) { try { localStorage.setItem(key, value); } catch(e) {} }
+        function loadSetting(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+
+        // ══════════ GIỌNG ĐỌC TIẾNG VIỆT ══════════
+        function playTTS(text) {
+            return new Promise(resolve => {
+                if (soundOn && 'speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const u = new SpeechSynthesisUtterance(text);
+                    u.lang = 'vi-VN';
+                    u.rate = 0.85;
+                    u.pitch = 1.15;
+
+                    const voices = window.speechSynthesis.getVoices();
+                    const viVoice = voices.find(v => v.lang === 'vi-VN' && v.name.includes('Premium')) || voices.find(v => v.lang === 'vi-VN');
+                    if (viVoice) u.voice = viVoice;
+
+                    u.onend = resolve;
+                    u.onerror = resolve;
+                    window.speechSynthesis.speak(u);
+                    setTimeout(resolve, 7000);
+                } else {
+                    setTimeout(resolve, soundOn ? 800 : 200);
+                }
+            });
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
+        }
+
+        // ══════════ 29 CHỮ CÁI TIẾNG VIỆT ══════════
+        const LETTERS = [
+            { up: 'A', low: 'a', sound: 'a',      word: 'Áo',    emoji: '👕' },
+            { up: 'Ă', low: 'ă', sound: 'á',      word: 'Ăn',    emoji: '🍚' },
+            { up: 'Â', low: 'â', sound: 'ớ',      word: 'Ấm',    emoji: '🫖' },
+            { up: 'B', low: 'b', sound: 'bờ',     word: 'Bóng',  emoji: '⚽' },
+            { up: 'C', low: 'c', sound: 'cờ',     word: 'Cá',    emoji: '🐟' },
+            { up: 'D', low: 'd', sound: 'dờ',     word: 'Dê',    emoji: '🐐' },
+            { up: 'Đ', low: 'đ', sound: 'đờ',     word: 'Đèn',   emoji: '💡' },
+            { up: 'E', low: 'e', sound: 'e',      word: 'Em bé', emoji: '👶' },
+            { up: 'Ê', low: 'ê', sound: 'ê',      word: 'Ếch',   emoji: '🐸' },
+            { up: 'G', low: 'g', sound: 'gờ',     word: 'Gà',    emoji: '🐔' },
+            { up: 'H', low: 'h', sound: 'hờ',     word: 'Hoa',   emoji: '🌸' },
+            { up: 'I', low: 'i', sound: 'i',      word: 'Ỉn',    emoji: '🐷' },
+            { up: 'K', low: 'k', sound: 'ca',     word: 'Kẹo',   emoji: '🍬' },
+            { up: 'L', low: 'l', sound: 'lờ',     word: 'Lá',    emoji: '🍃' },
+            { up: 'M', low: 'm', sound: 'mờ',     word: 'Mèo',   emoji: '🐱' },
+            { up: 'N', low: 'n', sound: 'nờ',     word: 'Nấm',   emoji: '🍄' },
+            { up: 'O', low: 'o', sound: 'o',      word: 'Ong',   emoji: '🐝' },
+            { up: 'Ô', low: 'ô', sound: 'ô',      word: 'Ô',     emoji: '☂️' },
+            { up: 'Ơ', low: 'ơ', sound: 'ơ',      word: 'Ớt',    emoji: '🌶️' },
+            { up: 'P', low: 'p', sound: 'pờ',     word: 'Pin',   emoji: '🔋' },
+            { up: 'Q', low: 'q', sound: 'quy',    word: 'Quà',   emoji: '🎁' },
+            { up: 'R', low: 'r', sound: 'rờ',     word: 'Rùa',   emoji: '🐢' },
+            { up: 'S', low: 's', sound: 'sờ',     word: 'Sao',   emoji: '⭐' },
+            { up: 'T', low: 't', sound: 'tờ',     word: 'Táo',   emoji: '🍎' },
+            { up: 'U', low: 'u', sound: 'u',      word: 'Uống',  emoji: '🥤' },
+            { up: 'Ư', low: 'ư', sound: 'ư',      word: 'Ước',   emoji: '✨' },
+            { up: 'V', low: 'v', sound: 'vờ',     word: 'Vịt',   emoji: '🦆' },
+            { up: 'X', low: 'x', sound: 'xờ',     word: 'Xe',    emoji: '🚗' },
+            { up: 'Y', low: 'y', sound: 'i dài',  word: 'Yêu',   emoji: '❤️' }
         ];
 
-        // ==========================================
-        // COMPONENT CHÍNH
-        // ==========================================
-        const App = () => {
-            const [gameState, setGameState] = useState('START'); // START, PLAYING, END
-            const [targetLetter, setTargetLetter] = useState(null);
-            const [boardLetters, setBoardLetters] = useState([]);
-            const [foundCount, setFoundCount] = useState(0);
-            const [totalTargets, setTotalTargets] = useState(0);
-            const [wrongClickedId, setWrongClickedId] = useState(null);
-            const [starCount, setStarCount] = useState(0);
-            const [showTargetLetter, setShowTargetLetter] = useState(true);
+        // Bảng màu kẹo pastel: nền đậm hơn để chữ trắng viền nổi rõ
+        const CARD_STYLES = [
+            { bg: 'linear-gradient(180deg, #ff9ecb, #f76fae)', text: '#c2255c', border: '#f783ac', shadow: '#e64980' },
+            { bg: 'linear-gradient(180deg, #c5b3ff, #a184f5)', text: '#6741d9', border: '#b197fc', shadow: '#7950f2' },
+            { bg: 'linear-gradient(180deg, #86d6ff, #4dabf7)', text: '#1971c2', border: '#74c0fc', shadow: '#339af0' },
+            { bg: 'linear-gradient(180deg, #ffd66b, #ffb930)', text: '#b45309', border: '#ffd43b', shadow: '#f59f00' },
+            { bg: 'linear-gradient(180deg, #8be398, #51cf66)', text: '#2b8a3e', border: '#69db7c', shadow: '#40c057' },
+            { bg: 'linear-gradient(180deg, #ffb37e, #ff922b)', text: '#c2410c', border: '#ffa94d', shadow: '#f76707' }
+        ];
+        function styleOf(i) { return CARD_STYLES[i % CARD_STYLES.length]; }
 
-            const activeTimeoutsRef = useRef([]);
-            const recentTargetsRef = useRef([]);
+        // ══════════ TRẠNG THÁI ══════════
+        let stars = 0;
+        let detailIndex = 0;
+        let quizAnswer = null;
+        let quizLocked = false;
+        let recentQuiz = [];
 
-            useEffect(() => {
-                return () => {
-                    activeTimeoutsRef.current.forEach(clearTimeout);
-                    window.speechSynthesis.cancel();
-                };
-            }, []);
+        window.addEventListener('DOMContentLoaded', () => {
+            stars = parseInt(loadSetting('abc-stars') || '0', 10) || 0;
+            if (loadSetting('abc-sound') === '0') { soundOn = false; document.getElementById('sound-label').innerText = '🔇'; }
+            updateStarUI();
+            buildExploreGrid();
+        });
 
-            const setSafeTimeout = (callback, delay) => {
-                const timer = setTimeout(callback, delay);
-                activeTimeoutsRef.current.push(timer);
-                return timer;
-            };
+        function updateStarUI() {
+            document.getElementById('star-display').innerText = stars;
+        }
 
-            const speak = useCallback((text, rate = 0.9, onEndCallback = null) => {
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel();
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    const voices = window.speechSynthesis.getVoices();
-                    
-                    const bestVoice = voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && (v.name.includes('Neural') || v.name.includes('HoaiMy')))
-                                   || voices.find(v => (v.lang.includes('vi') || v.lang.includes('VN')) && v.name.includes('Google'))
-                                   || voices.find(v => v.lang.includes('vi') || v.lang.includes('VN'));
-                                   
-                    if (bestVoice) utterance.voice = bestVoice;
-                    
-                    utterance.lang = 'vi-VN';
-                    utterance.rate = rate; 
-                    utterance.pitch = 1.1; 
+        function addStar() {
+            stars++;
+            updateStarUI();
+            saveSetting('abc-stars', String(stars));
+        }
 
-                    if (onEndCallback) {
-                        let isEnded = false;
-                        const handleEnd = () => {
-                            if (!isEnded) {
-                                isEnded = true;
-                                onEndCallback();
-                            }
-                        };
-                        utterance.onend = handleEnd;
-                        utterance.onerror = handleEnd;
-                        setSafeTimeout(handleEnd, text.length * 120 + 1000); 
-                    }
-                    window.speechSynthesis.speak(utterance);
-                } else {
-                    if (onEndCallback) setSafeTimeout(onEndCallback, 1500);
-                }
-            }, []);
+        // ══════════ ĐIỀU HƯỚNG MÀN HÌNH ══════════
+        function showScreen(name) {
+            ['home', 'explore', 'quiz'].forEach(s => {
+                const el = document.getElementById('screen-' + s);
+                if (s === name) { el.classList.remove('hidden'); el.classList.add('flex'); }
+                else { el.classList.add('hidden'); el.classList.remove('flex'); }
+            });
+        }
 
-            const generateBoard = useCallback(() => {
-                let availableTargets = ALPHABET.filter(item => !recentTargetsRef.current.includes(item.lower));
-                if (availableTargets.length === 0) {
-                    recentTargetsRef.current = [];
-                    availableTargets = ALPHABET;
-                }
-                const target = availableTargets[Math.floor(Math.random() * availableTargets.length)];
-                recentTargetsRef.current.push(target.lower);
+        function goHome() {
+            ensureAudio(); sfxClick();
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            closeDetail();
+            showScreen('home');
+        }
 
-                setTargetLetter(target);
+        // ══════════ CHẾ ĐỘ 1: KHÁM PHÁ CHỮ ══════════
+        function buildExploreGrid() {
+            const grid = document.getElementById('explore-grid');
+            grid.innerHTML = '';
+            LETTERS.forEach((L, i) => {
+                const st = styleOf(i);
+                const tilt = (Math.random() * 5 - 2.5).toFixed(1);
+                const card = document.createElement('button');
+                card.className = 'sticker-card aspect-square pop-in no-select';
+                card.style.background = st.bg;
+                card.style.boxShadow = `0 6px 0 0 ${st.shadow}, 0 12px 18px rgba(90, 130, 190, 0.3)`;
+                card.style.animationDelay = `${(i % 12) * 0.03}s`;
+                card.innerHTML = `
+                    <div class="w-full h-full flex flex-col items-center justify-center" style="transform: rotate(${tilt}deg);">
+                        <span class="font-extrabold text-3xl sm:text-4xl md:text-5xl leading-none sticker-text" style="color:${st.text};">${L.up}</span>
+                        <span class="text-xl sm:text-2xl md:text-3xl mt-1 drop-shadow-md">${L.emoji}</span>
+                    </div>
+                `;
+                card.onclick = () => openDetail(i);
+                grid.appendChild(card);
+            });
+        }
 
-                // GIẢM SỐ LƯỢNG CHỮ ĐỂ Con ĐỠ RỐI
-                const BOARD_SIZE = 7; // Tổng 7 chữ
-                const TARGET_AMOUNT = 2; // Cần tìm 2 chữ (1 hoa, 1 thường hoặc ngẫu nhiên)
-                setTotalTargets(TARGET_AMOUNT);
-                setFoundCount(0);
+        function openExplore() {
+            ensureAudio(); sfxClick();
+            showScreen('explore');
+            playTTS('Bé chạm vào chữ nào cũng được nhé!');
+        }
 
-                let newBoard = [];
-                
-                // Thêm các chữ mục tiêu
-                for (let i = 0; i < TARGET_AMOUNT; i++) {
-                    newBoard.push({
-                        id: `target_${i}`,
-                        char: i % 2 === 0 ? target.upper : target.lower,
-                        isTarget: true,
-                        isFound: false,
-                        rot: Math.floor(Math.random() * 20) - 10, // Độ nghiêng nhỏ
-                        tx: Math.floor(Math.random() * 10) - 5,
-                        ty: Math.floor(Math.random() * 10) - 5
-                    });
-                }
+        function openDetail(i) {
+            ensureAudio(); sfxPop();
+            detailIndex = i;
+            renderDetail();
+            const overlay = document.getElementById('letter-detail');
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+        }
 
-                // Thêm các chữ nhiễu
-                const distractors = ALPHABET.filter(item => item.lower !== target.lower);
-                for (let i = 0; i < (BOARD_SIZE - TARGET_AMOUNT); i++) {
-                    const randomDistractor = distractors[Math.floor(Math.random() * distractors.length)];
-                    newBoard.push({
-                        id: `distractor_${i}`,
-                        char: Math.random() > 0.5 ? randomDistractor.upper : randomDistractor.lower,
-                        isTarget: false,
-                        isFound: false,
-                        rot: Math.floor(Math.random() * 20) - 10,
-                        tx: Math.floor(Math.random() * 10) - 5,
-                        ty: Math.floor(Math.random() * 10) - 5
-                    });
-                }
+        function renderDetail() {
+            const L = LETTERS[detailIndex];
+            const st = styleOf(detailIndex);
 
-                // Trộn đều
-                newBoard.sort(() => Math.random() - 0.5);
-                setBoardLetters(newBoard);
+            const card = document.getElementById('letter-detail-card');
+            card.style.background = st.bg;
 
-                setSafeTimeout(() => {
-                    speak(`Con tìm ${target.name} nhé!`);
-                }, 300);
+            const circle = document.getElementById('detail-circle');
+            circle.style.borderColor = st.border;
 
-            }, [speak]);
+            const closeBtn = document.getElementById('detail-close-btn');
+            closeBtn.style.color = st.text;
+            closeBtn.style.borderColor = st.border;
 
-            const handleStartApp = () => {
-                const applause = document.getElementById('applauseSound');
-                if (applause) {
-                    applause.play().then(() => {
-                        applause.pause();
-                        applause.currentTime = 0;
-                    }).catch(e => console.log("Lỗi mồi audio:", e));
-                }
-                setStarCount(0);
-                recentTargetsRef.current = [];
-                speak(`Cùng chơi Săn chữ nhé!`, 0.9, () => {
-                    setGameState('PLAYING');
-                    generateBoard();
+            document.getElementById('detail-upper').innerText = L.up;
+            document.getElementById('detail-upper').style.color = st.text;
+            document.getElementById('detail-lower').innerText = L.low;
+            document.getElementById('detail-word').innerText = L.word;
+
+            const em = document.getElementById('detail-emoji');
+            em.innerText = L.emoji;
+            em.classList.remove('happy-dance');
+            void em.offsetWidth;
+            em.classList.add('happy-dance');
+
+            readDetail();
+        }
+
+        function readDetail() {
+            const L = LETTERS[detailIndex];
+            playTTS(`Chữ ${L.sound}! ${L.sound}, như trong từ ${L.word}!`);
+        }
+
+        function detailNav(dir) {
+            ensureAudio(); sfxClick();
+            detailIndex = (detailIndex + dir + LETTERS.length) % LETTERS.length;
+            renderDetail();
+        }
+
+        function closeDetail(e) {
+            const overlay = document.getElementById('letter-detail');
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        }
+
+        // ══════════ CHẾ ĐỘ 2: TÌM CHỮ CÁI ══════════
+        function openQuiz() {
+            ensureAudio(); sfxClick();
+            showScreen('quiz');
+            nextQuizQuestion(true);
+        }
+
+        function pickQuizLetter() {
+            let candidates = LETTERS.map((_, i) => i).filter(i => !recentQuiz.includes(i));
+            let idx = candidates[Math.floor(Math.random() * candidates.length)];
+            recentQuiz.push(idx);
+            if (recentQuiz.length > 5) recentQuiz.shift();
+            return idx;
+        }
+
+        function nextQuizQuestion(isFirst = false) {
+            quizLocked = false;
+            document.getElementById('quiz-reward').innerHTML = '';
+
+            quizAnswer = pickQuizLetter();
+
+            let others = LETTERS.map((_, i) => i).filter(i => i !== quizAnswer);
+            others.sort(() => Math.random() - 0.5);
+            let options = [quizAnswer, others[0], others[1]];
+            options.sort(() => Math.random() - 0.5);
+
+            const box = document.getElementById('quiz-options');
+            box.innerHTML = '';
+            options.forEach((idx, k) => {
+                const L = LETTERS[idx];
+                const st = styleOf(idx);
+
+                // Thẻ ngoài: pop-in. Nội dung trong: floaty. Hai animation TÁCH RIÊNG
+                // trên hai phần tử khác nhau nên không còn đè nhau gây tàng hình.
+                const card = document.createElement('button');
+                card.className = 'sticker-card w-24 h-24 sm:w-28 sm:h-28 md:w-40 md:h-40 pop-in no-select';
+                card.style.background = st.bg;
+                card.style.boxShadow = `0 8px 0 0 ${st.shadow}, 0 16px 22px rgba(90, 130, 190, 0.35)`;
+                card.style.animationDelay = `${k * 0.08}s`;
+
+                const inner = document.createElement('div');
+                inner.className = 'w-full h-full flex items-center justify-center floaty';
+                inner.style.animationDelay = `${-Math.random() * 2}s`;
+                inner.innerHTML = `<span class="font-extrabold text-6xl md:text-8xl leading-none sticker-text-lg" style="color:${st.text};">${L.up}</span>`;
+
+                card.appendChild(inner);
+                card.onclick = () => answerQuiz(idx, card);
+                box.appendChild(card);
+            });
+
+            const L = LETTERS[quizAnswer];
+            document.getElementById('quiz-prompt').innerText = 'Tìm chữ ' + L.up + ' nào!';
+
+            const intro = isFirst ? 'Cùng chơi tìm chữ nhé! ' : '';
+            playTTS(`${intro}Bé hãy tìm chữ ${L.sound}! Chữ ${L.sound} như trong từ ${L.word}.`);
+        }
+
+        function repeatQuizQuestion() {
+            if (quizAnswer === null) return;
+            ensureAudio(); sfxClick();
+            const L = LETTERS[quizAnswer];
+            playTTS(`Bé hãy tìm chữ ${L.sound}! Chữ ${L.sound} như trong từ ${L.word}.`);
+        }
+
+        const PRAISES = ['Giỏi quá', 'Tuyệt vời', 'Đúng rồi', 'Hoan hô bé', 'Xuất sắc', 'Bé thông minh quá'];
+
+        function answerQuiz(idx, cardEl) {
+            if (quizLocked) return;
+            ensureAudio();
+
+            const L = LETTERS[quizAnswer];
+
+            if (idx === quizAnswer) {
+                quizLocked = true;
+                sfxPop();
+                setTimeout(sfxSparkle, 150);
+
+                cardEl.classList.add('happy-dance');
+
+                const mascot = document.getElementById('quiz-mascot');
+                mascot.classList.remove('happy-dance');
+                void mascot.offsetWidth;
+                mascot.classList.add('happy-dance');
+
+                const fly = document.createElement('div');
+                fly.className = 'star-fly absolute left-1/2 top-0 text-4xl pointer-events-none z-30';
+                fly.innerText = '🌟';
+                cardEl.style.position = 'relative';
+                cardEl.appendChild(fly);
+
+                const rect = cardEl.getBoundingClientRect();
+                confetti({
+                    particleCount: 70, spread: 90, zIndex: 100,
+                    origin: { x: (rect.left + rect.width/2) / window.innerWidth, y: (rect.top + rect.height/2) / window.innerHeight },
+                    colors: ['#fde047', '#f9a8d4', '#7dd3fc', '#86efac']
                 });
-            };
 
-            const handleLetterClick = (letterObj) => {
-                if (letterObj.isFound) return; 
+                addStar();
 
-                if (letterObj.isTarget) {
-                    setBoardLetters(prev => prev.map(l => l.id === letterObj.id ? { ...l, isFound: true } : l));
-                    
-                    const newFoundCount = foundCount + 1;
-                    setFoundCount(newFoundCount);
+                const praise = PRAISES[Math.floor(Math.random() * PRAISES.length)];
+                document.getElementById('quiz-reward').innerHTML = `
+                    <div class="pop-in bg-white border-4 border-emerald-300 rounded-3xl px-6 py-3 shadow-[0_6px_0_0_#69db7c,0_12px_18px_rgba(64,192,87,0.3)] flex items-center gap-3">
+                        <span class="text-4xl md:text-5xl">${L.emoji}</span>
+                        <span class="font-extrabold text-2xl md:text-3xl text-emerald-500">${L.up} — ${L.word}</span>
+                    </div>
+                `;
 
-                    const ping = document.getElementById('pingSound');
-                    if (ping) {
-                        ping.currentTime = 0;
-                        ping.play().catch(e=>console.log(e));
-                    }
-
-                    if (newFoundCount >= totalTargets) {
-                        const applause = document.getElementById('applauseSound');
-                        if (applause) {
-                            applause.currentTime = 0;
-                            applause.play().catch(e => console.log(e));
-                        }
-
-                        setStarCount(s => s + 1);
-                        speak(`Hoan hô!`, 0.9, () => {
-                            setSafeTimeout(() => {
-                                if (starCount + 1 >= ALPHABET.length) {
-                                    setGameState('END');
-                                    speak("Con giỏi quá! Con đã tìm được toàn bộ bảng chữ cái rồi!");
-                                } else {
-                                    generateBoard();
-                                }
-                            }, 800);
-                        });
-                    }
-
-                } else {
-                    setWrongClickedId(letterObj.id);
-                    speak(`Chưa đúng rồi.`);
-                    setSafeTimeout(() => setWrongClickedId(null), 800);
+                let bigParty = stars % 5 === 0;
+                if (bigParty) {
+                    sfxFanfare();
+                    showPraiseBadge(`🎉 Bé được ${stars} sao rồi! 🎉`);
+                    confetti({ particleCount: 140, spread: 140, origin: { y: 0.4 }, zIndex: 110, colors: ['#fbbf24', '#f472b6', '#a78bfa', '#4ade80'] });
                 }
-            };
 
-            const repeatQuestion = () => {
-                speak(`Con tìm ${targetLetter.name} nhé!`);
-            };
+                playTTS(`${praise}! Chữ ${L.sound}. ${L.sound} như trong từ ${L.word}!`).then(() => {
+                    setTimeout(() => nextQuizQuestion(), bigParty ? 700 : 300);
+                });
 
-            // ========================================
-            // GIAO DIỆN START
-            // ========================================
-            if (gameState === 'START') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-4 font-sans relative">
-                        <audio id="applauseSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_1067517c5b.mp3" preload="auto"></audio>
-                        <audio id="pingSound" src="https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3" preload="auto"></audio>
+            } else {
+                sfxBoing();
+                cardEl.classList.remove('wiggle');
+                void cardEl.offsetWidth;
+                cardEl.classList.add('wiggle');
 
-                        <button onClick={() => window.location.href='index.html'} className="absolute top-6 left-6 flex items-center gap-2 bg-white text-indigo-500 border-2 border-indigo-100 hover:bg-indigo-50 px-4 py-2 rounded-xl shadow-sm font-bold transition-transform active:scale-90 z-20">
-                            <IconArrowLeft size={24} /> Về Menu
-                        </button>
-                        
-                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-center max-w-md w-full border-4 border-slate-100 transform transition hover:scale-105 z-10 relative">
-                            <div className="text-7xl mb-6 relative animate-bounce-slow">
-                                🐝<span className="absolute -top-2 -right-4 text-4xl">🔍</span>
-                            </div>
-                            <h1 className="text-5xl font-black mb-2 font-kid text-sky-500 tracking-wider">
-                                SĂN CHỮ
-                            </h1>
-                            <p className="text-lg text-slate-500 mb-8 font-semibold">Con tinh mắt tìm chữ cái nha!</p>
-                            <button 
-                                onClick={handleStartApp}
-                                className="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-800 text-3xl font-black py-5 px-8 rounded-3xl shadow-[0_8px_0_#ca8a04] active:translate-y-2 active:shadow-none flex items-center justify-center gap-4 transition-all"
-                            >
-                                <IconPlay size={36} fill="currentColor" /> Bắt đầu ngay
-                            </button>
-                        </div>
-                    </div>
-                );
+                const wrongL = LETTERS[idx];
+                playTTS(`Đây là chữ ${wrongL.sound}. Bé thử tìm chữ ${L.sound} lần nữa nhé!`);
             }
+        }
 
-            // ========================================
-            // GIAO DIỆN END
-            // ========================================
-            if (gameState === 'END') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-4 font-sans">
-                        <div className="bg-white p-10 rounded-[3rem] shadow-2xl text-center max-w-md w-full border-4 border-slate-100 relative">
-                            <div className="text-[100px] mb-4 animate-bounce-slow">🏆</div>
-                            <h1 className="text-4xl font-black text-rose-500 mb-6">Con Giỏi Quá!</h1>
-                            
-                            <div className="flex justify-center gap-2 mb-4 bg-slate-50 py-5 rounded-[2rem] border-2 border-slate-100">
-                                {[1, 2, 3, 4, 5].map(i => (
-                                    <IconStar key={i} size={48} className="text-yellow-400 drop-shadow-md" fill="currentColor" />
-                                ))}
-                            </div>
-                            
-                            <p className="text-xl text-sky-600 font-bold mb-8">
-                                Con đã hoàn thành {ALPHABET.length}/{ALPHABET.length} chữ cái!
-                            </p>
-                            
-                            <div className="flex flex-col gap-4">
-                                <button onClick={handleStartApp} className="w-full bg-sky-400 hover:bg-sky-500 text-white text-2xl font-black py-5 rounded-2xl shadow-[0_6px_0_#0284c7] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
-                                    <IconRefresh size={28} /> Chơi lại bài này
-                                </button>
-                                <button onClick={() => window.location.href='index.html'} className="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 text-2xl font-bold py-5 rounded-2xl shadow-[0_6px_0_#94a3b8] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 mt-2">
-                                    <IconHome size={28} /> Về màn hình chính
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                );
+        function showPraiseBadge(text) {
+            const badge = document.getElementById('praise-badge');
+            document.getElementById('praise-text').innerText = text;
+            badge.classList.remove('hidden', 'praise-pop');
+            void badge.offsetWidth;
+            badge.classList.add('praise-pop');
+            setTimeout(() => badge.classList.add('hidden'), 1600);
+        }
+
+        // ══════════ TOÀN MÀN HÌNH ══════════
+        function toggleFullScreen() {
+            const doc = document.documentElement;
+            const req = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
+            const ext = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement)) {
+                if (req) { try { req.call(doc); } catch(e){} }
+            } else {
+                if (ext) ext.call(document);
             }
+        }
 
-            // ========================================
-            // GIAO DIỆN PLAYING
-            // ========================================
-            return (
-                <div className="min-h-screen flex flex-col items-center p-4 md:p-6 font-sans relative overflow-hidden">
-                    
-                    {/* Header Controls */}
-                    <div className="w-full max-w-4xl flex justify-between items-center bg-white p-3 md:p-4 rounded-3xl shadow-sm border-2 border-slate-100 z-20">
-                        <button onClick={() => window.location.href='index.html'} className="text-slate-400 hover:text-rose-500 bg-slate-50 p-3 rounded-full active:scale-90 transition">
-                            <IconArrowLeft size={28} />
-                        </button>
-                        
-                        <div className="flex gap-1 md:gap-2 flex-1 items-center justify-center bg-sky-50 py-2 px-6 rounded-full w-fit mx-auto border-2 border-sky-100">
-                            {[...Array(5)].map((_, i) => {
-                                const activeStars = starCount === 0 ? 0 : ((starCount - 1) % 5) + 1;
-                                return <IconStar key={i} size={28} className={i < activeStars ? "text-yellow-400 transform scale-110 drop-shadow-sm" : "text-slate-200"} fill={i < activeStars ? "currentColor" : "none"} />
-                            })}
-                            <div className="ml-2 font-black text-sky-500 text-xl border-l-2 border-sky-200 pl-3">
-                                {starCount}/{ALPHABET.length}
-                            </div>
-                        </div>
-                        
-                        <button onClick={repeatQuestion} className="bg-green-100 hover:bg-green-200 text-green-600 p-3 rounded-full active:scale-90 transition shadow-sm border border-green-200">
-                            <IconVolume2 size={28} />
-                        </button>
-                    </div>
-
-                    {/* Vùng trò chơi Worksheet */}
-                    <div className="flex-1 w-full max-w-3xl flex flex-col items-center mt-6 md:mt-8 z-10 relative">
-                        
-                        {/* HÌNH TRANG TRÍ MÉP VỞ */}
-                        <div className="absolute -top-10 -left-6 md:-left-10 text-7xl md:text-[90px] animate-bounce-slow z-30 pointer-events-none hidden sm:block">🐝</div>
-                        <div className="absolute -bottom-10 -right-8 md:-right-12 text-[120px] md:text-[160px] z-30 pointer-events-none hidden sm:block">🐻</div>
-                        <div className="absolute bottom-16 -left-6 md:-left-10 text-6xl md:text-[80px] z-30 pointer-events-none hidden sm:block">🍯</div>
-
-                        {/* TỜ BÀI TẬP TRẮNG */}
-                        <div className="w-full bg-white rounded-[2.5rem] shadow-xl border-4 border-slate-100 p-6 md:p-10 flex flex-col items-center z-10">
-                            
-                            {/* Tiêu đề & Mục tiêu: Căn chỉnh lại cho iPad */}
-                            <div className="w-full flex flex-col md:flex-row justify-between items-center text-center md:text-left px-2 mb-8 md:mb-12 border-b-4 border-slate-50 pb-6 gap-6">
-                                <div className="flex flex-col items-center md:items-start">
-                                    <h2 className="text-4xl md:text-5xl font-black text-sky-500 tracking-wider">SĂN CHỮ</h2>
-                                    <p className="text-lg md:text-xl text-slate-500 font-semibold mt-1">Con tìm và chọn chữ cái</p>
-                                    
-                                    <label className="flex items-center gap-3 mt-4 cursor-pointer group" onClick={() => setShowTargetLetter(!showTargetLetter)}>
-                                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center border-2 transition-colors ${showTargetLetter ? 'bg-green-400 border-green-500' : 'bg-slate-100 border-slate-300'}`}>
-                                            {showTargetLetter && <IconCheck size={20} className="text-white" />}
-                                        </div>
-                                        <span className="text-slate-500 font-bold text-lg group-hover:text-slate-700 transition-colors">Hiện chữ mẫu</span>
-                                    </label>
-                                </div>
-                                
-                                {targetLetter && (
-                                    <div className={`flex gap-4 md:gap-8 items-end text-target-outline font-black bg-yellow-50 px-6 py-2 md:px-8 md:py-3 rounded-[2rem] border-4 border-yellow-200 shadow-sm transition-opacity duration-300 ${showTargetLetter ? 'opacity-100' : 'opacity-0 select-none pointer-events-none'}`}>
-                                        <span className="text-[75px] md:text-[110px] leading-none transform -rotate-3">{targetLetter.upper}</span>
-                                        <span className="text-[60px] md:text-[85px] leading-none transform rotate-3">{targetLetter.lower}</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Lưới chữ cái rải rác */}
-                            <div className="grid grid-cols-3 sm:grid-cols-4 gap-y-10 gap-x-4 md:gap-x-8 w-full max-w-2xl mx-auto">
-                                {boardLetters.map((letterObj) => {
-                                    const isWrong = wrongClickedId === letterObj.id;
-                                    
-                                    return (
-                                        <div key={letterObj.id} className="flex justify-center items-center h-[80px] w-[80px] sm:h-[100px] sm:w-[100px] md:h-[130px] md:w-[130px] mx-auto">
-                                            <button
-                                                onClick={() => handleLetterClick(letterObj)}
-                                                style={{
-                                                    transform: `rotate(${letterObj.rot}deg) translate(${letterObj.tx}px, ${letterObj.ty}px)`
-                                                }}
-                                                className={`
-                                                    w-full h-full flex items-center justify-center font-kid font-bold bg-transparent transition-all duration-300 outline-none
-                                                    ${isWrong ? 'animate-shake text-slate-300' : 'hover:scale-110 active:scale-95'}
-                                                    ${letterObj.isFound ? 'circled rotate-0 translate-x-0 translate-y-0 text-red-500' : 'text-slate-800'}
-                                                `}
-                                            >
-                                                <span className="text-[60px] sm:text-[75px] md:text-[95px] leading-none pointer-events-none">
-                                                    {letterObj.char}
-                                                </span>
-                                            </button>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Hiệu ứng qua bài */}
-                    {foundCount >= totalTargets && totalTargets > 0 && (
-                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-50 bg-white/40 backdrop-blur-sm">
-                             <div className="text-[120px] animate-bounce drop-shadow-2xl">🌟</div>
-                        </div>
-                    )}
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
+            document.addEventListener(evt, () => {
+                const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+                document.getElementById('fullscreen-label').innerText = isFull ? '❎' : '🔲';
+            });
+        });
     </script>
 </body>
 </html>
