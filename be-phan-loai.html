@@ -3,16 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Sắp Xếp Vui Vẻ — Bé phân loại màu, hình, kích thước</title>
+<title>Sắp Xếp Vui Vẻ — Bé kéo thả phân loại</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════ HỆ THỐNG THIẾT KẾ "HỘP ĐỒ CHƠI VẢI NỈ" ═══════════════
-   Sky #8ED1FF · Meadow #6FC96F · Sun #FFCB3D · Bubblegum #FF6FA5
-   Grape #8D79E6 (điểm nhấn game này) · Leaf #43B97F · Tangerine #FF9A3D
-   Ink #4A4458 · Cream #FFF9EE                                            */
+/* ═══ HỆ THỐNG "HỘP ĐỒ CHƠI VẢI NỈ" — điểm nhấn Tím nho ═══ */
 :root {
     --sky-hi:#8ED1FF; --sky-lo:#E2F5FF;
     --hill-1:#93DE93; --hill-2:#6FC96F; --hill-3:#55B855;
@@ -28,205 +25,134 @@
 * { box-sizing:border-box; margin:0; padding:0; }
 html,body { height:100%; }
 body {
-    font-family:'Baloo 2', system-ui, sans-serif;
-    color:var(--ink);
-    background:
-        radial-gradient(1200px 500px at 50% -100px, #FFFFFF66, transparent),
+    font-family:'Baloo 2', system-ui, sans-serif; color:var(--ink);
+    background:radial-gradient(1200px 500px at 50% -100px, #FFFFFF66, transparent),
         linear-gradient(180deg, #BFE7FF 0%, #E7F6FF 60%, #FFF3F9 100%);
-    display:flex; flex-direction:column; align-items:center;
-    padding:10px; min-height:100vh;
-    user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;
-    overflow-x:hidden;
+    display:flex; flex-direction:column; align-items:center; padding:10px; min-height:100vh;
+    user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; overflow-x:hidden;
 }
 button { font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
 button:focus-visible { outline:4px dashed var(--grape); outline-offset:3px; border-radius:20px; }
 
-/* ─── Sân khấu ─── */
 .stage {
-    position:relative; width:100%; max-width:880px; flex:1;
-    min-height:540px;
+    position:relative; width:100%; max-width:880px; flex:1; min-height:540px;
     border-radius:36px; border:8px solid var(--white);
     background:linear-gradient(180deg, var(--sky-hi) 0%, var(--sky-lo) 52%, #EFFAEF 66%);
     box-shadow:0 26px 60px rgba(63,113,170,.38), inset 0 0 0 2px rgba(255,255,255,.5);
-    overflow:hidden;
-    display:flex; flex-direction:column;
+    overflow:hidden; display:flex; flex-direction:column;
     animation:stageIn .6s cubic-bezier(.34,1.4,.5,1) both;
 }
 @keyframes stageIn { from { transform:translateY(26px) scale(.97); opacity:0; } }
 
 .scene { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
-.drift-slow  { animation:drift 70s linear infinite; }
-.drift-fast  { animation:drift 46s linear infinite; animation-delay:-18s; }
-@keyframes drift { from { transform:translateX(-16%);} to { transform:translateX(112%);} }
+.drift-slow { animation:drift 70s linear infinite; }
+.drift-fast { animation:drift 46s linear infinite; animation-delay:-18s; }
+@keyframes drift { from{transform:translateX(-16%);} to{transform:translateX(112%);} }
 .rays { animation:spin 30s linear infinite; transform-origin:center; transform-box:fill-box; }
-@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes spin { to{transform:rotate(360deg);} }
 .flutter { animation:flutter 7s ease-in-out infinite alternate; }
 @keyframes flutter { from{transform:translate(0,0) rotate(-4deg);} to{transform:translate(14px,-18px) rotate(6deg);} }
 
-/* ─── HUD ─── */
-.hud {
-    position:relative; z-index:20;
-    display:flex; align-items:center; justify-content:space-between;
-    gap:8px; padding:12px 14px 0;
-}
+.hud { position:relative; z-index:20; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 14px 0; }
 .hud-group { display:flex; gap:7px; }
-.icon-btn {
-    width:44px; height:44px; border-radius:15px;
-    background:rgba(255,255,255,.92);
+.icon-btn { width:44px; height:44px; border-radius:15px; background:rgba(255,255,255,.92);
     box-shadow:0 4px 0 rgba(101,140,180,.35), 0 8px 14px rgba(63,113,170,.18);
-    display:flex; align-items:center; justify-content:center;
-    transition:transform .12s, box-shadow .12s;
-}
+    display:flex; align-items:center; justify-content:center; transition:transform .12s, box-shadow .12s; }
 .icon-btn:active { transform:translateY(4px); box-shadow:0 0 0 rgba(0,0,0,0); }
 .icon-btn svg { width:23px; height:23px; }
 
 .beads { display:flex; gap:6px; align-items:center; }
-.bead {
-    width:15px; height:15px; border-radius:50%;
-    background:rgba(255,255,255,.75);
-    box-shadow:inset 0 2px 3px rgba(101,140,180,.35);
-    transition:transform .25s cubic-bezier(.34,1.5,.5,1), background .25s;
-}
+.beads.hidden { display:none; }
+.bead { width:15px; height:15px; border-radius:50%; background:rgba(255,255,255,.75);
+    box-shadow:inset 0 2px 3px rgba(101,140,180,.35); transition:transform .25s cubic-bezier(.34,1.5,.5,1), background .25s; }
 .bead.on { background:var(--sun); box-shadow:inset 0 -2px 0 var(--sun-deep), 0 0 10px #FFD97066; transform:scale(1.25); }
 
-.star-chip {
-    display:flex; align-items:center; gap:5px;
-    background:rgba(255,255,255,.92); border-radius:15px;
+.star-chip { display:flex; align-items:center; gap:5px; background:rgba(255,255,255,.92); border-radius:15px;
     padding:7px 13px; font-weight:800; font-size:1.06rem; color:var(--sun-deep);
-    box-shadow:0 4px 0 rgba(101,140,180,.35), 0 8px 14px rgba(63,113,170,.18);
-}
+    box-shadow:0 4px 0 rgba(101,140,180,.35), 0 8px 14px rgba(63,113,170,.18); }
 .star-chip svg { width:19px; height:19px; }
 
-/* ─── Màn hình ─── */
 .screen { position:relative; z-index:10; flex:1; display:flex; flex-direction:column; align-items:center; padding:8px 16px 18px; }
 .screen.hidden { display:none; }
 
-/* Trang bìa */
 .home-mascot { width:132px; margin-top:2px; animation:bob 3.4s ease-in-out infinite alternate; }
 @keyframes bob { from{transform:translateY(-5px);} to{transform:translateY(5px);} }
-.title {
-    font-size:clamp(1.9rem, 6vw, 3.3rem); font-weight:800; letter-spacing:.02em;
-    color:var(--grape-deep); text-align:center; line-height:1.05; margin-top:2px;
-    text-shadow:0 3px 0 var(--white), 0 8px 16px rgba(108,86,201,.25);
-}
+.title { font-size:clamp(1.9rem,6vw,3.3rem); font-weight:800; letter-spacing:.02em; color:var(--grape-deep);
+    text-align:center; line-height:1.05; margin-top:2px; text-shadow:0 3px 0 var(--white), 0 8px 16px rgba(108,86,201,.25); }
 .subtitle { font-weight:700; color:var(--ink-soft); text-align:center; margin:4px 0 16px; font-size:clamp(.85rem,2.6vw,1.1rem); }
 .mode-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; width:100%; max-width:620px; }
-@media (max-width:560px){ .mode-grid { grid-template-columns:1fr; max-width:330px; } }
-.mode-card {
-    background:var(--white); border-radius:26px; padding:16px 10px 14px;
+@media (max-width:560px){ .mode-grid{ grid-template-columns:1fr; max-width:330px; } }
+.mode-card { background:var(--white); border-radius:26px; padding:16px 10px 14px;
     display:flex; flex-direction:column; align-items:center; gap:6px;
     box-shadow:0 7px 0 rgba(101,140,180,.28), 0 16px 26px rgba(63,113,170,.22);
-    transition:transform .14s, box-shadow .14s;
-    animation:popIn .5s cubic-bezier(.34,1.5,.5,1) both;
-}
-.mode-card:nth-child(1){ animation-delay:.10s; } .mode-card:nth-child(2){ animation-delay:.18s; } .mode-card:nth-child(3){ animation-delay:.26s; }
+    transition:transform .14s, box-shadow .14s; animation:popIn .5s cubic-bezier(.34,1.5,.5,1) both; }
+.mode-card:nth-child(1){animation-delay:.10s;} .mode-card:nth-child(2){animation-delay:.18s;} .mode-card:nth-child(3){animation-delay:.26s;}
 .mode-card:hover { transform:translateY(-4px) rotate(-1deg); }
 .mode-card:active { transform:translateY(3px); box-shadow:0 2px 0 rgba(101,140,180,.28); }
 .mode-card svg { width:74px; height:74px; }
 .mode-name { font-weight:800; font-size:1.22rem; }
 .mode-sub { font-weight:700; font-size:.8rem; color:var(--ink-soft); margin-top:-4px; }
-.tip {
-    margin-top:16px; font-weight:700; font-size:.82rem; color:#fff;
-    background:var(--leaf); padding:7px 16px; border-radius:99px;
-    box-shadow:0 4px 0 var(--leaf-deep);
-    display:flex; align-items:center; gap:7px;
-}
+.tip { margin-top:16px; font-weight:700; font-size:.82rem; color:#fff; background:var(--leaf);
+    padding:7px 16px; border-radius:99px; box-shadow:0 4px 0 var(--leaf-deep); display:flex; align-items:center; gap:7px; }
 .tip svg{ width:17px; height:17px; flex:none; }
-@keyframes popIn { from { transform:scale(.6); opacity:0; } }
+@keyframes popIn { from{transform:scale(.6); opacity:0;} }
 
-/* Màn chơi */
-.prompt-btn {
-    display:flex; align-items:center; gap:10px;
-    background:var(--white); border-radius:99px; padding:10px 22px;
-    font-weight:800; font-size:clamp(1.05rem,3.4vw,1.45rem); color:var(--tang-deep);
-    box-shadow:0 6px 0 #F3D9A4, 0 14px 22px rgba(190,140,40,.22);
-    transition:transform .12s, box-shadow .12s;
-}
+.prompt-btn { display:flex; align-items:center; gap:10px; background:var(--white); border-radius:99px;
+    padding:10px 22px; font-weight:800; font-size:clamp(1.05rem,3.4vw,1.4rem); color:var(--tang-deep);
+    box-shadow:0 6px 0 #F3D9A4, 0 14px 22px rgba(190,140,40,.22); transition:transform .12s, box-shadow .12s; }
 .prompt-btn:active { transform:translateY(4px); box-shadow:0 1px 0 #F3D9A4; }
 .prompt-btn svg { width:26px; height:26px; flex:none; }
 
-.play-mascot { position:absolute; left:12px; bottom:10px; width:96px; z-index:5; pointer-events:none;
-    animation:bob 3.4s ease-in-out infinite alternate; }
-@media (max-width:640px){ .play-mascot{ width:72px; left:6px; } }
+.play-mascot { position:absolute; left:12px; bottom:10px; width:92px; z-index:5; pointer-events:none; animation:bob 3.4s ease-in-out infinite alternate; }
+@media (max-width:640px){ .play-mascot{ width:66px; left:6px; } }
 
 .item-area { flex:1; display:flex; align-items:center; justify-content:center; width:100%; min-height:120px; }
-.toy-float { animation:bob 2.6s ease-in-out infinite alternate; filter:drop-shadow(0 12px 10px rgba(46,90,46,.28)); }
+
+/* ── Đồ chơi kéo được ── */
 .toy-enter { animation:toyIn .45s cubic-bezier(.34,1.5,.5,1) both; }
-@keyframes toyIn { from { transform:scale(0) rotate(-14deg); opacity:0; } }
-.toy-solved { animation:toySolve .5s ease-in forwards; }
-@keyframes toySolve { to { transform:scale(.25) translateY(60px); opacity:0; } }
+@keyframes toyIn { from{transform:scale(0) rotate(-14deg); opacity:0;} }
+.toy-drag { display:inline-block; cursor:grab; touch-action:none; will-change:transform; }
+.toy-drag:active { cursor:grabbing; }
+.toy-drag.dragging { z-index:200; position:relative; cursor:grabbing; }
+.toy-drag.dragging .toy-float { animation:none; }
+.toy-float { display:inline-block; animation:bob 2.6s ease-in-out infinite alternate; filter:drop-shadow(0 12px 10px rgba(46,90,46,.28)); }
+/* vòng gợi ý kéo quanh đồ chơi */
+.grab-ring { animation:grabRing 2.6s ease-in-out infinite; }
+@keyframes grabRing { 0%,100%{ transform:scale(1); opacity:.0;} 40%{ transform:scale(1.06); opacity:.5;} }
 
 .bins { display:flex; gap:14px; align-items:flex-end; justify-content:center; flex-wrap:wrap; padding-bottom:4px; }
-.bin-btn { position:relative; display:flex; flex-direction:column; align-items:center; gap:2px;
-    transition:transform .13s; animation:popIn .5s cubic-bezier(.34,1.5,.5,1) both; }
-.bin-btn:nth-child(1){animation-delay:.08s;} .bin-btn:nth-child(2){animation-delay:.16s;} .bin-btn:nth-child(3){animation-delay:.24s;}
-.bin-btn:hover { transform:translateY(-5px); }
-.bin-btn:active { transform:translateY(3px) scale(.97); }
-.bin-label {
-    font-weight:800; font-size:.86rem; letter-spacing:.06em;
-    background:var(--white); border-radius:99px; padding:3px 14px;
-    box-shadow:0 3px 0 rgba(101,140,180,.28);
-}
+.bin { position:relative; display:flex; flex-direction:column; align-items:center; gap:2px;
+    animation:popIn .5s cubic-bezier(.34,1.5,.5,1) both; transition:transform .14s, filter .14s; }
+.bin:nth-child(1){animation-delay:.08s;} .bin:nth-child(2){animation-delay:.16s;} .bin:nth-child(3){animation-delay:.24s;}
+.bin.hot { transform:translateY(-10px) scale(1.08); filter:drop-shadow(0 0 20px #FFE08A); }
+.bin-label { font-weight:800; font-size:.86rem; letter-spacing:.06em; background:var(--white);
+    border-radius:99px; padding:3px 14px; box-shadow:0 3px 0 rgba(101,140,180,.28); }
 .bin-glow { animation:binGlow .65s ease; }
 @keyframes binGlow { 50% { filter:brightness(1.28) drop-shadow(0 0 22px #fff); } }
 .wiggle { animation:wig .5s ease; }
 @keyframes wig { 25%{transform:rotate(-6deg);} 50%{transform:rotate(6deg);} 75%{transform:rotate(-3deg);} }
 
 .reward-line { min-height:52px; display:flex; align-items:center; justify-content:center; margin-top:8px; }
-.reward-pill {
-    display:flex; align-items:center; gap:9px;
-    background:var(--white); border-radius:20px; padding:8px 20px;
+.reward-pill { display:flex; align-items:center; gap:9px; background:var(--white); border-radius:20px; padding:8px 20px;
     font-weight:800; font-size:1.15rem; color:var(--leaf-deep);
-    box-shadow:0 5px 0 #BDE8CE, 0 12px 18px rgba(46,154,100,.2);
-    animation:popIn .4s cubic-bezier(.34,1.5,.5,1) both;
-}
+    box-shadow:0 5px 0 #BDE8CE, 0 12px 18px rgba(46,154,100,.2); animation:popIn .4s cubic-bezier(.34,1.5,.5,1) both; }
 
-/* Màn hoàn thành */
-.overlay {
-    position:absolute; inset:0; z-index:40; display:flex; align-items:center; justify-content:center;
-    background:rgba(74,68,88,.42); backdrop-filter:blur(5px); padding:18px;
-    animation:fadeIn .3s both;
-}
+.overlay { position:absolute; inset:0; z-index:40; display:flex; align-items:center; justify-content:center;
+    background:rgba(74,68,88,.42); backdrop-filter:blur(5px); padding:18px; animation:fadeIn .3s both; }
 @keyframes fadeIn { from{opacity:0;} }
 .overlay.hidden { display:none; }
-.done-card {
-    background:var(--cream); border-radius:32px; padding:26px 26px 22px;
-    width:100%; max-width:360px; text-align:center;
-    box-shadow:0 12px 0 rgba(101,140,180,.25), 0 30px 60px rgba(40,30,80,.4);
-    animation:popIn .5s cubic-bezier(.34,1.5,.5,1) both;
-}
+.done-card { background:var(--cream); border-radius:32px; padding:26px 26px 22px; width:100%; max-width:360px;
+    text-align:center; box-shadow:0 12px 0 rgba(101,140,180,.25), 0 30px 60px rgba(40,30,80,.4);
+    animation:popIn .5s cubic-bezier(.34,1.5,.5,1) both; }
 .done-card h2 { font-size:2rem; font-weight:800; color:var(--grape-deep); margin-top:6px; }
 .done-card p { font-weight:700; color:var(--ink-soft); margin:2px 0 16px; }
 .medal { width:120px; margin:-58px auto 0; display:block; filter:drop-shadow(0 10px 14px rgba(190,140,40,.4)); }
 .done-actions { display:flex; gap:10px; }
-.btn-3d {
-    flex:1; border-radius:20px; padding:12px 8px; font-weight:800; font-size:1.05rem; color:#fff;
-    transition:transform .12s, box-shadow .12s;
-}
+.btn-3d { flex:1; border-radius:20px; padding:12px 8px; font-weight:800; font-size:1.05rem; color:#fff; transition:transform .12s, box-shadow .12s; }
 .btn-3d:active { transform:translateY(4px); box-shadow:0 1px 0 rgba(0,0,0,.2) !important; }
 .btn-again { background:linear-gradient(180deg,#57C689,var(--leaf)); box-shadow:0 6px 0 var(--leaf-deep), 0 14px 22px rgba(46,154,100,.35); }
 .btn-home  { background:linear-gradient(180deg,#A493F0,var(--grape)); box-shadow:0 6px 0 var(--grape-deep), 0 14px 22px rgba(108,86,201,.35); }
 
-/* Huy hiệu khen giữa màn */
-.praise { position:absolute; left:50%; top:46%; z-index:60; pointer-events:none;
-    transform:translate(-50%,-50%);
-    background:linear-gradient(180deg,#FFD97A,#FFAE3D); color:#fff;
-    font-weight:800; font-size:clamp(1.3rem,4.5vw,2.1rem); white-space:nowrap;
-    padding:14px 28px; border-radius:26px; border:5px solid #fff;
-    box-shadow:0 0 40px rgba(255,190,60,.9);
-    text-shadow:0 2px 0 rgba(160,90,0,.35);
-}
-.praise.hidden { display:none; }
-.praise-run { animation:praise 1.6s cubic-bezier(.34,1.4,.5,1) forwards; }
-@keyframes praise {
-    0%{transform:translate(-50%,-50%) scale(0);opacity:0;}
-    16%{transform:translate(-50%,-50%) scale(1.2);opacity:1;}
-    32%{transform:translate(-50%,-50%) scale(1);}
-    80%{transform:translate(-50%,-62%) scale(1);opacity:1;}
-    100%{transform:translate(-50%,-95%) scale(.9);opacity:0;}
-}
-
-/* Linh vật: mắt chớp + mắt cười */
 .eye { transform-box:fill-box; transform-origin:center; animation:blink 4.6s infinite; }
 @keyframes blink { 0%,93%,100%{transform:scaleY(1);} 95.5%,97.5%{transform:scaleY(.06);} }
 .eye-happy { display:none; }
@@ -236,92 +162,48 @@ button:focus-visible { outline:4px dashed var(--grape); outline-offset:3px; bord
 @keyframes dance { 25%{transform:scale(1.14) rotate(-7deg);} 50%{transform:scale(1.18) rotate(7deg);} 75%{transform:scale(1.1) rotate(-3deg);} }
 
 @media (prefers-reduced-motion: reduce) {
-    .drift-slow,.drift-fast,.rays,.flutter,.home-mascot,.play-mascot,.toy-float,.eye { animation:none !important; }
+    .drift-slow,.drift-fast,.rays,.flutter,.home-mascot,.play-mascot,.toy-float,.eye,.grab-ring { animation:none !important; }
 }
 </style>
 </head>
 <body>
-
-<div class="stage" id="stage">
-
-    <!-- ═══ BỐI CẢNH VẼ TAY ═══ -->
+<div class="stage">
+    <!-- BỐI CẢNH -->
     <svg class="scene" viewBox="0 0 880 620" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
         <defs>
-            <g id="cloud">
-                <path d="M20 36 a14 14 0 0 1 2-28 a19 19 0 0 1 36-4 a13 13 0 0 1 10 32 z" fill="#fff"/>
-            </g>
-            <g id="tree">
-                <rect x="-5" y="26" width="10" height="26" rx="5" fill="#B07B4C"/>
-                <circle cx="-14" cy="14" r="17" fill="#5FBF5F"/>
-                <circle cx="14" cy="14" r="17" fill="#6FCB6F"/>
-                <circle cx="0" cy="-2" r="19" fill="#7DD87D"/>
-                <circle cx="-6" cy="8" r="3" fill="#FF6FA5"/>
-                <circle cx="10" cy="2" r="3" fill="#FFCB3D"/>
-            </g>
-            <g id="flower">
-                <rect x="-1.6" y="0" width="3.2" height="16" rx="1.6" fill="#4CA96B"/>
-                <g fill="#FF6FA5">
-                    <circle cx="0" cy="-4" r="4.4"/><circle cx="-4.8" cy="0" r="4.4"/><circle cx="4.8" cy="0" r="4.4"/>
-                    <circle cx="-3" cy="4.4" r="4.4"/><circle cx="3" cy="4.4" r="4.4"/>
-                </g>
-                <circle cx="0" cy="0.6" r="3.4" fill="#FFCB3D"/>
-            </g>
+            <g id="cloud"><path d="M20 36 a14 14 0 0 1 2-28 a19 19 0 0 1 36-4 a13 13 0 0 1 10 32 z" fill="#fff"/></g>
+            <g id="tree"><rect x="-5" y="26" width="10" height="26" rx="5" fill="#B07B4C"/>
+                <circle cx="-14" cy="14" r="17" fill="#5FBF5F"/><circle cx="14" cy="14" r="17" fill="#6FCB6F"/>
+                <circle cx="0" cy="-2" r="19" fill="#7DD87D"/><circle cx="-6" cy="8" r="3" fill="#FF6FA5"/><circle cx="10" cy="2" r="3" fill="#FFCB3D"/></g>
+            <g id="flower"><rect x="-1.6" y="0" width="3.2" height="16" rx="1.6" fill="#4CA96B"/>
+                <g fill="#FF6FA5"><circle cx="0" cy="-4" r="4.4"/><circle cx="-4.8" cy="0" r="4.4"/><circle cx="4.8" cy="0" r="4.4"/><circle cx="-3" cy="4.4" r="4.4"/><circle cx="3" cy="4.4" r="4.4"/></g>
+                <circle cx="0" cy="0.6" r="3.4" fill="#FFCB3D"/></g>
         </defs>
-
-        <!-- Mặt trời -->
         <g transform="translate(792,74)">
             <g class="rays" stroke="#FFD970" stroke-width="8" stroke-linecap="round" opacity=".9">
                 <line y1="-50" y2="-64"/><line y1="50" y2="64"/><line x1="-50" x2="-64"/><line x1="50" x2="64"/>
-                <line x1="-36" y1="-36" x2="-46" y2="-46"/><line x1="36" y1="36" x2="46" y2="46"/>
-                <line x1="-36" y1="36" x2="-46" y2="46"/><line x1="36" y1="-36" x2="46" y2="-46"/>
-            </g>
-            <circle r="38" fill="var(--sun)"/>
-            <circle cx="-12" cy="-3" r="4" fill="#7A5C00"/><circle cx="12" cy="-3" r="4" fill="#7A5C00"/>
+                <line x1="-36" y1="-36" x2="-46" y2="-46"/><line x1="36" y1="36" x2="46" y2="46"/><line x1="-36" y1="36" x2="-46" y2="46"/><line x1="36" y1="-36" x2="46" y2="-46"/></g>
+            <circle r="38" fill="var(--sun)"/><circle cx="-12" cy="-3" r="4" fill="#7A5C00"/><circle cx="12" cy="-3" r="4" fill="#7A5C00"/>
             <path d="M-10 9 Q0 17 10 9" stroke="#7A5C00" stroke-width="4" fill="none" stroke-linecap="round"/>
-            <circle cx="-20" cy="6" r="5" fill="#FFB3C1"/><circle cx="20" cy="6" r="5" fill="#FFB3C1"/>
-        </g>
-
-        <!-- Mây trôi -->
-        <g class="drift-slow" opacity=".95"><use href="#cloud" x="40"  y="70"  transform="scale(1.15)"/></g>
+            <circle cx="-20" cy="6" r="5" fill="#FFB3C1"/><circle cx="20" cy="6" r="5" fill="#FFB3C1"/></g>
+        <g class="drift-slow" opacity=".95"><use href="#cloud" x="40" y="70" transform="scale(1.15)"/></g>
         <g class="drift-fast" opacity=".8"><use href="#cloud" x="150" y="150" transform="scale(.8)"/></g>
-
-        <!-- Cờ đuôi nheo -->
-        <g>
-            <path id="bunt" d="M-10 26 Q 220 74 440 58 Q 660 42 890 84" fill="none" stroke="#FFFFFFAA" stroke-width="5"/>
+        <g><path d="M-10 26 Q 220 74 440 58 Q 660 42 890 84" fill="none" stroke="#FFFFFFAA" stroke-width="5"/>
             <g stroke="#fff" stroke-width="2.5" stroke-linejoin="round">
-                <path d="M60 42 l13 30 l14 -26" fill="#FF6FA5"/>
-                <path d="M150 56 l13 30 l14 -27" fill="#FFCB3D"/>
-                <path d="M240 62 l13 30 l14 -28" fill="#43B97F"/>
-                <path d="M330 62 l13 30 l14 -29" fill="#4FA8F5"/>
-                <path d="M420 58 l13 30 l14 -30" fill="#8D79E6"/>
-                <path d="M510 52 l13 30 l14 -29" fill="#FF9A3D"/>
-                <path d="M600 48 l13 31 l14 -28" fill="#FF6FA5"/>
-                <path d="M690 48 l13 31 l14 -27" fill="#FFCB3D"/>
-                <path d="M780 54 l13 31 l14 -26" fill="#43B97F"/>
-            </g>
-        </g>
-
-        <!-- Đồi cỏ ba lớp -->
+                <path d="M60 42 l13 30 l14 -26" fill="#FF6FA5"/><path d="M150 56 l13 30 l14 -27" fill="#FFCB3D"/>
+                <path d="M240 62 l13 30 l14 -28" fill="#43B97F"/><path d="M330 62 l13 30 l14 -29" fill="#4FA8F5"/>
+                <path d="M420 58 l13 30 l14 -30" fill="#8D79E6"/><path d="M510 52 l13 30 l14 -29" fill="#FF9A3D"/>
+                <path d="M600 48 l13 31 l14 -28" fill="#FF6FA5"/><path d="M690 48 l13 31 l14 -27" fill="#FFCB3D"/><path d="M780 54 l13 31 l14 -26" fill="#43B97F"/></g></g>
         <ellipse cx="180" cy="700" rx="520" ry="210" fill="var(--hill-1)"/>
         <ellipse cx="740" cy="720" rx="560" ry="235" fill="var(--hill-2)"/>
         <ellipse cx="440" cy="770" rx="640" ry="240" fill="var(--hill-3)"/>
-
-        <!-- Cây & hoa -->
-        <use href="#tree" x="94" y="470" transform="scale(1)"/>
-        <use href="#tree" x="806" y="486" transform="scale(.8)" opacity=".95"/>
-        <use href="#flower" x="212" y="560"/>
-        <use href="#flower" x="668" y="572" transform="scale(.85)"/>
-        <use href="#flower" x="760" y="590" transform="scale(.7)"/>
-
-        <!-- Bươm bướm -->
-        <g class="flutter" transform="translate(210,220)">
-            <ellipse cx="-6" cy="0" rx="7" ry="10" fill="#FFB3C9" transform="rotate(-20)"/>
-            <ellipse cx="6" cy="0" rx="7" ry="10" fill="#FF8FB4" transform="rotate(20)"/>
-            <rect x="-1.6" y="-8" width="3.2" height="16" rx="1.6" fill="#4A4458"/>
-        </g>
+        <use href="#tree" x="94" y="470"/><use href="#tree" x="806" y="486" transform="scale(.8)" opacity=".95"/>
+        <use href="#flower" x="212" y="560"/><use href="#flower" x="668" y="572" transform="scale(.85)"/><use href="#flower" x="760" y="590" transform="scale(.7)"/>
+        <g class="flutter" transform="translate(210,220)"><ellipse cx="-6" cy="0" rx="7" ry="10" fill="#FFB3C9" transform="rotate(-20)"/>
+            <ellipse cx="6" cy="0" rx="7" ry="10" fill="#FF8FB4" transform="rotate(20)"/><rect x="-1.6" y="-8" width="3.2" height="16" rx="1.6" fill="#4A4458"/></g>
     </svg>
 
-    <!-- ═══ HUD ═══ -->
+    <!-- HUD -->
     <div class="hud">
         <div class="hud-group">
             <button class="icon-btn" onclick="goHome()" aria-label="Về trang bìa" id="btn-home"></button>
@@ -332,72 +214,49 @@ button:focus-visible { outline:4px dashed var(--grape); outline-offset:3px; bord
         <div class="star-chip"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.2 1.3-6.6L2.5 9l6.6-.8z" fill="#FFCB3D" stroke="#F5A700" stroke-width="1.4" stroke-linejoin="round"/></svg><span id="star-display">0</span></div>
     </div>
 
-    <!-- ═══ TRANG BÌA ═══ -->
+    <!-- TRANG BÌA -->
     <div class="screen" id="screen-home">
         <svg class="home-mascot" viewBox="0 0 200 200" id="home-mascot"></svg>
         <h1 class="title">SẮP XẾP VUI VẺ</h1>
-        <p class="subtitle">Bé phân loại màu sắc · hình dạng · kích thước</p>
-
+        <p class="subtitle">Kéo đồ chơi vào đúng giỏ · màu · hình · kích thước</p>
         <div class="mode-grid">
             <button class="mode-card" onclick="startGame('color')">
-                <svg viewBox="0 0 100 100">
-                    <circle cx="34" cy="38" r="19" fill="#FF6B6B"/>
-                    <circle cx="66" cy="38" r="19" fill="#FFCB3D"/>
-                    <circle cx="50" cy="64" r="19" fill="#4FA8F5"/>
-                    <g fill="#fff" opacity=".55"><ellipse cx="28" cy="32" rx="6" ry="4"/><ellipse cx="60" cy="32" rx="6" ry="4"/><ellipse cx="44" cy="58" rx="6" ry="4"/></g>
-                </svg>
-                <span class="mode-name" style="color:var(--berry-deep)">Màu Sắc</span>
-                <span class="mode-sub">Đỏ · Vàng · Xanh</span>
+                <svg viewBox="0 0 100 100"><circle cx="34" cy="38" r="19" fill="#FF6B6B"/><circle cx="66" cy="38" r="19" fill="#FFCB3D"/><circle cx="50" cy="64" r="19" fill="#4FA8F5"/>
+                    <g fill="#fff" opacity=".55"><ellipse cx="28" cy="32" rx="6" ry="4"/><ellipse cx="60" cy="32" rx="6" ry="4"/><ellipse cx="44" cy="58" rx="6" ry="4"/></g></svg>
+                <span class="mode-name" style="color:var(--berry-deep)">Màu Sắc</span><span class="mode-sub">Đỏ · Vàng · Xanh</span>
             </button>
             <button class="mode-card" onclick="startGame('shape')">
-                <svg viewBox="0 0 100 100">
-                    <circle cx="30" cy="34" r="17" fill="#8D79E6"/>
-                    <rect x="54" y="18" width="32" height="32" rx="8" fill="#43B97F"/>
-                    <path d="M50 56 L72 90 L28 90 Z" fill="#FF9A3D"/>
-                    <g fill="#fff" opacity=".5"><ellipse cx="25" cy="29" rx="5" ry="3.5"/><ellipse cx="62" cy="26" rx="5" ry="3.5"/><ellipse cx="46" cy="72" rx="5" ry="3.5"/></g>
-                </svg>
-                <span class="mode-name" style="color:var(--grape-deep)">Hình Dạng</span>
-                <span class="mode-sub">Tròn · Vuông · Tam giác</span>
+                <svg viewBox="0 0 100 100"><circle cx="30" cy="34" r="17" fill="#8D79E6"/><rect x="54" y="18" width="32" height="32" rx="8" fill="#43B97F"/><path d="M50 56 L72 90 L28 90 Z" fill="#FF9A3D"/>
+                    <g fill="#fff" opacity=".5"><ellipse cx="25" cy="29" rx="5" ry="3.5"/><ellipse cx="62" cy="26" rx="5" ry="3.5"/><ellipse cx="46" cy="72" rx="5" ry="3.5"/></g></svg>
+                <span class="mode-name" style="color:var(--grape-deep)">Hình Dạng</span><span class="mode-sub">Tròn · Vuông · Tam giác</span>
             </button>
             <button class="mode-card" onclick="startGame('size')">
-                <svg viewBox="0 0 100 100">
-                    <circle cx="38" cy="52" r="30" fill="#4FA8F5"/>
-                    <circle cx="80" cy="66" r="15" fill="#9BCFF8"/>
-                    <g fill="#fff" opacity=".55"><ellipse cx="28" cy="42" rx="9" ry="6"/><ellipse cx="75" cy="61" rx="5" ry="3.5"/></g>
-                </svg>
-                <span class="mode-name" style="color:var(--blue-deep)">Kích Thước</span>
-                <span class="mode-sub">To · Nhỏ</span>
+                <svg viewBox="0 0 100 100"><circle cx="38" cy="52" r="30" fill="#4FA8F5"/><circle cx="80" cy="66" r="15" fill="#9BCFF8"/>
+                    <g fill="#fff" opacity=".55"><ellipse cx="28" cy="42" rx="9" ry="6"/><ellipse cx="75" cy="61" rx="5" ry="3.5"/></g></svg>
+                <span class="mode-name" style="color:var(--blue-deep)">Kích Thước</span><span class="mode-sub">To · Nhỏ</span>
             </button>
         </div>
-
         <div class="tip"><svg viewBox="0 0 24 24" fill="none"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="#fff"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Bật loa để nghe cô hướng dẫn nhé!</div>
     </div>
 
-    <!-- ═══ MÀN CHƠI ═══ -->
+    <!-- MÀN CHƠI -->
     <div class="screen hidden" id="screen-play">
         <button class="prompt-btn" onclick="repeatQuestion()">
             <svg viewBox="0 0 24 24" fill="none"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="#FF9A3D"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" stroke="#FF9A3D" stroke-width="2.2" stroke-linecap="round"/></svg>
             <span id="play-prompt">…</span>
         </button>
-
         <div class="item-area"><div id="current-item"></div></div>
-
         <div class="bins" id="bins"></div>
         <div class="reward-line" id="reward-line"></div>
-
         <svg class="play-mascot" viewBox="0 0 200 200" id="play-mascot"></svg>
     </div>
 
-    <!-- ═══ MÀN HOÀN THÀNH ═══ -->
+    <!-- HOÀN THÀNH -->
     <div class="overlay hidden" id="done-overlay">
         <div class="done-card">
-            <svg class="medal" viewBox="0 0 120 130">
-                <path d="M38 6 L54 6 L46 44 L30 44 Z" fill="#FF6FA5"/>
-                <path d="M82 6 L66 6 L74 44 L90 44 Z" fill="#4FA8F5"/>
-                <circle cx="60" cy="78" r="42" fill="#FFCB3D" stroke="#F5A700" stroke-width="5"/>
-                <circle cx="60" cy="78" r="31" fill="#FFE28A"/>
-                <path d="M60 56 l6.6 14 15 1.8 -11.2 10.4 3 14.8 -13.4-7.4 -13.4 7.4 3-14.8 L38.4 71.8 l15-1.8 Z" fill="#F5A700"/>
-            </svg>
+            <svg class="medal" viewBox="0 0 120 130"><path d="M38 6 L54 6 L46 44 L30 44 Z" fill="#FF6FA5"/><path d="M82 6 L66 6 L74 44 L90 44 Z" fill="#4FA8F5"/>
+                <circle cx="60" cy="78" r="42" fill="#FFCB3D" stroke="#F5A700" stroke-width="5"/><circle cx="60" cy="78" r="31" fill="#FFE28A"/>
+                <path d="M60 56 l6.6 14 15 1.8 -11.2 10.4 3 14.8 -13.4-7.4 -13.4 7.4 3-14.8 L38.4 71.8 l15-1.8 Z" fill="#F5A700"/></svg>
             <h2>Hoàn thành!</h2>
             <p>Bé đã sắp xếp đúng <b id="done-count">8</b> món đồ 🎉</p>
             <div class="done-actions">
@@ -406,139 +265,108 @@ button:focus-visible { outline:4px dashed var(--grape); outline-offset:3px; bord
             </div>
         </div>
     </div>
-
-    <div class="praise hidden" id="praise"><span id="praise-text"></span></div>
 </div>
 
 <script>
-/* ═══════════ ÂM THANH TỨC THÌ ═══════════ */
+/* ═══ ÂM THANH ═══ */
 let audioCtx=null, soundOn=true;
 function ensureAudio(){ if(!soundOn)return; if(!audioCtx){const AC=window.AudioContext||window.webkitAudioContext; if(AC)audioCtx=new AC();} if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume(); }
-function tone(type,f1,f2,dur,vol,at=0){ if(!soundOn||!audioCtx)return; const t=audioCtx.currentTime+at,o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.type=type; o.frequency.setValueAtTime(f1,t); if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.01,t+dur); o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t+dur+0.02); }
+function tone(t,f1,f2,dur,vol,at=0){ if(!soundOn||!audioCtx)return; const s=audioCtx.currentTime+at,o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.type=t; o.frequency.setValueAtTime(f1,s); if(f2)o.frequency.exponentialRampToValueAtTime(f2,s+dur); g.gain.setValueAtTime(vol,s); g.gain.exponentialRampToValueAtTime(0.01,s+dur); o.connect(g); g.connect(audioCtx.destination); o.start(s); o.stop(s+dur+0.02); }
 const sfx = {
-    pop:   ()=>tone('triangle',420,950,.16,.35),
-    click: ()=>tone('sine',600,null,.1,.25),
-    boing: ()=>{ tone('sine',340,220,.13,.28); tone('sine',220,300,.14,.22,.13); },
+    lift:()=>tone('sine',300,520,.1,.2),
+    pop:()=>tone('triangle',420,950,.16,.35),
+    click:()=>tone('sine',600,null,.1,.25),
+    boing:()=>{ tone('sine',340,220,.13,.28); tone('sine',220,300,.14,.22,.13); },
     sparkle:()=>{ tone('sine',880,null,.2,.22); tone('sine',1174,null,.2,.22,.07); },
     fanfare:()=>[523.25,659.25,783.99,1046.5].forEach((f,i)=>tone('triangle',f,null,.26,.3,i*.09)),
 };
-function toggleSound(){ soundOn=!soundOn; renderIcons(); if(!soundOn&&'speechSynthesis'in window)window.speechSynthesis.cancel(); if(soundOn){ensureAudio();sfx.click();} save('sort-sound',soundOn?'1':'0'); }
-
+function toggleSound(){ soundOn=!soundOn; renderIcons(); if(!soundOn&&'speechSynthesis'in window)speechSynthesis.cancel(); if(soundOn){ensureAudio();sfx.click();} save('sort-sound',soundOn?'1':'0'); }
 function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function load(k){try{return localStorage.getItem(k);}catch(e){return null;}}
-
-/* ═══════════ GIỌNG ĐỌC ═══════════ */
 function playTTS(text){ return new Promise(res=>{ if(soundOn&&'speechSynthesis'in window){ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang='vi-VN'; u.rate=.85; u.pitch=1.15; const vs=speechSynthesis.getVoices(); const vi=vs.find(v=>v.lang==='vi-VN'&&v.name.includes('Premium'))||vs.find(v=>v.lang==='vi-VN'); if(vi)u.voice=vi; u.onend=res; u.onerror=res; speechSynthesis.speak(u); setTimeout(res,7000);} else setTimeout(res,soundOn?800:200); }); }
 if('speechSynthesis'in window){ speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices(); }
 
-/* ═══════════ ICON HUD (SVG) ═══════════ */
+/* ═══ ICON ═══ */
 const ICONS = {
-    home: `<svg viewBox="0 0 24 24" fill="none"><path d="M3 11.2 12 3l9 8.2" stroke="#8D79E6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10v9.5h13V10" stroke="#8D79E6" stroke-width="2.6" stroke-linecap="round"/><rect x="10" y="13.5" width="4" height="6" rx="1.4" fill="#8D79E6"/></svg>`,
-    soundOn: `<svg viewBox="0 0 24 24" fill="none"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="#4FA8F5"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" stroke="#4FA8F5" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+    home:`<svg viewBox="0 0 24 24" fill="none"><path d="M3 11.2 12 3l9 8.2" stroke="#8D79E6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10v9.5h13V10" stroke="#8D79E6" stroke-width="2.6" stroke-linecap="round"/><rect x="10" y="13.5" width="4" height="6" rx="1.4" fill="#8D79E6"/></svg>`,
+    soundOn:`<svg viewBox="0 0 24 24" fill="none"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="#4FA8F5"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" stroke="#4FA8F5" stroke-width="2.2" stroke-linecap="round"/></svg>`,
     soundOff:`<svg viewBox="0 0 24 24" fill="none"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="#B9B3C9"/><path d="M16 9.5 21 14.5M21 9.5 16 14.5" stroke="#B9B3C9" stroke-width="2.4" stroke-linecap="round"/></svg>`,
-    expand:  `<svg viewBox="0 0 24 24" fill="none" stroke="#43B97F" stroke-width="2.6" stroke-linecap="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></svg>`,
-    shrink:  `<svg viewBox="0 0 24 24" fill="none" stroke="#43B97F" stroke-width="2.6" stroke-linecap="round"><path d="M4 9h5V4M20 9h-5V4M4 15h5v5M20 15h-5v5"/></svg>`
+    expand:`<svg viewBox="0 0 24 24" fill="none" stroke="#43B97F" stroke-width="2.6" stroke-linecap="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></svg>`,
+    shrink:`<svg viewBox="0 0 24 24" fill="none" stroke="#43B97F" stroke-width="2.6" stroke-linecap="round"><path d="M4 9h5V4M20 9h-5V4M4 15h5v5M20 15h-5v5"/></svg>`
 };
 let isFull=false;
-function renderIcons(){
-    document.getElementById('btn-home').innerHTML=ICONS.home;
-    document.getElementById('btn-sound').innerHTML=soundOn?ICONS.soundOn:ICONS.soundOff;
-    document.getElementById('btn-fs').innerHTML=isFull?ICONS.shrink:ICONS.expand;
-}
+function renderIcons(){ document.getElementById('btn-home').innerHTML=ICONS.home; document.getElementById('btn-sound').innerHTML=soundOn?ICONS.soundOn:ICONS.soundOff; document.getElementById('btn-fs').innerHTML=isFull?ICONS.shrink:ICONS.expand; }
 
-/* ═══════════ LINH VẬT THỎ (chớp mắt + cười) ═══════════ */
+/* ═══ LINH VẬT THỎ ═══ */
 function bunnySVG(){ return `
     <ellipse cx="100" cy="188" rx="46" ry="8" fill="rgba(60,90,60,.18)"/>
-    <g>
-        <ellipse cx="72" cy="42" rx="15" ry="36" fill="#FFF6EA" stroke="#EFDCC6" stroke-width="3" transform="rotate(-10 72 42)"/>
-        <ellipse cx="72" cy="46" rx="7"  ry="24" fill="#FFC9D9" transform="rotate(-10 72 46)"/>
-        <ellipse cx="128" cy="42" rx="15" ry="36" fill="#FFF6EA" stroke="#EFDCC6" stroke-width="3" transform="rotate(10 128 42)"/>
-        <ellipse cx="128" cy="46" rx="7"  ry="24" fill="#FFC9D9" transform="rotate(10 128 46)"/>
-    </g>
-    <circle cx="100" cy="118" r="62" fill="#FFF6EA" stroke="#EFDCC6" stroke-width="3.5"/>
-    <ellipse cx="100" cy="146" rx="30" ry="22" fill="#FFFDF8"/>
-    <circle class="eye" cx="80" cy="106" r="7.5" fill="#4A4458"/>
-    <circle class="eye" cx="120" cy="106" r="7.5" fill="#4A4458"/>
-    <circle class="eye" cx="82.5" cy="103.5" r="2.4" fill="#fff"/>
-    <circle class="eye" cx="122.5" cy="103.5" r="2.4" fill="#fff"/>
-    <g class="eye-happy" stroke="#4A4458" stroke-width="4" fill="none" stroke-linecap="round">
-        <path d="M72 106 Q80 98 88 106"/><path d="M112 106 Q120 98 128 106"/>
-    </g>
-    <path d="M96 118 L104 118 L100 124 Z" fill="#FF8FB4"/>
-    <path d="M100 124 Q100 130 93 132 M100 124 Q100 130 107 132" stroke="#C9A0AC" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <circle cx="64" cy="122" r="8" fill="#FFC9D9" opacity=".85"/>
-    <circle cx="136" cy="122" r="8" fill="#FFC9D9" opacity=".85"/>
-    <ellipse cx="58" cy="158" rx="13" ry="9" fill="#FFF6EA" stroke="#EFDCC6" stroke-width="3"/>
-    <ellipse cx="142" cy="158" rx="13" ry="9" fill="#FFF6EA" stroke="#EFDCC6" stroke-width="3"/>`;
-}
+    <g><ellipse cx="72" cy="42" rx="15" ry="36" fill="#FFF6EA" stroke="#EFDCC6" stroke-width="3" transform="rotate(-10 72 42)"/><ellipse cx="72" cy="46" rx="7" ry="24" fill="#FFC9D9" transform="rotate(-10 72 46)"/>
+        <ellipse cx="128" cy="42" rx="15" ry="36" fill="#FFF6EA" stroke="#EFDCC6" stroke-width="3" transform="rotate(10 128 42)"/><ellipse cx="128" cy="46" rx="7" ry="24" fill="#FFC9D9" transform="rotate(10 128 46)"/></g>
+    <circle cx="100" cy="118" r="62" fill="#FFF6EA" stroke="#EFDCC6" stroke-width="3.5"/><ellipse cx="100" cy="146" rx="30" ry="22" fill="#FFFDF8"/>
+    <circle class="eye" cx="80" cy="106" r="7.5" fill="#4A4458"/><circle class="eye" cx="120" cy="106" r="7.5" fill="#4A4458"/>
+    <circle class="eye" cx="82.5" cy="103.5" r="2.4" fill="#fff"/><circle class="eye" cx="122.5" cy="103.5" r="2.4" fill="#fff"/>
+    <g class="eye-happy" stroke="#4A4458" stroke-width="4" fill="none" stroke-linecap="round"><path d="M72 106 Q80 98 88 106"/><path d="M112 106 Q120 98 128 106"/></g>
+    <path d="M96 118 L104 118 L100 124 Z" fill="#FF8FB4"/><path d="M100 124 Q100 130 93 132 M100 124 Q100 130 107 132" stroke="#C9A0AC" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="64" cy="122" r="8" fill="#FFC9D9" opacity=".85"/><circle cx="136" cy="122" r="8" fill="#FFC9D9" opacity=".85"/>
+    <ellipse cx="58" cy="158" rx="13" ry="9" fill="#FFF6EA" stroke="#EFDCC6" stroke-width="3"/><ellipse cx="142" cy="158" rx="13" ry="9" fill="#FFF6EA" stroke="#EFDCC6" stroke-width="3"/>`; }
 function mascotHappy(id){ const m=document.getElementById(id); m.classList.add('m-happy','dance'); setTimeout(()=>m.classList.remove('m-happy','dance'),1400); }
 
-/* ═══════════ HÌNH VẼ ĐỒ CHƠI & GIỎ ═══════════ */
-const COLORS = {
-    do:   { name:'đỏ',   hex:'#FF6B6B', deep:'#E04545' },
-    vang: { name:'vàng', hex:'#FFCB3D', deep:'#F5A700' },
-    xanh: { name:'xanh', hex:'#4FA8F5', deep:'#2E86DB' }
-};
-const SHAPES = [
-    { key:'circle',   name:'tròn' },
-    { key:'square',   name:'vuông' },
-    { key:'triangle', name:'tam giác' }
-];
-
+/* ═══ ĐỒ CHƠI & GIỎ ═══ */
+const COLORS = { do:{name:'đỏ',hex:'#FF6B6B',deep:'#E04545'}, vang:{name:'vàng',hex:'#FFCB3D',deep:'#F5A700'}, xanh:{name:'xanh',hex:'#4FA8F5',deep:'#2E86DB'} };
+const SHAPES = [ {key:'circle',name:'tròn'}, {key:'square',name:'vuông'}, {key:'triangle',name:'tam giác'} ];
 function drawToy(shape,colorKey,px){
-    const c=COLORS[colorKey];
-    let body='';
+    const c=COLORS[colorKey]; let body='';
     if(shape==='circle')  body=`<circle cx="50" cy="50" r="40" fill="${c.hex}" stroke="${c.deep}" stroke-width="4"/><ellipse cx="37" cy="34" rx="13" ry="8" fill="#fff" opacity=".5"/>`;
     if(shape==='square')  body=`<rect x="11" y="11" width="78" height="78" rx="16" fill="${c.hex}" stroke="${c.deep}" stroke-width="4"/><ellipse cx="33" cy="30" rx="12" ry="7" fill="#fff" opacity=".5"/>`;
     if(shape==='triangle')body=`<path d="M50 9 L92 85 L8 85 Z" fill="${c.hex}" stroke="${c.deep}" stroke-width="4" stroke-linejoin="round"/><ellipse cx="45" cy="46" rx="9" ry="6" fill="#fff" opacity=".5"/>`;
-    const face=`<g transform="translate(50,54)">
-        <circle cx="-11" cy="-2" r="4.6" fill="#4A4458"/><circle cx="11" cy="-2" r="4.6" fill="#4A4458"/>
+    const face=`<g transform="translate(50,54)"><circle cx="-11" cy="-2" r="4.6" fill="#4A4458"/><circle cx="11" cy="-2" r="4.6" fill="#4A4458"/>
         <circle cx="-9.4" cy="-3.6" r="1.5" fill="#fff"/><circle cx="12.6" cy="-3.6" r="1.5" fill="#fff"/>
         <path d="M-8 8 Q0 15 8 8" stroke="#4A4458" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <circle cx="-19" cy="5" r="4.4" fill="#fff" opacity=".45"/><circle cx="19" cy="5" r="4.4" fill="#fff" opacity=".45"/>
-    </g>`;
+        <circle cx="-19" cy="5" r="4.4" fill="#fff" opacity=".45"/><circle cx="19" cy="5" r="4.4" fill="#fff" opacity=".45"/></g>`;
     return `<svg viewBox="0 0 100 100" width="${px}" height="${px}">${body}${face}</svg>`;
 }
-
-function drawBear(px){
-    return `<svg viewBox="0 0 100 100" width="${px}" height="${px}">
-        <circle cx="28" cy="26" r="13" fill="#D9A066" stroke="#B87F45" stroke-width="3"/>
-        <circle cx="72" cy="26" r="13" fill="#D9A066" stroke="#B87F45" stroke-width="3"/>
-        <circle cx="28" cy="26" r="6" fill="#F2C98F"/><circle cx="72" cy="26" r="6" fill="#F2C98F"/>
-        <ellipse cx="50" cy="58" rx="34" ry="32" fill="#D9A066" stroke="#B87F45" stroke-width="3.5"/>
-        <ellipse cx="50" cy="68" rx="16" ry="13" fill="#F2C98F"/>
-        <circle cx="40" cy="50" r="5" fill="#4A4458"/><circle cx="60" cy="50" r="5" fill="#4A4458"/>
-        <circle cx="41.6" cy="48.4" r="1.6" fill="#fff"/><circle cx="61.6" cy="48.4" r="1.6" fill="#fff"/>
-        <ellipse cx="50" cy="62" rx="5.5" ry="4" fill="#8A5A2B"/>
-        <path d="M44 71 Q50 76 56 71" stroke="#8A5A2B" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-        <circle cx="30" cy="58" r="5" fill="#FF9CB8" opacity=".6"/><circle cx="70" cy="58" r="5" fill="#FF9CB8" opacity=".6"/>
-    </svg>`;
-}
-
+function drawBear(px){ return `<svg viewBox="0 0 100 100" width="${px}" height="${px}">
+    <circle cx="28" cy="26" r="13" fill="#D9A066" stroke="#B87F45" stroke-width="3"/><circle cx="72" cy="26" r="13" fill="#D9A066" stroke="#B87F45" stroke-width="3"/>
+    <circle cx="28" cy="26" r="6" fill="#F2C98F"/><circle cx="72" cy="26" r="6" fill="#F2C98F"/>
+    <ellipse cx="50" cy="58" rx="34" ry="32" fill="#D9A066" stroke="#B87F45" stroke-width="3.5"/><ellipse cx="50" cy="68" rx="16" ry="13" fill="#F2C98F"/>
+    <circle cx="40" cy="50" r="5" fill="#4A4458"/><circle cx="60" cy="50" r="5" fill="#4A4458"/><circle cx="41.6" cy="48.4" r="1.6" fill="#fff"/><circle cx="61.6" cy="48.4" r="1.6" fill="#fff"/>
+    <ellipse cx="50" cy="62" rx="5.5" ry="4" fill="#8A5A2B"/><path d="M44 71 Q50 76 56 71" stroke="#8A5A2B" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <circle cx="30" cy="58" r="5" fill="#FF9CB8" opacity=".6"/><circle cx="70" cy="58" r="5" fill="#FF9CB8" opacity=".6"/></svg>`; }
 function drawBasket(fill,deep,scale,front=''){
     const w=118*scale, h=100*scale;
     return `<svg viewBox="0 0 118 100" width="${w}" height="${h}" style="filter:drop-shadow(0 8px 8px rgba(46,90,46,.3))">
         <path d="M13 32 L105 32 L95 88 Q59 97 23 88 Z" fill="${fill}" stroke="#fff" stroke-width="4.5"/>
-        <g stroke="${deep}" stroke-width="3.6" opacity=".4" fill="none">
-            <path d="M18 48 Q59 56 100 48"/><path d="M21 64 Q59 72 97 64"/>
-            <path d="M36 34 L40 90"/><path d="M59 35 L59 93"/><path d="M82 34 L78 90"/>
-        </g>
-        <rect x="8" y="22" width="102" height="15" rx="7.5" fill="${deep}" stroke="#fff" stroke-width="4"/>
-        ${front}
-    </svg>`;
+        <g stroke="${deep}" stroke-width="3.6" opacity=".4" fill="none"><path d="M18 48 Q59 56 100 48"/><path d="M21 64 Q59 72 97 64"/><path d="M36 34 L40 90"/><path d="M59 35 L59 93"/><path d="M82 34 L78 90"/></g>
+        <rect x="8" y="22" width="102" height="15" rx="7.5" fill="${deep}" stroke="#fff" stroke-width="4"/>${front}</svg>`;
 }
-function shapePlate(shapeKey){
-    let p='';
-    if(shapeKey==='circle')  p=`<circle cx="0" cy="0" r="13" fill="none" stroke="#fff" stroke-width="5"/>`;
-    if(shapeKey==='square')  p=`<rect x="-12" y="-12" width="24" height="24" rx="5" fill="none" stroke="#fff" stroke-width="5"/>`;
-    if(shapeKey==='triangle')p=`<path d="M0 -13 L13 11 L-13 11 Z" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>`;
-    return `<g transform="translate(59,62)">${p}</g>`;
-}
-function colorBlob(hex){
-    return `<g transform="translate(59,62)"><circle r="15" fill="${hex}" stroke="#fff" stroke-width="4"/><ellipse cx="-5" cy="-5" rx="5" ry="3.4" fill="#fff" opacity=".55"/></g>`;
-}
+function shapePlate(k){ let p=''; if(k==='circle')p=`<circle cx="0" cy="0" r="13" fill="none" stroke="#fff" stroke-width="5"/>`; if(k==='square')p=`<rect x="-12" y="-12" width="24" height="24" rx="5" fill="none" stroke="#fff" stroke-width="5"/>`; if(k==='triangle')p=`<path d="M0 -13 L13 11 L-13 11 Z" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>`; return `<g transform="translate(59,62)">${p}</g>`; }
+function colorBlob(hex){ return `<g transform="translate(59,62)"><circle r="15" fill="${hex}" stroke="#fff" stroke-width="4"/><ellipse cx="-5" cy="-5" rx="5" ry="3.4" fill="#fff" opacity=".55"/></g>`; }
 
-/* ═══════════ VÒNG CHƠI ═══════════ */
+/* ═══ KÉO THẢ (chuột + cảm ứng) ═══ */
+function enableDrag(handle, opts){
+    handle.style.touchAction='none';
+    handle.addEventListener('pointerdown', down);
+    function down(e){
+        if(opts.canDrag && !opts.canDrag()) return;
+        e.preventDefault();
+        try{ handle.setPointerCapture(e.pointerId); }catch(_){}
+        handle.classList.add('dragging'); handle.style.transition=''; ensureAudio(); sfx.lift();
+        const sx=e.clientX, sy=e.clientY; let dx=0, dy=0;
+        function move(ev){ dx=ev.clientX-sx; dy=ev.clientY-sy; handle.style.transform=`translate(${dx}px,${dy}px)`; if(opts.onHover)opts.onHover(zoneAt(ev.clientX,ev.clientY)); }
+        function finish(x,y,cancelled){
+            handle.removeEventListener('pointermove',move); handle.removeEventListener('pointerup',up); handle.removeEventListener('pointercancel',cancel);
+            handle.classList.remove('dragging'); if(opts.onHover)opts.onHover(null);
+            opts.onDrop(cancelled?null:zoneAt(x,y), {handle,dx,dy});
+        }
+        function up(ev){ finish(ev.clientX,ev.clientY,false); }
+        function cancel(){ finish(sx,sy,true); }
+        handle.addEventListener('pointermove',move); handle.addEventListener('pointerup',up); handle.addEventListener('pointercancel',cancel);
+    }
+    function zoneAt(x,y){ const zs=opts.zones(), pad=16; for(const z of zs){ const r=z.el.getBoundingClientRect(); if(x>=r.left-pad&&x<=r.right+pad&&y>=r.top-pad&&y<=r.bottom+pad)return z.key; } return null; }
+}
+function snapBack(handle){ handle.style.transition='transform .3s cubic-bezier(.34,1.4,.5,1)'; handle.style.transform='translate(0,0)'; }
+
+/* ═══ VÒNG CHƠI ═══ */
 const ROUNDS=8;
 let stars=0, mode='color', currentItem=null, locked=false, roundBins=[], roundIdx=0;
 
@@ -551,50 +379,25 @@ window.addEventListener('DOMContentLoaded',()=>{
     renderIcons();
 });
 function addStar(){ stars++; document.getElementById('star-display').innerText=stars; save('sort-stars',String(stars)); }
-
-function showScreen(name){
-    ['home','play'].forEach(s=>document.getElementById('screen-'+s).classList.toggle('hidden', s!==name));
-    document.getElementById('beads').classList.toggle('hidden', name!=='play');
-    document.getElementById('done-overlay').classList.add('hidden');
-}
+function showScreen(name){ ['home','play'].forEach(s=>document.getElementById('screen-'+s).classList.toggle('hidden', s!==name)); document.getElementById('beads').classList.toggle('hidden', name!=='play'); document.getElementById('done-overlay').classList.add('hidden'); }
 function goHome(){ ensureAudio();sfx.click(); if('speechSynthesis'in window)speechSynthesis.cancel(); showScreen('home'); }
+function renderBeads(){ const b=document.getElementById('beads'); b.innerHTML=''; for(let i=0;i<ROUNDS;i++){ const d=document.createElement('div'); d.className='bead'+(i<roundIdx?' on':''); b.appendChild(d); } }
 
-function renderBeads(){
-    const b=document.getElementById('beads'); b.innerHTML='';
-    for(let i=0;i<ROUNDS;i++){ const d=document.createElement('div'); d.className='bead'+(i<roundIdx?' on':''); b.appendChild(d); }
-}
-
-function startGame(m){
-    ensureAudio(); sfx.click();
-    mode=m; roundIdx=0;
-    showScreen('play'); renderBeads();
-    setupBins();
-    nextRound(true);
-}
+function startGame(m){ ensureAudio(); sfx.click(); mode=m; roundIdx=0; showScreen('play'); renderBeads(); setupBins(); nextRound(true); }
 function playAgain(){ ensureAudio(); sfx.click(); startGame(mode); }
 
 function setupBins(){
     const box=document.getElementById('bins'); box.innerHTML=''; roundBins=[];
-    const mk=(html,label,labelColor,onclick)=>{
-        const b=document.createElement('button'); b.className='bin-btn';
-        b.innerHTML=html+`<span class="bin-label" style="color:${labelColor}">${label}</span>`;
-        b.onclick=onclick; box.appendChild(b); return b;
-    };
+    const mk=(html,label,labelColor)=>{ const b=document.createElement('div'); b.className='bin'; b.innerHTML=html+`<span class="bin-label" style="color:${labelColor}">${label}</span>`; box.appendChild(b); };
     const scale = window.innerWidth<640 ? .82 : 1.05;
     if(mode==='color'){
-        Object.keys(COLORS).forEach((k,i)=>{
-            const c=COLORS[k]; roundBins.push({value:k});
-            mk(drawBasket('#E8C98F','#C8A15C',scale,colorBlob(c.hex)), 'MÀU '+c.name.toUpperCase(), c.deep, ()=>chooseBin(i));
-        });
+        Object.keys(COLORS).forEach(k=>{ const c=COLORS[k]; roundBins.push({value:k}); mk(drawBasket('#E8C98F','#C8A15C',scale,colorBlob(c.hex)),'MÀU '+c.name.toUpperCase(),c.deep); });
     } else if(mode==='shape'){
         const tints=[['#B7A4F2','#8D79E6'],['#7FD6A6','#43B97F'],['#FFBC7E','#FF9A3D']];
-        SHAPES.forEach((sh,i)=>{
-            roundBins.push({value:sh.key});
-            mk(drawBasket(tints[i][0],tints[i][1],scale,shapePlate(sh.key)), 'HÌNH '+sh.name.toUpperCase(), tints[i][1], ()=>chooseBin(i));
-        });
+        SHAPES.forEach((sh,i)=>{ roundBins.push({value:sh.key}); mk(drawBasket(tints[i][0],tints[i][1],scale,shapePlate(sh.key)),'HÌNH '+sh.name.toUpperCase(),tints[i][1]); });
     } else {
-        roundBins.push({value:'big'});   mk(drawBasket('#8FC6F7','#4FA8F5',scale*1.22),'THÙNG TO','#2E86DB',()=>chooseBin(0));
-        roundBins.push({value:'small'}); mk(drawBasket('#FFC9DC','#FF6FA5',scale*.7),'THÙNG NHỎ','#E84D89',()=>chooseBin(1));
+        roundBins.push({value:'big'});   mk(drawBasket('#8FC6F7','#4FA8F5',scale*1.22),'THÙNG TO','#2E86DB');
+        roundBins.push({value:'small'}); mk(drawBasket('#FFC9DC','#FF6FA5',scale*.7),'THÙNG NHỎ','#E84D89');
     }
 }
 
@@ -604,99 +407,77 @@ function nextRound(isFirst=false){
     const stage=document.getElementById('current-item');
     const mobile=window.innerWidth<640;
     let prompt='';
-
     if(mode==='color'||mode==='shape'){
         const ck=Object.keys(COLORS)[Math.floor(Math.random()*3)];
         const shape=SHAPES[Math.floor(Math.random()*3)].key;
         currentItem={color:ck, shape};
-        stage.innerHTML=`<div class="toy-enter"><div class="toy-float">${drawToy(shape,ck,mobile?104:148)}</div></div>`;
-        prompt = mode==='color' ? 'Đồ chơi này màu gì? Bỏ vào giỏ đúng màu nhé!'
-                                : 'Đây là hình gì? Bỏ vào giỏ có hình giống nhé!';
+        stage.innerHTML=`<div class="toy-enter"><div class="toy-drag" id="toy-drag"><div class="toy-float">${drawToy(shape,ck,mobile?104:148)}</div></div></div>`;
+        prompt = mode==='color' ? 'Kéo đồ chơi vào giỏ đúng màu nhé!' : 'Kéo đồ chơi vào giỏ có hình giống nhé!';
     } else {
-        const big=Math.random()<.5;
-        currentItem={size: big?'big':'small'};
+        const big=Math.random()<.5; currentItem={size: big?'big':'small'};
         const px = mobile ? (big?134:66) : (big?196:92);
-        stage.innerHTML=`<div class="toy-enter"><div class="toy-float">${drawBear(px)}</div></div>`;
-        prompt='Bạn gấu này TO hay NHỎ? Bỏ vào đúng thùng nhé!';
+        stage.innerHTML=`<div class="toy-enter"><div class="toy-drag" id="toy-drag"><div class="toy-float">${drawBear(px)}</div></div></div>`;
+        prompt='Kéo bạn gấu vào đúng thùng: to hay nhỏ nhé!';
     }
-    document.getElementById('play-prompt').innerText = mode==='color'?'Màu gì đây?' : mode==='shape'?'Hình gì đây?' : 'To hay nhỏ?';
+    document.getElementById('play-prompt').innerText = mode==='color'?'Kéo vào giỏ đúng màu' : mode==='shape'?'Kéo vào giỏ đúng hình' : 'Kéo vào thùng to hay nhỏ';
+    attachToyDrag();
     playTTS((isFirst?'Cùng sắp xếp nào! ':'')+prompt);
 }
 
 function repeatQuestion(){
     ensureAudio(); sfx.click();
-    const p = mode==='color' ? 'Đồ chơi này màu gì? Bỏ vào giỏ đúng màu nhé!'
-            : mode==='shape' ? 'Đây là hình gì? Bỏ vào giỏ có hình giống nhé!'
-            : 'Bạn gấu này to hay nhỏ? Bỏ vào đúng thùng nhé!';
+    const p = mode==='color' ? 'Kéo đồ chơi vào giỏ đúng màu nhé!' : mode==='shape' ? 'Kéo đồ chơi vào giỏ có hình giống nhé!' : 'Kéo bạn gấu vào đúng thùng: to hay nhỏ nhé!';
     playTTS(p);
 }
 
-const PRAISES=['Giỏi quá','Tuyệt vời','Đúng rồi','Hoan hô bé','Xuất sắc','Bé thông minh quá'];
+function isCorrect(bin){ if(mode==='color')return bin.value===currentItem.color; if(mode==='shape')return bin.value===currentItem.shape; return bin.value===currentItem.size; }
 
-function isCorrect(bin){
-    if(mode==='color')return bin.value===currentItem.color;
-    if(mode==='shape')return bin.value===currentItem.shape;
-    return bin.value===currentItem.size;
-}
-
-function chooseBin(idx){
-    if(locked)return;
-    ensureAudio();
-    const bin=roundBins[idx];
-    const binEl=document.querySelectorAll('.bin-btn')[idx];
-
-    if(isCorrect(bin)){
-        locked=true;
-        sfx.pop(); setTimeout(sfx.sparkle,150);
-        binEl.classList.add('bin-glow'); setTimeout(()=>binEl.classList.remove('bin-glow'),700);
-        const item=document.getElementById('current-item').firstElementChild;
-        if(item)item.classList.add('toy-solved');
-        mascotHappy('play-mascot');
-
-        const r=binEl.getBoundingClientRect();
-        confetti({particleCount:65,spread:85,zIndex:100,origin:{x:(r.left+r.width/2)/innerWidth,y:(r.top+r.height/2)/innerHeight},colors:['#FFCB3D','#FF6FA5','#4FA8F5','#43B97F']});
-
-        addStar(); roundIdx++; renderBeads();
-
-        const answer = mode==='color'?('Màu '+COLORS[currentItem.color].name)
-                     : mode==='shape'?('Hình '+SHAPES.find(s=>s.key===currentItem.shape).name)
-                     : (currentItem.size==='big'?'Gấu to':'Gấu nhỏ');
-        document.getElementById('reward-line').innerHTML=
-            `<div class="reward-pill"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 2l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.2 1.3-6.6L2.5 9l6.6-.8z" fill="#FFCB3D"/></svg>${answer}!</div>`;
-
-        const praise=PRAISES[Math.floor(Math.random()*PRAISES.length)];
-        const speech = mode==='color'?`Đây là màu ${COLORS[currentItem.color].name}.`
-                     : mode==='shape'?`Đây là hình ${SHAPES.find(s=>s.key===currentItem.shape).name}.`
-                     : `Bạn gấu ${currentItem.size==='big'?'to':'nhỏ'}.`;
-
-        if(roundIdx>=ROUNDS){
-            sfx.fanfare();
-            confetti({particleCount:170,spread:150,origin:{y:.4},zIndex:110,colors:['#FFCB3D','#FF6FA5','#8D79E6','#43B97F']});
-            playTTS(`${praise}! ${speech}`).then(()=>showDone());
-        } else {
-            playTTS(`${praise}! ${speech}`).then(()=>setTimeout(()=>nextRound(),250));
+function attachToyDrag(){
+    const handle=document.getElementById('toy-drag'); if(!handle)return;
+    const binsEls=()=>[...document.querySelectorAll('.bin')];
+    enableDrag(handle,{
+        canDrag:()=>!locked,
+        zones:()=>binsEls().map((el,i)=>({el,key:i})),
+        onHover:(key)=>binsEls().forEach((el,i)=>el.classList.toggle('hot', i===key)),
+        onDrop:(key,ctx)=>{
+            binsEls().forEach(el=>el.classList.remove('hot'));
+            if(key==null){ snapBack(ctx.handle); return; }
+            const idx=+key;
+            if(isCorrect(roundBins[idx])){
+                locked=true;
+                ctx.handle.style.transition='transform .4s ease-in, opacity .4s';
+                ctx.handle.style.transform=`translate(${ctx.dx}px,${ctx.dy}px) scale(.18)`;
+                ctx.handle.style.opacity='0';
+                winRound(idx);
+            } else {
+                snapBack(ctx.handle);
+                const binEl=binsEls()[idx]; binEl.classList.remove('wiggle'); void binEl.offsetWidth; binEl.classList.add('wiggle');
+                sfx.boing(); playTTS('Chưa đúng rồi. Bé thử giỏ khác nhé!');
+            }
         }
-    } else {
-        sfx.boing();
-        binEl.classList.remove('wiggle'); void binEl.offsetWidth; binEl.classList.add('wiggle');
-        playTTS('Chưa đúng rồi. Bé thử giỏ khác nhé!');
-    }
+    });
 }
 
-function showDone(){
-    document.getElementById('done-count').innerText=ROUNDS;
-    document.getElementById('done-overlay').classList.remove('hidden');
-    playTTS(`Hoan hô! Bé đã hoàn thành và nhận được huy chương vàng!`);
+const PRAISES=['Giỏi quá','Tuyệt vời','Đúng rồi','Hoan hô bé','Xuất sắc','Bé thông minh quá'];
+function winRound(idx){
+    const binEl=document.querySelectorAll('.bin')[idx];
+    sfx.pop(); setTimeout(sfx.sparkle,150);
+    binEl.classList.add('bin-glow'); setTimeout(()=>binEl.classList.remove('bin-glow'),700);
+    mascotHappy('play-mascot');
+    const r=binEl.getBoundingClientRect();
+    confetti({particleCount:65,spread:85,zIndex:100,origin:{x:(r.left+r.width/2)/innerWidth,y:(r.top+r.height/2)/innerHeight},colors:['#FFCB3D','#FF6FA5','#4FA8F5','#43B97F']});
+    addStar(); roundIdx++; renderBeads();
+    const answer = mode==='color'?('Màu '+COLORS[currentItem.color].name) : mode==='shape'?('Hình '+SHAPES.find(s=>s.key===currentItem.shape).name) : (currentItem.size==='big'?'Gấu to':'Gấu nhỏ');
+    document.getElementById('reward-line').innerHTML=`<div class="reward-pill"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 2l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.2 1.3-6.6L2.5 9l6.6-.8z" fill="#FFCB3D"/></svg>${answer}!</div>`;
+    const praise=PRAISES[Math.floor(Math.random()*PRAISES.length)];
+    const speech = mode==='color'?`Đây là màu ${COLORS[currentItem.color].name}.` : mode==='shape'?`Đây là hình ${SHAPES.find(s=>s.key===currentItem.shape).name}.` : `Bạn gấu ${currentItem.size==='big'?'to':'nhỏ'}.`;
+    if(roundIdx>=ROUNDS){ sfx.fanfare(); confetti({particleCount:170,spread:150,origin:{y:.4},zIndex:110,colors:['#FFCB3D','#FF6FA5','#8D79E6','#43B97F']}); playTTS(`${praise}! ${speech}`).then(()=>showDone()); }
+    else { playTTS(`${praise}! ${speech}`).then(()=>setTimeout(()=>nextRound(),250)); }
 }
 
-function showPraise(text){
-    const el=document.getElementById('praise');
-    document.getElementById('praise-text').innerText=text;
-    el.classList.remove('hidden','praise-run'); void el.offsetWidth; el.classList.add('praise-run');
-    setTimeout(()=>el.classList.add('hidden'),1600);
-}
+function showDone(){ document.getElementById('done-count').innerText=ROUNDS; document.getElementById('done-overlay').classList.remove('hidden'); playTTS('Hoan hô! Bé đã hoàn thành và nhận được huy chương vàng!'); }
 
-/* ═══════════ TOÀN MÀN HÌNH ═══════════ */
+/* ═══ TOÀN MÀN HÌNH ═══ */
 function toggleFullScreen(){
     const d=document.documentElement;
     const req=d.requestFullscreen||d.webkitRequestFullscreen||d.mozRequestFullScreen||d.msRequestFullscreen;
@@ -704,12 +485,7 @@ function toggleFullScreen(){
     if(!(document.fullscreenElement||document.webkitFullscreenElement||document.mozFullScreenElement||document.msFullscreenElement)){ if(req){try{req.call(d);}catch(e){}} }
     else { if(ext)ext.call(document); }
 }
-['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange'].forEach(evt=>{
-    document.addEventListener(evt,()=>{
-        isFull=!!(document.fullscreenElement||document.webkitFullscreenElement||document.mozFullScreenElement||document.msFullscreenElement);
-        renderIcons();
-    });
-});
+['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange'].forEach(evt=>{ document.addEventListener(evt,()=>{ isFull=!!(document.fullscreenElement||document.webkitFullscreenElement||document.mozFullScreenElement||document.msFullscreenElement); renderIcons(); }); });
 </script>
 </body>
 </html>
