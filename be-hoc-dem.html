@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Đếm Cùng Bé — Kéo thả tập đếm 1 đến 5</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══ HỆ THỐNG "HỘP ĐỒ CHƠI VẢI NỈ" — điểm nhấn Cam ═══ */
+:root {
+    --sky-hi:#8ED1FF; --sky-lo:#E2F5FF;
+    --hill-1:#93DE93; --hill-2:#6FC96F; --hill-3:#55B855;
+    --sun:#FFCB3D; --sun-deep:#F5A700;
+    --berry:#FF6FA5; --berry-deep:#E84D89;
+    --grape:#8D79E6; --grape-deep:#6C56C9;
+    --leaf:#43B97F;  --leaf-deep:#2E9A64;
+    --tang:#FF9A3D;  --tang-deep:#EE7F14;
+    --blue:#4FA8F5;  --blue-deep:#2E86DB;
+    --wood:#E8C98F;  --wood-deep:#C8A15C;
+    --ink:#4A4458; --ink-soft:#8B85A0;
+    --cream:#FFF9EE; --white:#FFFFFF;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html,body { height:100%; }
+body {
+    font-family:'Baloo 2', system-ui, sans-serif; color:var(--ink);
+    background:radial-gradient(1200px 500px at 50% -100px, #FFFFFF66, transparent),
+        linear-gradient(180deg, #BFE7FF 0%, #E7F6FF 60%, #FFF6EE 100%);
+    display:flex; flex-direction:column; align-items:center; padding:10px; min-height:100vh;
+    user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; overflow-x:hidden;
+}
+button { font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+button:focus-visible { outline:4px dashed var(--tang); outline-offset:3px; border-radius:20px; }
+
+.stage {
+    position:relative; width:100%; max-width:880px; flex:1; min-height:540px;
+    border-radius:36px; border:8px solid var(--white);
+    background:linear-gradient(180deg, var(--sky-hi) 0%, var(--sky-lo) 52%, #EFFAEF 66%);
+    box-shadow:0 26px 60px rgba(63,113,170,.38), inset 0 0 0 2px rgba(255,255,255,.5);
+    overflow:hidden; display:flex; flex-direction:column;
+    animation:stageIn .6s cubic-bezier(.34,1.4,.5,1) both;
+}
+@keyframes stageIn { from { transform:translateY(26px) scale(.97); opacity:0; } }
+
+.scene { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.drift-slow { animation:drift 70s linear infinite; }
+.drift-fast { animation:drift 46s linear infinite; animation-delay:-18s; }
+@keyframes drift { from{transform:translateX(-16%);} to{transform:translateX(112%);} }
+.rays { animation:spin 30s linear infinite; transform-origin:center; transform-box:fill-box; }
+@keyframes spin { to{transform:rotate(360deg);} }
+.flutter { animation:flutter 7s ease-in-out infinite alternate; }
+@keyframes flutter { from{transform:translate(0,0) rotate(-4deg);} to{transform:translate(14px,-18px) rotate(6deg);} }
+
+.hud { position:relative; z-index:20; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 14px 0; }
+.hud-group { display:flex; gap:7px; }
+.icon-btn { width:44px; height:44px; border-radius:15px; background:rgba(255,255,255,.92);
+    box-shadow:0 4px 0 rgba(101,140,180,.35), 0 8px 14px rgba(63,113,170,.18);
+    display:flex; align-items:center; justify-content:center; transition:transform .12s, box-shadow .12s; }
+.icon-btn:active { transform:translateY(4px); box-shadow:0 0 0 rgba(0,0,0,0); }
+.icon-btn svg { width:23px; height:23px; }
+
+.beads { display:flex; gap:6px; align-items:center; }
+.beads.hidden { display:none; }
+.bead { width:15px; height:15px; border-radius:50%; background:rgba(255,255,255,.75);
+    box-shadow:inset 0 2px 3px rgba(101,140,180,.35); transition:transform .25s cubic-bezier(.34,1.5,.5,1), background .25s; }
+.bead.on { background:var(--sun); box-shadow:inset 0 -2px 0 var(--sun-deep), 0 0 10px #FFD97066; transform:scale(1.25); }
+
+.star-chip { display:flex; align-items:center; gap:5px; background:rgba(255,255,255,.92); border-radius:15px;
+    padding:7px 13px; font-weight:800; font-size:1.06rem; color:var(--sun-deep);
+    box-shadow:0 4px 0 rgba(101,140,180,.35), 0 8px 14px rgba(63,113,170,.18); }
+.star-chip svg { width:19px; height:19px; }
+
+.screen { position:relative; z-index:10; flex:1; display:flex; flex-direction:column; align-items:center; padding:8px 16px 18px; }
+.screen.hidden { display:none; }
+
+.home-mascot { width:128px; margin-top:2px; animation:bob 3.4s ease-in-out infinite alternate; }
+@keyframes bob { from{transform:translateY(-5px);} to{transform:translateY(5px);} }
+.title { font-size:clamp(1.9rem,6vw,3.3rem); font-weight:800; letter-spacing:.02em; color:var(--tang-deep);
+    text-align:center; line-height:1.05; margin-top:2px; text-shadow:0 3px 0 var(--white), 0 8px 16px rgba(238,127,20,.25); }
+.subtitle { font-weight:700; color:var(--ink-soft); text-align:center; margin:4px 0 16px; font-size:clamp(.85rem,2.6vw,1.1rem); }
+.mode-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; width:100%; max-width:480px; }
+@media (max-width:460px){ .mode-grid{ grid-template-columns:1fr; max-width:320px; } }
+.mode-card { background:var(--white); border-radius:26px; padding:18px 12px 15px;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    box-shadow:0 7px 0 rgba(101,140,180,.28), 0 16px 26px rgba(63,113,170,.22);
+    transition:transform .14s, box-shadow .14s; animation:popIn .5s cubic-bezier(.34,1.5,.5,1) both; }
+.mode-card:nth-child(1){animation-delay:.12s;} .mode-card:nth-child(2){animation-delay:.22s;}
+.mode-card:hover { transform:translateY(-4px) rotate(-1deg); }
+.mode-card:active { transform:translateY(3px); box-shadow:0 2px 0 rgba(101,140,180,.28); }
+.mode-card svg { width:80px; height:80px; }
+.mode-name { font-weight:800; font-size:1.28rem; }
+.mode-sub { font-weight:700; font-size:.82rem; color:var(--ink-soft); margin-top:-4px; }
+.tip { margin-top:16px; font-weight:700; font-size:.82rem; color:#fff; background:var(--leaf);
+    padding:7px 16px; border-radius:99px; box-shadow:0 4px 0 var(--leaf-deep); display:flex; align-items:center; gap:7px; }
+.tip svg{ width:17px; height:17px; flex:none; }
+@keyframes popIn { from{transform:scale(.6); opacity:0;} }
+
+.prompt-btn { display:flex; align-items:center; gap:10px; background:var(--white); border-radius:99px;
+    padding:10px 22px; font-weight:800; font-size:clamp(1.05rem,3.4vw,1.4rem); color:var(--tang-deep);
+    box-shadow:0 6px 0 #F3D9A4, 0 14px 22px rgba(190,140,40,.22); transition:transform .12s, box-shadow .12s; }
+.prompt-btn:active { transform:translateY(4px); box-shadow:0 1px 0 #F3D9A4; }
+.prompt-btn svg { width:26px; height:26px; flex:none; }
+
+.play-mascot { position:absolute; left:12px; bottom:12px; width:88px; z-index:5; pointer-events:none; animation:bob 3.4s ease-in-out infinite alternate; }
+@media (max-width:640px){ .play-mascot{ width:62px; left:6px; } }
+
+.tray-zone { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; }
+.tray-items { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:center; gap:10px 16px; max-width:88%; padding:0 8px 6px; position:relative; z-index:2; }
+.tray-board { width:min(560px,86%); height:26px; border-radius:13px; margin-top:-6px;
+    background:linear-gradient(180deg, var(--wood), var(--wood-deep));
+    box-shadow:0 8px 0 #A87F3E, 0 16px 20px rgba(120,80,20,.3), inset 0 3px 0 #F5DFB4; position:relative; z-index:1; }
+.tray-board::before, .tray-board::after { content:''; position:absolute; top:8px; width:60px; height:4px; border-radius:2px; background:#B58A45; opacity:.6; }
+.tray-board::before{ left:16%; } .tray-board::after{ right:16%; }
+
+/* ── Vật đếm (kéo được) ── */
+.item-unit { position:relative; animation:toyIn .45s cubic-bezier(.34,1.5,.5,1) both; }
+@keyframes toyIn { from{transform:scale(0) rotate(-14deg); opacity:0;} }
+.item-unit .inner { display:inline-block; animation:bob 2.7s ease-in-out infinite alternate; filter:drop-shadow(0 8px 8px rgba(46,90,46,.25)); }
+.item-unit.draggable { cursor:grab; touch-action:none; will-change:transform; }
+.item-unit.draggable:active { cursor:grabbing; }
+.item-unit.dragging { z-index:200; }
+.item-unit.dragging .inner { animation:none; }
+.count-bump { animation:bump .4s cubic-bezier(.34,1.6,.5,1); }
+@keyframes bump { 50%{ transform:scale(1.35);} }
+.count-badge { position:absolute; top:-9px; right:-9px; width:30px; height:30px; border-radius:50%;
+    background:var(--white); border:3px solid var(--sun-deep); display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:1.02rem; color:var(--sun-deep); box-shadow:0 3px 6px rgba(160,110,20,.3);
+    animation:popIn .3s cubic-bezier(.34,1.6,.5,1) both; }
+
+/* ── Giỏ nhận (chế độ kéo đếm) ── */
+.count-basket { position:relative; display:flex; flex-direction:column; align-items:center; gap:3px; margin-top:2px; transition:transform .14s, filter .14s; }
+.count-basket.hidden { display:none; }
+.count-basket.hot { transform:translateY(-6px) scale(1.06); filter:drop-shadow(0 0 20px #FFE08A); }
+.basket-label { font-weight:800; font-size:.82rem; letter-spacing:.04em; color:var(--tang-deep);
+    background:var(--white); border-radius:99px; padding:3px 14px; box-shadow:0 3px 0 rgba(101,140,180,.28); }
+.basket-pulse { animation:bpulse .5s ease; }
+@keyframes bpulse { 50%{ filter:brightness(1.25) drop-shadow(0 0 18px #FFE08A);} }
+
+.touch-chip { display:flex; align-items:center; gap:9px; background:var(--white); border-radius:99px; padding:7px 20px;
+    font-weight:800; font-size:1.15rem; color:var(--tang-deep); margin-top:8px;
+    box-shadow:0 5px 0 #F3D9A4, 0 12px 18px rgba(190,140,40,.2); }
+.touch-chip.hidden { display:none; }
+.touch-chip b { font-size:1.5rem; min-width:22px; text-align:center; }
+
+/* ── Ô đáp án + bàn tính hạt số (chế độ đếm & kéo số) ── */
+.answer-slot { position:relative; width:74px; height:74px; border-radius:22px; margin-top:6px;
+    background:linear-gradient(180deg,#FFF6E6,#FBE9C6); border:5px dashed var(--wood-deep);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:2.2rem; color:var(--wood-deep);
+    box-shadow:0 6px 0 #C8A15C, inset 0 2px 8px rgba(160,110,20,.15); transition:transform .14s, filter .14s; }
+.answer-slot.hidden { display:none; }
+.answer-slot.hot { transform:scale(1.08); filter:drop-shadow(0 0 18px #FFE08A); border-color:var(--tang); }
+.answer-slot.filled { border-style:solid; border-color:var(--leaf); background:linear-gradient(180deg,#EAFBEF,#CFF3DB); color:var(--leaf-deep); animation:slotFill .4s cubic-bezier(.34,1.6,.5,1); }
+@keyframes slotFill { 0%{transform:scale(.4);} 60%{transform:scale(1.2);} 100%{transform:scale(1);} }
+.slot-hint { font-weight:700; font-size:.78rem; color:var(--ink-soft); margin-top:6px; }
+.slot-hint.hidden { display:none; }
+
+.abacus { position:relative; display:flex; gap:12px; justify-content:center; align-items:center; padding:12px 26px 6px; margin-top:2px; }
+.abacus.hidden { display:none; }
+.abacus::before { content:''; position:absolute; left:0; right:0; top:calc(50% - 3px); height:14px; transform:translateY(-50%);
+    background:linear-gradient(180deg, var(--wood), var(--wood-deep)); border-radius:8px; box-shadow:0 4px 0 #A87F3E, inset 0 2px 0 #F5DFB4; }
+.num-bead { position:relative; width:58px; height:58px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:1.8rem; color:#fff; text-shadow:0 2px 0 rgba(0,0,0,.18); border:4px solid var(--white);
+    cursor:grab; touch-action:none; will-change:transform; transition:transform .13s; animation:popIn .45s cubic-bezier(.34,1.6,.5,1) both; }
+@media (min-width:640px){ .num-bead{ width:70px; height:70px; font-size:2.2rem; } }
+.num-bead:active { cursor:grabbing; }
+.num-bead.dragging { z-index:200; }
+.wiggle { animation:wig .5s ease; }
+@keyframes wig { 25%{transform:rotate(-8deg);} 50%{transform:rotate(8deg);} 75%{transform:rotate(-4deg);} }
+.dance { animation:dance .7s ease-in-out; }
+@keyframes dance { 25%{transform:scale(1.14) rotate(-7deg);} 50%{transform:scale(1.18) rotate(7deg);} 75%{transform:scale(1.1) rotate(-3deg);} }
+
+.quiz-tools { display:flex; flex-direction:column; align-items:center; }
+.quiz-tools.hidden { display:none; }
+
+.reward-line { min-height:50px; display:flex; align-items:center; justify-content:center; margin-top:6px; }
+.reward-pill { display:flex; align-items:center; gap:9px; background:var(--white); border-radius:20px; padding:8px 20px;
+    font-weight:800; font-size:1.15rem; color:var(--leaf-deep); box-shadow:0 5px 0 #BDE8CE, 0 12px 18px rgba(46,154,100,.2);
+    animation:popIn .4s cubic-bezier(.34,1.5,.5,1) both; }
+
+.overlay { position:absolute; inset:0; z-index:40; display:flex; align-items:center; justify-content:center;
+    background:rgba(74,68,88,.42); backdrop-filter:blur(5px); padding:18px; animation:fadeIn .3s both; }
+@keyframes fadeIn { from{opacity:0;} }
+.overlay.hidden { display:none; }
+.done-card { background:var(--cream); border-radius:32px; padding:26px 26px 22px; width:100%; max-width:360px; text-align:center;
+    box-shadow:0 12px 0 rgba(101,140,180,.25), 0 30px 60px rgba(40,30,80,.4); animation:popIn .5s cubic-bezier(.34,1.5,.5,1) both; }
+.done-card h2 { font-size:2rem; font-weight:800; color:var(--tang-deep); margin-top:6px; }
+.done-card p { font-weight:700; color:var(--ink-soft); margin:2px 0 16px; }
+.medal { width:120px; margin:-58px auto 0; display:block; filter:drop-shadow(0 10px 14px rgba(190,140,40,.4)); }
+.done-actions { display:flex; gap:10px; }
+.btn-3d { flex:1; border-radius:20px; padding:12px 8px; font-weight:800; font-size:1.05rem; color:#fff; transition:transform .12s, box-shadow .12s; }
+.btn-3d:active { transform:translateY(4px); box-shadow:0 1px 0 rgba(0,0,0,.2) !important; }
+.btn-again { background:linear-gradient(180deg,#57C689,var(--leaf)); box-shadow:0 6px 0 var(--leaf-deep), 0 14px 22px rgba(46,154,100,.35); }
+.btn-home  { background:linear-gradient(180deg,#FFB169,var(--tang)); box-shadow:0 6px 0 var(--tang-deep), 0 14px 22px rgba(238,127,20,.35); }
+
+.eye { transform-box:fill-box; transform-origin:center; animation:blink 4.6s infinite; }
+@keyframes blink { 0%,93%,100%{transform:scaleY(1);} 95.5%,97.5%{transform:scaleY(.06);} }
+.eye-happy { display:none; }
+.m-happy .eye { display:none; }
+.m-happy .eye-happy { display:block; }
+
+@media (prefers-reduced-motion: reduce) {
+    .drift-slow,.drift-fast,.rays,.flutter,.home-mascot,.play-mascot,.item-unit .inner,.eye { animation:none !important; }
+}
+</style>
+</head>
+<body>
+<div class="stage">
+    <!-- BỐI CẢNH -->
+    <svg class="scene" viewBox="0 0 880 620" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <defs>
+            <g id="cloud"><path d="M20 36 a14 14 0 0 1 2-28 a19 19 0 0 1 36-4 a13 13 0 0 1 10 32 z" fill="#fff"/></g>
+            <g id="tree"><rect x="-5" y="26" width="10" height="26" rx="5" fill="#B07B4C"/>
+                <circle cx="-14" cy="14" r="17" fill="#5FBF5F"/><circle cx="14" cy="14" r="17" fill="#6FCB6F"/>
+                <circle cx="0" cy="-2" r="19" fill="#7DD87D"/><circle cx="-6" cy="8" r="3" fill="#FF6FA5"/><circle cx="10" cy="2" r="3" fill="#FFCB3D"/></g>
+            <g id="flower"><rect x="-1.6" y="0" width="3.2" height="16" rx="1.6" fill="#4CA96B"/>
+                <g fill="#FF9A3D"><circle cx="0" cy="-4" r="4.4"/><circle cx="-4.8" cy="0" r="4.4"/><circle cx="4.8" cy="0" r="4.4"/><circle cx="-3" cy="4.4" r="4.4"/><circle cx="3" cy="4.4" r="4.4"/></g>
+                <circle cx="0" cy="0.6" r="3.4" fill="#FFE28A"/></g>
+        </defs>
+        <g transform="translate(792,74)">
+            <g class="rays" stroke="#FFD970" stroke-width="8" stroke-linecap="round" opacity=".9">
+                <line y1="-50" y2="-64"/><line y1="50" y2="64"/><line x1="-50" x2="-64"/><line x1="50" x2="64"/>
+                <line x1="-36" y1="-36" x2="-46" y2="-46"/><line x1="36" y1="36" x2="46" y2="46"/><line x1="-36" y1="36" x2="-46" y2="46"/><line x1="36" y1="-36" x2="46" y2="-46"/></g>
+            <circle r="38" fill="var(--sun)"/><circle cx="-12" cy="-3" r="4" fill="#7A5C00"/><circle cx="12" cy="-3" r="4" fill="#7A5C00"/>
+            <path d="M-10 9 Q0 17 10 9" stroke="#7A5C00" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <circle cx="-20" cy="6" r="5" fill="#FFB3C1"/><circle cx="20" cy="6" r="5" fill="#FFB3C1"/></g>
+        <g class="drift-slow" opacity=".95"><use href="#cloud" x="40" y="70" transform="scale(1.15)"/></g>
+        <g class="drift-fast" opacity=".8"><use href="#cloud" x="150" y="150" transform="scale(.8)"/></g>
+        <g><path d="M-10 26 Q 220 74 440 58 Q 660 42 890 84" fill="none" stroke="#FFFFFFAA" stroke-width="5"/>
+            <g stroke="#fff" stroke-width="2.5" stroke-linejoin="round">
+                <path d="M60 42 l13 30 l14 -26" fill="#FF9A3D"/><path d="M150 56 l13 30 l14 -27" fill="#FFCB3D"/>
+                <path d="M240 62 l13 30 l14 -28" fill="#43B97F"/><path d="M330 62 l13 30 l14 -29" fill="#4FA8F5"/>
+                <path d="M420 58 l13 30 l14 -30" fill="#8D79E6"/><path d="M510 52 l13 30 l14 -29" fill="#FF6FA5"/>
+                <path d="M600 48 l13 31 l14 -28" fill="#FF9A3D"/><path d="M690 48 l13 31 l14 -27" fill="#FFCB3D"/><path d="M780 54 l13 31 l14 -26" fill="#43B97F"/></g></g>
+        <ellipse cx="180" cy="700" rx="520" ry="210" fill="var(--hill-1)"/>
+        <ellipse cx="740" cy="720" rx="560" ry="235" fill="var(--hill-2)"/>
+        <ellipse cx="440" cy="770" rx="640" ry="240" fill="var(--hill-3)"/>
+        <use href="#tree" x="94" y="470"/><use href="#tree" x="806" y="486" transform="scale(.8)" opacity=".95"/>
+        <use href="#flower" x="212" y="560"/><use href="#flower" x="668" y="572" transform="scale(.85)"/>
+        <g class="flutter" transform="translate(230,210)"><ellipse cx="-6" cy="0" rx="7" ry="10" fill="#FFD08A" transform="rotate(-20)"/>
+            <ellipse cx="6" cy="0" rx="7" ry="10" fill="#FFB35C" transform="rotate(20)"/><rect x="-1.6" y="-8" width="3.2" height="16" rx="1.6" fill="#4A4458"/></g>
+    </svg>
+
+    <!-- HUD -->
+    <div class="hud">
+        <div class="hud-group">
+            <button class="icon-btn" onclick="goHome()" aria-label="Về trang bìa" id="btn-home"></button>
+            <button class="icon-btn" onclick="toggleSound()" aria-label="Bật tắt âm thanh" id="btn-sound"></button>
+            <button class="icon-btn" onclick="toggleFullScreen()" aria-label="Toàn màn hình" id="btn-fs"></button>
+        </div>
+        <div class="beads hidden" id="beads"></div>
+        <div class="star-chip"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.2 1.3-6.6L2.5 9l6.6-.8z" fill="#FFCB3D" stroke="#F5A700" stroke-width="1.4" stroke-linejoin="round"/></svg><span id="star-display">0</span></div>
+    </div>
+
+    <!-- TRANG BÌA -->
+    <div class="screen" id="screen-home">
+        <svg class="home-mascot" viewBox="0 0 200 200" id="home-mascot"></svg>
+        <h1 class="title">ĐẾM CÙNG BÉ</h1>
+        <p class="subtitle">Kéo thả tập đếm từ 1 đến 5</p>
+        <div class="mode-grid">
+            <button class="mode-card" onclick="startGame('drag')">
+                <svg viewBox="0 0 100 100"><circle cx="32" cy="34" r="14" fill="#FF6FA5"/><circle cx="66" cy="30" r="13" fill="#4FA8F5"/>
+                    <g fill="#fff" opacity=".5"><ellipse cx="28" cy="30" rx="4.5" ry="3"/><ellipse cx="62" cy="26" rx="4.5" ry="3"/></g>
+                    <path d="M22 58 L78 58 L70 84 Q50 90 30 84 Z" fill="#E8C98F" stroke="#C8A15C" stroke-width="3"/><rect x="18" y="52" width="64" height="9" rx="4.5" fill="#C8A15C"/>
+                    <path d="M50 30 V46 M50 46 l-6 6 M50 46 l6 6" stroke="#43B97F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="mode-name" style="color:var(--leaf-deep)">Kéo Đếm</span><span class="mode-sub">Kéo từng món vào giỏ</span>
+            </button>
+            <button class="mode-card" onclick="startGame('quiz')">
+                <svg viewBox="0 0 100 100"><circle cx="30" cy="34" r="12" fill="#FF6FA5"/><circle cx="58" cy="34" r="12" fill="#4FA8F5"/>
+                    <rect x="60" y="58" width="30" height="30" rx="9" fill="#FFF6E6" stroke="#C8A15C" stroke-width="3.5" stroke-dasharray="5 4"/>
+                    <circle cx="26" cy="72" r="14" fill="#8D79E6" stroke="#fff" stroke-width="3"/>
+                    <text x="26" y="79" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="17" fill="#fff">2</text>
+                    <path d="M42 72 h13 M50 67 l6 5 -6 5" stroke="#EE7F14" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="mode-name" style="color:var(--grape-deep)">Đếm &amp; Kéo Số</span><span class="mode-sub">Đếm rồi kéo số đúng</span>
+            </button>
+        </div>
+        <div class="tip"><svg viewBox="0 0 24 24" fill="none"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="#fff"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>Bật loa để nghe cô đếm cùng bé nhé!</div>
+    </div>
+
+    <!-- MÀN CHƠI -->
+    <div class="screen hidden" id="screen-play">
+        <button class="prompt-btn" onclick="repeatQuestion()">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="#FF9A3D"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" stroke="#FF9A3D" stroke-width="2.2" stroke-linecap="round"/></svg>
+            <span id="play-prompt">…</span>
+        </button>
+
+        <div class="tray-zone">
+            <div class="tray-items" id="items-box"></div>
+            <div class="tray-board"></div>
+        </div>
+
+        <!-- Chế độ kéo đếm -->
+        <div class="count-basket hidden" id="count-basket">
+            <svg viewBox="0 0 140 108" width="140" height="108" style="filter:drop-shadow(0 8px 8px rgba(120,80,20,.3))">
+                <path d="M16 36 L124 36 L112 96 Q70 106 28 96 Z" fill="#E8C98F" stroke="#fff" stroke-width="5"/>
+                <g stroke="#C8A15C" stroke-width="4" opacity=".45" fill="none"><path d="M22 54 Q70 62 118 54"/><path d="M25 72 Q70 80 115 72"/><path d="M44 38 L48 98"/><path d="M70 39 L70 101"/><path d="M96 38 L92 98"/></g>
+                <rect x="10" y="26" width="120" height="16" rx="8" fill="#C8A15C" stroke="#fff" stroke-width="4"/>
+            </svg>
+            <span class="basket-label" id="basket-label">Kéo món vào đây ⬆</span>
+        </div>
+        <div class="touch-chip hidden" id="touch-chip">Đã bỏ vào: <b id="touch-count">0</b> / <span id="touch-total">5</span></div>
+
+        <!-- Chế độ đếm & kéo số -->
+        <div class="quiz-tools hidden" id="quiz-tools">
+            <div class="answer-slot" id="answer-slot"><span>?</span></div>
+            <div class="slot-hint" id="slot-hint">Kéo số đúng vào ô ⬆</div>
+            <div class="abacus" id="abacus"></div>
+        </div>
+
+        <div class="reward-line" id="reward-line"></div>
+        <svg class="play-mascot" viewBox="0 0 200 200" id="play-mascot"></svg>
+    </div>
+
+    <!-- HOÀN THÀNH -->
+    <div class="overlay hidden" id="done-overlay">
+        <div class="done-card">
+            <svg class="medal" viewBox="0 0 120 130"><path d="M38 6 L54 6 L46 44 L30 44 Z" fill="#FF9A3D"/><path d="M82 6 L66 6 L74 44 L90 44 Z" fill="#4FA8F5"/>
+                <circle cx="60" cy="78" r="42" fill="#FFCB3D" stroke="#F5A700" stroke-width="5"/><circle cx="60" cy="78" r="31" fill="#FFE28A"/>
+                <path d="M60 56 l6.6 14 15 1.8 -11.2 10.4 3 14.8 -13.4-7.4 -13.4 7.4 3-14.8 L38.4 71.8 l15-1.8 Z" fill="#F5A700"/></svg>
+            <h2>Hoàn thành!</h2>
+            <p>Bé đã đếm đúng <b id="done-count">8</b> lượt 🎉</p>
+            <div class="done-actions">
+                <button class="btn-3d btn-home" onclick="goHome()">Về nhà</button>
+                <button class="btn-3d btn-again" onclick="playAgain()">Chơi tiếp</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ═══ ÂM THANH ═══ */
+let audioCtx=null, soundOn=true;
+function ensureAudio(){ if(!soundOn)return; if(!audioCtx){const AC=window.AudioContext||window.webkitAudioContext; if(AC)audioCtx=new AC();} if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume(); }
+function tone(t,f1,f2,dur,vol,at=0){ if(!soundOn||!audioCtx)return; const s=audioCtx.currentTime+at,o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.type=t; o.frequency.setValueAtTime(f1,s); if(f2)o.frequency.exponentialRampToValueAtTime(f2,s+dur); g.gain.setValueAtTime(vol,s); g.gain.exponentialRampToValueAtTime(0.01,s+dur); o.connect(g); g.connect(audioCtx.destination); o.start(s); o.stop(s+dur+0.02); }
+const sfx = {
+    lift:()=>tone('sine',300,520,.1,.2),
+    pop:()=>tone('triangle',420,950,.16,.35),
+    click:()=>tone('sine',600,null,.1,.25),
+    count:(n)=>tone('triangle',440*Math.pow(1.12,n),440*Math.pow(1.12,n)*1.4,.14,.3),
+    boing:()=>{ tone('sine',340,220,.13,.28); tone('sine',220,300,.14,.22,.13); },
+    sparkle:()=>{ tone('sine',880,null,.2,.22); tone('sine',1174,null,.2,.22,.07); },
+    fanfare:()=>[523.25,659.25,783.99,1046.5].forEach((f,i)=>tone('triangle',f,null,.26,.3,i*.09)),
+};
+function toggleSound(){ soundOn=!soundOn; renderIcons(); if(!soundOn&&'speechSynthesis'in window)speechSynthesis.cancel(); if(soundOn){ensureAudio();sfx.click();} save('count-sound',soundOn?'1':'0'); }
+function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function load(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function playTTS(text){ return new Promise(res=>{ if(soundOn&&'speechSynthesis'in window){ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang='vi-VN'; u.rate=.85; u.pitch=1.15; const vs=speechSynthesis.getVoices(); const vi=vs.find(v=>v.lang==='vi-VN'&&v.name.includes('Premium'))||vs.find(v=>v.lang==='vi-VN'); if(vi)u.voice=vi; u.onend=res; u.onerror=res; speechSynthesis.speak(u); setTimeout(res,7000);} else setTimeout(res,soundOn?800:200); }); }
+if('speechSynthesis'in window){ speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices(); }
+
+/* ═══ ICON ═══ */
+const ICONS = {
+    home:`<svg viewBox="0 0 24 24" fill="none"><path d="M3 11.2 12 3l9 8.2" stroke="#FF9A3D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10v9.5h13V10" stroke="#FF9A3D" stroke-width="2.6" stroke-linecap="round"/><rect x="10" y="13.5" width="4" height="6" rx="1.4" fill="#FF9A3D"/></svg>`,
+    soundOn:`<svg viewBox="0 0 24 24" fill="none"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="#4FA8F5"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" stroke="#4FA8F5" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+    soundOff:`<svg viewBox="0 0 24 24" fill="none"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="#B9B3C9"/><path d="M16 9.5 21 14.5M21 9.5 16 14.5" stroke="#B9B3C9" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+    expand:`<svg viewBox="0 0 24 24" fill="none" stroke="#43B97F" stroke-width="2.6" stroke-linecap="round"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5"/></svg>`,
+    shrink:`<svg viewBox="0 0 24 24" fill="none" stroke="#43B97F" stroke-width="2.6" stroke-linecap="round"><path d="M4 9h5V4M20 9h-5V4M4 15h5v5M20 15h-5v5"/></svg>`
+};
+let isFull=false;
+function renderIcons(){ document.getElementById('btn-home').innerHTML=ICONS.home; document.getElementById('btn-sound').innerHTML=soundOn?ICONS.soundOn:ICONS.soundOff; document.getElementById('btn-fs').innerHTML=isFull?ICONS.shrink:ICONS.expand; }
+
+/* ═══ LINH VẬT GÀ CON ═══ */
+function chickSVG(){ return `
+    <ellipse cx="100" cy="186" rx="46" ry="8" fill="rgba(120,90,20,.15)"/>
+    <g stroke="#F5A700" stroke-width="5.5" stroke-linecap="round" fill="none"><path d="M 80 168 l -7 13 M 80 168 l 0 14 M 80 168 l 7 13"/><path d="M 120 168 l -7 13 M 120 168 l 0 14 M 120 168 l 7 13"/></g>
+    <circle cx="100" cy="106" r="64" fill="#FFDF5E" stroke="#F2C230" stroke-width="3"/>
+    <path d="M 52 78 A 64 64 0 0 1 116 44" stroke="#FFF3B0" stroke-width="14" fill="none" stroke-linecap="round" opacity=".8"/>
+    <ellipse cx="41" cy="116" rx="15" ry="25" fill="#FCC419" transform="rotate(18 41 116)"/><ellipse cx="159" cy="116" rx="15" ry="25" fill="#FCC419" transform="rotate(-18 159 116)"/>
+    <path d="M 95 44 Q 88 20 104 15 Q 97 29 107 41 Z" fill="#FCC419"/>
+    <circle class="eye" cx="79" cy="96" r="8.5" fill="#4A4458"/><circle class="eye" cx="121" cy="96" r="8.5" fill="#4A4458"/>
+    <circle class="eye" cx="82" cy="93" r="2.8" fill="#fff"/><circle class="eye" cx="124" cy="93" r="2.8" fill="#fff"/>
+    <g class="eye-happy" stroke="#4A4458" stroke-width="4.5" fill="none" stroke-linecap="round"><path d="M70 96 Q79 87 88 96"/><path d="M112 96 Q121 87 130 96"/></g>
+    <path d="M 91 109 L 109 109 L 100 122 Z" fill="#FF922B"/>
+    <circle cx="63" cy="112" r="8.5" fill="#FFB3C1" opacity=".85"/><circle cx="137" cy="112" r="8.5" fill="#FFB3C1" opacity=".85"/>`; }
+function mascotHappy(id){ const m=document.getElementById(id); m.classList.add('m-happy','dance'); setTimeout(()=>m.classList.remove('m-happy','dance'),1400); }
+
+/* ═══ VẬT ĐẾM ═══ */
+function svgCandy(px){ return `<svg viewBox="0 0 100 100" width="${px}" height="${px}">
+    <path d="M 22 50 L 8 40 L 12 50 L 8 60 Z" fill="#FF8FAB" stroke="#E86F94" stroke-width="3"/><path d="M 78 50 L 92 40 L 88 50 L 92 60 Z" fill="#FF8FAB" stroke="#E86F94" stroke-width="3"/>
+    <circle cx="50" cy="50" r="26" fill="#FFD43B" stroke="#F5A700" stroke-width="3.5"/><path d="M 38 42 Q 50 34 62 42" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".8"/>
+    <circle cx="43" cy="50" r="3.5" fill="#4A4458"/><circle cx="57" cy="50" r="3.5" fill="#4A4458"/><path d="M 44 58 Q 50 63 56 58" stroke="#4A4458" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`; }
+function svgCar(px){ return `<svg viewBox="0 0 100 100" width="${px}" height="${px}">
+    <rect x="14" y="46" width="72" height="26" rx="12" fill="#4FA8F5" stroke="#2E86DB" stroke-width="3.5"/><path d="M 30 46 Q 38 28 62 30 L 70 46 Z" fill="#74C0FC" stroke="#2E86DB" stroke-width="3.5"/>
+    <rect x="40" y="34" width="18" height="12" rx="3" fill="#E7F5FF"/><circle cx="32" cy="74" r="10" fill="#4A4458" stroke="#fff" stroke-width="3"/><circle cx="32" cy="74" r="4" fill="#ADB5BD"/>
+    <circle cx="68" cy="74" r="10" fill="#4A4458" stroke="#fff" stroke-width="3"/><circle cx="68" cy="74" r="4" fill="#ADB5BD"/><circle cx="80" cy="56" r="4" fill="#FFD43B"/></svg>`; }
+function svgApple(px){ return `<svg viewBox="0 0 100 100" width="${px}" height="${px}">
+    <path d="M 50 30 C 30 20 14 34 20 56 C 24 74 40 84 50 84 C 60 84 76 74 80 56 C 86 34 70 20 50 30 Z" fill="#FF6B6B" stroke="#E04545" stroke-width="3.5"/>
+    <path d="M 50 30 Q 52 18 62 14" stroke="#7A5C00" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M 56 22 Q 68 14 74 22 Q 64 26 56 22 Z" fill="#69DB7C" stroke="#40C057" stroke-width="2"/>
+    <ellipse cx="38" cy="46" rx="7" ry="10" fill="#fff" opacity=".4"/></svg>`; }
+function svgBalloon(px){ return `<svg viewBox="0 0 100 100" width="${px}" height="${px}">
+    <ellipse cx="50" cy="40" rx="28" ry="33" fill="#B197FC" stroke="#8D79E6" stroke-width="3.5"/><path d="M 50 73 L 46 80 L 54 80 Z" fill="#9775FA"/>
+    <path d="M 50 80 Q 56 90 50 98" stroke="#8B85A0" stroke-width="2.5" fill="none"/><ellipse cx="40" cy="30" rx="8" ry="12" fill="#fff" opacity=".45"/></svg>`; }
+function svgFish(px){ return `<svg viewBox="0 0 100 100" width="${px}" height="${px}">
+    <path d="M 74 50 L 92 36 L 90 50 L 92 64 Z" fill="#FFA94D" stroke="#EE7F14" stroke-width="3"/><ellipse cx="46" cy="50" rx="32" ry="22" fill="#FFA94D" stroke="#EE7F14" stroke-width="3.5"/>
+    <circle cx="34" cy="46" r="5" fill="#4A4458"/><circle cx="35.5" cy="44.5" r="1.6" fill="#fff"/><path d="M 46 40 Q 56 34 62 42" stroke="#fff" stroke-width="3" fill="none" opacity=".7"/><circle cx="24" cy="56" r="4" fill="#fff" opacity=".5"/></svg>`; }
+const ITEM_TYPES=[ {draw:svgCandy,name:'cái kẹo'}, {draw:svgCar,name:'chiếc xe'}, {draw:svgApple,name:'quả táo'}, {draw:svgBalloon,name:'quả bóng bay'}, {draw:svgFish,name:'con cá'} ];
+const NUM_WORDS=['không','một','hai','ba','bốn','năm'];
+const BEAD_COLORS=[ ['#FF8FBB','#E84D89'],['#B197FC','#6C56C9'],['#74C0FC','#2E86DB'],['#FFD05C','#F5A700'],['#7FD6A6','#2E9A64'] ];
+
+/* ═══ KÉO THẢ ═══ */
+function enableDrag(handle, opts){
+    handle.style.touchAction='none';
+    handle.addEventListener('pointerdown', down);
+    function down(e){
+        if(opts.canDrag && !opts.canDrag()) return;
+        e.preventDefault();
+        try{ handle.setPointerCapture(e.pointerId); }catch(_){}
+        handle.classList.add('dragging'); handle.style.transition=''; ensureAudio(); sfx.lift();
+        const sx=e.clientX, sy=e.clientY; let dx=0, dy=0;
+        function move(ev){ dx=ev.clientX-sx; dy=ev.clientY-sy; handle.style.transform=`translate(${dx}px,${dy}px)`; if(opts.onHover)opts.onHover(zoneAt(ev.clientX,ev.clientY)); }
+        function finish(x,y,cancelled){
+            handle.removeEventListener('pointermove',move); handle.removeEventListener('pointerup',up); handle.removeEventListener('pointercancel',cancel);
+            handle.classList.remove('dragging'); if(opts.onHover)opts.onHover(null);
+            opts.onDrop(cancelled?null:zoneAt(x,y), {handle,dx,dy});
+        }
+        function up(ev){ finish(ev.clientX,ev.clientY,false); }
+        function cancel(){ finish(sx,sy,true); }
+        handle.addEventListener('pointermove',move); handle.addEventListener('pointerup',up); handle.addEventListener('pointercancel',cancel);
+    }
+    function zoneAt(x,y){ const zs=opts.zones(), pad=18; for(const z of zs){ const r=z.el.getBoundingClientRect(); if(x>=r.left-pad&&x<=r.right+pad&&y>=r.top-pad&&y<=r.bottom+pad)return z.key; } return null; }
+}
+function snapBack(handle){ handle.style.transition='transform .3s cubic-bezier(.34,1.4,.5,1)'; handle.style.transform='translate(0,0)'; }
+
+/* ═══ VÒNG CHƠI ═══ */
+const ROUNDS=8;
+let stars=0, mode='drag', targetCount=0, currentItemType=null, locked=false, dropped=0, recent=[], roundIdx=0;
+
+window.addEventListener('DOMContentLoaded',()=>{
+    stars=parseInt(load('count-stars')||'0',10)||0;
+    if(load('count-sound')==='0')soundOn=false;
+    document.getElementById('star-display').innerText=stars;
+    document.getElementById('home-mascot').innerHTML=chickSVG();
+    document.getElementById('play-mascot').innerHTML=chickSVG();
+    renderIcons();
+});
+function addStar(){ stars++; document.getElementById('star-display').innerText=stars; save('count-stars',String(stars)); }
+function showScreen(name){ ['home','play'].forEach(s=>document.getElementById('screen-'+s).classList.toggle('hidden', s!==name)); document.getElementById('beads').classList.toggle('hidden', name!=='play'); document.getElementById('done-overlay').classList.add('hidden'); }
+function goHome(){ ensureAudio();sfx.click(); if('speechSynthesis'in window)speechSynthesis.cancel(); showScreen('home'); }
+function renderBeads(){ const b=document.getElementById('beads'); b.innerHTML=''; for(let i=0;i<ROUNDS;i++){ const d=document.createElement('div'); d.className='bead'+(i<roundIdx?' on':''); b.appendChild(d); } }
+
+function startGame(m){
+    ensureAudio(); sfx.click();
+    mode=m; roundIdx=0; recent=[];
+    showScreen('play'); renderBeads();
+    document.getElementById('count-basket').classList.toggle('hidden', m!=='drag');
+    document.getElementById('touch-chip').classList.toggle('hidden', m!=='drag');
+    document.getElementById('quiz-tools').classList.toggle('hidden', m!=='quiz');
+    nextRound(true);
+}
+function playAgain(){ ensureAudio(); sfx.click(); startGame(mode); }
+
+function pickCount(){ let c=[1,2,3,4,5].filter(n=>!recent.includes(n)); if(!c.length)c=[1,2,3,4,5]; const n=c[Math.floor(Math.random()*c.length)]; recent.push(n); if(recent.length>3)recent.shift(); return n; }
+function itemPx(total){ const m=window.innerWidth<640; if(total<=2)return m?84:112; if(total===3)return m?74:100; if(total===4)return m?64:90; return m?56:80; }
+
+function nextRound(isFirst=false){
+    locked=false; dropped=0;
+    document.getElementById('reward-line').innerHTML='';
+    targetCount=pickCount();
+    currentItemType=ITEM_TYPES[Math.floor(Math.random()*ITEM_TYPES.length)];
+
+    const box=document.getElementById('items-box'); box.innerHTML='';
+    const px=itemPx(targetCount);
+    for(let i=0;i<targetCount;i++){
+        const w=document.createElement('div');
+        w.className='item-unit'+(mode==='drag'?' draggable':'');
+        w.dataset.counted='0';
+        w.style.animationDelay=`${i*.09}s`;
+        w.innerHTML=`<div class="inner" style="animation-delay:${-Math.random()*2}s">${currentItemType.draw(px)}</div>`;
+        box.appendChild(w);
+        if(mode==='drag') attachItemDrag(w);
+    }
+
+    if(mode==='drag'){
+        document.getElementById('touch-count').innerText='0';
+        document.getElementById('touch-total').innerText=targetCount;
+        document.getElementById('basket-label').innerText='Kéo món vào đây ⬆';
+        document.getElementById('play-prompt').innerText='Kéo vào giỏ để đếm';
+        playTTS((isFirst?'Cùng đếm nào! ':'')+`Bé hãy kéo từng ${currentItemType.name} vào giỏ để đếm nhé!`);
+    } else {
+        buildAbacus();
+        const slot=document.getElementById('answer-slot'); slot.classList.remove('filled'); slot.innerHTML='<span>?</span>';
+        document.getElementById('slot-hint').classList.remove('hidden');
+        document.getElementById('play-prompt').innerText='Có mấy cái?';
+        playTTS((isFirst?'Cùng đếm nào! ':'')+`Có mấy ${currentItemType.name}? Bé đếm rồi kéo số đúng vào ô nhé!`);
+    }
+}
+
+function repeatQuestion(){
+    ensureAudio(); sfx.click();
+    if(!currentItemType)return;
+    if(mode==='drag')playTTS(`Bé hãy kéo từng ${currentItemType.name} vào giỏ để đếm nhé!`);
+    else playTTS(`Có mấy ${currentItemType.name}? Bé đếm rồi kéo số đúng vào ô nhé!`);
+}
+
+function stampBadge(unit,n){ unit.classList.remove('count-bump'); void unit.offsetWidth; unit.classList.add('count-bump'); const b=document.createElement('div'); b.className='count-badge'; b.innerText=n; unit.appendChild(b); }
+function pulseBasket(){ const b=document.getElementById('count-basket'); b.classList.remove('basket-pulse'); void b.offsetWidth; b.classList.add('basket-pulse'); }
+
+const PRAISES=['Giỏi quá','Tuyệt vời','Đúng rồi','Hoan hô bé','Xuất sắc','Bé thông minh quá'];
+
+/* ── KÉO ĐẾM ── */
+function attachItemDrag(unit){
+    const basket=()=>document.getElementById('count-basket');
+    enableDrag(unit,{
+        canDrag:()=>!locked && unit.dataset.counted==='0',
+        zones:()=>{ const b=basket(); return b?[{el:b,key:'basket'}]:[]; },
+        onHover:(key)=>basket().classList.toggle('hot', key==='basket'),
+        onDrop:(key,ctx)=>{
+            basket().classList.remove('hot');
+            if(key!=='basket' || unit.dataset.counted==='1'){ snapBack(ctx.handle); return; }
+            unit.dataset.counted='1';
+            dropped++;
+            sfx.count(dropped);
+            document.getElementById('touch-count').innerText=dropped;
+            playTTS(NUM_WORDS[dropped]);
+            ctx.handle.style.transition='transform .32s ease-in, opacity .32s';
+            ctx.handle.style.transform=`translate(${ctx.dx}px,${ctx.dy}px) scale(.2)`;
+            ctx.handle.style.opacity='0';
+            pulseBasket();
+            if(dropped>=targetCount){
+                locked=true;
+                setTimeout(()=>finishRound(`Có tất cả ${NUM_WORDS[targetCount]} ${currentItemType.name}.`, `Tất cả ${targetCount} ${currentItemType.name}!`), 500);
+            }
+        }
+    });
+}
+
+/* ── ĐẾM & KÉO SỐ ── */
+function buildAbacus(){
+    const ab=document.getElementById('abacus'); ab.innerHTML='';
+    for(let n=1;n<=5;n++){
+        const [bg,deep]=BEAD_COLORS[n-1];
+        const b=document.createElement('div');
+        b.className='num-bead';
+        b.style.background=`radial-gradient(circle at 32% 28%, #ffffff88, transparent 45%), linear-gradient(180deg, ${bg}, ${deep})`;
+        b.style.boxShadow=`0 6px 0 ${deep}, 0 12px 16px rgba(90,130,190,.3)`;
+        b.style.animationDelay=`${(n-1)*.06}s`;
+        b.innerText=n;
+        ab.appendChild(b);
+        attachBeadDrag(b, n);
+    }
+}
+function attachBeadDrag(bead, n){
+    const slot=()=>document.getElementById('answer-slot');
+    enableDrag(bead,{
+        canDrag:()=>!locked,
+        zones:()=>{ const s=slot(); return s?[{el:s,key:'slot'}]:[]; },
+        onHover:(key)=>slot().classList.toggle('hot', key==='slot'),
+        onDrop:(key,ctx)=>{
+            slot().classList.remove('hot');
+            if(key!=='slot'){ snapBack(ctx.handle); return; }
+            if(n===targetCount){
+                locked=true;
+                const s=slot(); s.innerHTML=`<span>${n}</span>`; s.classList.add('filled');
+                document.getElementById('slot-hint').classList.add('hidden');
+                bead.style.visibility='hidden';
+                sfx.pop();
+                const units=[...document.querySelectorAll('.item-unit')];
+                units.forEach((u,i)=>setTimeout(()=>{ sfx.count(i+1); stampBadge(u,i+1); }, i*340));
+                const countSpeech=Array.from({length:targetCount},(_,i)=>NUM_WORDS[i+1]).join(', ');
+                setTimeout(()=>finishRound(`${countSpeech}. Có tất cả ${NUM_WORDS[targetCount]} ${currentItemType.name}.`, `Đúng rồi! Số ${targetCount}`), targetCount*340+250);
+            } else {
+                snapBack(ctx.handle);
+                bead.classList.remove('wiggle'); void bead.offsetWidth; bead.classList.add('wiggle');
+                sfx.boing(); playTTS(`Đây là số ${NUM_WORDS[n]}. Bé đếm lại rồi thử nữa nhé!`);
+            }
+        }
+    });
+}
+
+function finishRound(speech, pillText){
+    sfx.sparkle(); mascotHappy('play-mascot');
+    confetti({particleCount:70,spread:95,zIndex:100,origin:{y:.5},colors:['#FFCB3D','#FF6FA5','#4FA8F5','#43B97F']});
+    addStar(); roundIdx++; renderBeads();
+    document.getElementById('reward-line').innerHTML=`<div class="reward-pill"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 2l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.2 1.3-6.6L2.5 9l6.6-.8z" fill="#FFCB3D"/></svg>${pillText}</div>`;
+    const praise=PRAISES[Math.floor(Math.random()*PRAISES.length)];
+    if(roundIdx>=ROUNDS){ sfx.fanfare(); confetti({particleCount:170,spread:150,origin:{y:.4},zIndex:110,colors:['#FFCB3D','#FF6FA5','#8D79E6','#43B97F']}); playTTS(`${praise}! ${speech}`).then(()=>showDone()); }
+    else { playTTS(`${praise}! ${speech}`).then(()=>setTimeout(()=>nextRound(),300)); }
+}
+function showDone(){ document.getElementById('done-count').innerText=ROUNDS; document.getElementById('done-overlay').classList.remove('hidden'); playTTS('Hoan hô! Bé đã hoàn thành và nhận được huy chương vàng!'); }
+
+/* ═══ TOÀN MÀN HÌNH ═══ */
+function toggleFullScreen(){
+    const d=document.documentElement;
+    const req=d.requestFullscreen||d.webkitRequestFullscreen||d.mozRequestFullScreen||d.msRequestFullscreen;
+    const ext=document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen||document.msExitFullscreen;
+    if(!(document.fullscreenElement||document.webkitFullscreenElement||document.mozFullScreenElement||document.msFullscreenElement)){ if(req){try{req.call(d);}catch(e){}} }
+    else { if(ext)ext.call(document); }
+}
+['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange'].forEach(evt=>{ document.addEventListener(evt,()=>{ isFull=!!(document.fullscreenElement||document.webkitFullscreenElement||document.mozFullScreenElement||document.msFullscreenElement); renderIcons(); }); });
+</script>
+</body>
+</html>
