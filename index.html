@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sân Chơi Của Bé — Chọn trò chơi</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#8ED1FF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
@@ -214,7 +217,7 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
             <span class="go">Chơi <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
         </a>
 
-        <a class="card c-object" href="do_vat.html">
+        <a class="card c-object" href="hoc-do-vat.html">
             <div class="chip">
                 <svg viewBox="0 0 100 100">
                     <circle cx="34" cy="42" r="20" fill="#FF6B6B" stroke="#fff" stroke-width="3"/>
@@ -262,6 +265,7 @@ function pop(){
     }catch(e){}
 }
 document.querySelectorAll('.card').forEach(c=>c.addEventListener('pointerdown',pop));
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
