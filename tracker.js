@@ -3,7 +3,7 @@
 (function () {
   var PK = 'bePlay', SK = 'beSettings';
   /* Số chủ đề từ vựng của game tiếng Anh (hoc-tieng-anh.html); khu phụ huynh dùng để hiện tiến độ */
-  var ENGLISH_TOPICS = 11;
+  var ENGLISH_TOPICS = 12;
   var GAMES = {
     'hoc-chu': 'Học Chữ Cái', 'be-hoc-dem': 'Đếm Cùng Bé', 'be-phan-loai': 'Sắp Xếp Vui Vẻ',
     'hoc-do-vat': 'Bé Học Đồ Vật', 'tieng-con-vat': 'Tiếng Con Vật', 'hoc-mau': 'Học Màu Sắc', 'hinh-khoi': 'Hình Khối', 'hoc-tieng-anh': 'Bé Học Tiếng Anh', 'ghep_hinh': 'Ghép Hình', 'do_vat': 'Toán Câu Cá'
