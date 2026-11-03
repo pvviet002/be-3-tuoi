@@ -78,7 +78,7 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
 @media (max-width:640px){ .card{ width:calc(50% - 8px); } }
 @media (max-width:360px){ .card{ width:100%; } }
 .card:nth-child(1){animation-delay:.06s;} .card:nth-child(2){animation-delay:.14s;} .card:nth-child(3){animation-delay:.22s;}
-.card:nth-child(4){animation-delay:.30s;} .card:nth-child(5){animation-delay:.38s;} .card:nth-child(6){animation-delay:.46s;} .card:nth-child(7){animation-delay:.54s;} .card:nth-child(8){animation-delay:.62s;} .card:nth-child(9){animation-delay:.7s;}
+.card:nth-child(4){animation-delay:.30s;} .card:nth-child(5){animation-delay:.38s;} .card:nth-child(6){animation-delay:.46s;} .card:nth-child(7){animation-delay:.54s;} .card:nth-child(8){animation-delay:.62s;} .card:nth-child(9){animation-delay:.7s;} .card:nth-child(10){animation-delay:.78s;}
 .card:hover { transform:translateY(-6px) rotate(-1deg); }
 .card:active { transform:translateY(3px); }
 @keyframes popIn { from{transform:scale(.6); opacity:0;} }
@@ -113,6 +113,8 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
 .c-shape   .go{ color:#434BC4; }
 .c-english { background:linear-gradient(180deg,#FF9BAA,#F0506E); box-shadow:0 8px 0 #C93A57, 0 16px 24px rgba(201,58,87,.32); }
 .c-english .go{ color:#C93A57; }
+.c-number  { background:linear-gradient(180deg,#A6DE5E,#65A30D); box-shadow:0 8px 0 #4D7C0F, 0 16px 24px rgba(77,124,15,.32); }
+.c-number  .go{ color:#4D7C0F; }
 
 .footer { position:relative; z-index:10; margin-top:auto; padding:6px 16px 18px; text-align:center; }
 .footer .badge { display:inline-flex; align-items:center; gap:7px; font-weight:700; font-size:.82rem; color:#fff;
@@ -303,6 +305,22 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
             </div>
             <span class="name">Học Tiếng Anh</span>
             <span class="sub">Từ vựng quen thuộc của bé</span>
+            <span class="go">Chơi <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+
+        <a class="card c-number" href="so-vui.html">
+            <div class="chip">
+                <svg viewBox="0 0 100 100">
+                    <rect x="8" y="14" width="40" height="40" rx="10" fill="#9AD94A" stroke="#fff" stroke-width="3"/>
+                    <text x="28" y="45" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="30" fill="#fff">3</text>
+                    <rect x="52" y="14" width="40" height="40" rx="10" fill="#FFB169" stroke="#fff" stroke-width="3"/>
+                    <text x="72" y="45" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="30" fill="#fff">+</text>
+                    <rect x="30" y="58" width="40" height="38" rx="10" fill="#6FD0E0" stroke="#fff" stroke-width="3"/>
+                    <text x="50" y="87" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="30" fill="#fff">5</text>
+                </svg>
+            </div>
+            <span class="name">Số Vui</span>
+            <span class="sub">So sánh, số thiếu, cộng bằng hình</span>
             <span class="go">Chơi <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
         </a>
 

@@ -197,7 +197,8 @@ function renderProgress(){
     ['Bé Học Đồ Vật',  num('doVatCorrect'),   c => (c < 8 ? 2 : 3) + ' đáp án'],
     ['Tiếng Con Vật',  num('animalCorrect'),  c => (c < 8 ? 2 : 3) + ' hình để chọn'],
     ['Bé Học Tiếng Anh', num('englishCorrect'), c => Math.min(T.ENGLISH_TOPICS, 1 + Math.floor(c / 8)) + '/' + T.ENGLISH_TOPICS + ' chủ đề'],
-    ['Tiếng Anh: Đếm số', num('englishCount'), c => c < 6 ? 'đếm tới 3' : (c < 14 ? 'đếm tới 5' : 'đếm tới 10')]
+    ['Tiếng Anh: Đếm số', num('englishCount'), c => c < 6 ? 'đếm tới 3' : (c < 14 ? 'đếm tới 5' : 'đếm tới 10')],
+    ['Số Vui', num('numberCorrect'), c => c < 8 ? 'số tới 5, 2 đáp án' : 'số tới 10, 3 đáp án']
   ];
   const stars = T.STAR_KEYS.reduce((t, k) => t + num(k), 0);
   $('progress').innerHTML = rows.map(r => `<div class="prog"><span>${r[0]}</span><b>${r[2](r[1])}</b></div>`).join('') +
