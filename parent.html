@@ -35,6 +35,9 @@ select{font:inherit;font-weight:700;padding:7px 10px;border-radius:10px;border:2
 .switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}
 .switch[aria-checked=true]{background:var(--leaf)}.switch[aria-checked=true]::after{left:23px}
 .hidden{display:none!important}
+.prog{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:.95rem}.prog:last-of-type{border:0}
+.prog b{color:var(--blue)}
+.ok{color:var(--leaf);font-weight:700;min-height:1.4em}
 .note{font-size:.82rem;color:var(--soft);font-weight:600;line-height:1.4}
 </style>
 </head>
@@ -90,6 +93,14 @@ select{font:inherit;font-weight:700;padding:7px 10px;border-radius:10px;border:2
       </div>
       <h2 style="margin-top:14px">Trò chơi bé được chơi</h2>
       <div id="toggles"></div>
+    </section>
+
+    <section class="card">
+      <h2>Tiến độ học của bé</h2>
+      <div id="progress"></div>
+      <p class="note" style="margin:8px 0 10px">Các trò chơi tự mở thêm chữ, màu, hình và đáp án khi bé trả lời đúng. Đặt lại để bé học lại từ mức dễ nhất (ví dụ khi đổi sang bé khác dùng chung thiết bị). Lịch sử chơi, giới hạn thời gian và cài đặt ở trên vẫn giữ nguyên.</p>
+      <button class="btn danger" id="reset-progress">Đặt lại tiến độ học</button>
+      <div class="ok" id="progress-ok" role="status"></div>
     </section>
 
     <section class="card">
@@ -166,6 +177,7 @@ function render(){
     const a = agg[id] || { sec: 0, rounds: 0, correct: 0 };
     return `<tr><td>${T.GAMES[id]}</td><td class="n">${fmtMin(a.sec)}</td><td class="n">${a.rounds || '–'}</td><td class="n">${a.rounds ? Math.round(a.correct / a.rounds * 100) + '%' : '–'}</td></tr>`;
   }).join('');
+  renderProgress();
   // Cài đặt
   $('limit').value = String(s.limitMin);
   $('toggles').innerHTML = Object.keys(T.GAMES).map(id =>
@@ -176,6 +188,25 @@ function render(){
     T.save(T.SK, st); render();
   });
 }
+function renderProgress(){
+  const num = k => { try { return parseInt(localStorage.getItem(k) || '0', 10) || 0; } catch (e) { return 0; } };
+  const rows = [
+    ['Học Chữ Cái',    num('chu-correct'),    c => Math.min(29, 6 + Math.floor(c / 2)) + '/29 chữ'],
+    ['Học Màu Sắc',    num('colorCorrect'),   c => Math.min(8, 4 + Math.floor(c / 3)) + '/8 màu'],
+    ['Hình Khối',      num('shapeCorrect'),   c => Math.min(8, 3 + Math.floor(c / 3)) + '/8 hình'],
+    ['Bé Học Đồ Vật',  num('doVatCorrect'),   c => (c < 8 ? 2 : 3) + ' đáp án'],
+    ['Tiếng Con Vật',  num('animalCorrect'),  c => (c < 8 ? 2 : 3) + ' hình để chọn']
+  ];
+  const stars = T.STAR_KEYS.reduce((t, k) => t + num(k), 0);
+  $('progress').innerHTML = rows.map(r => `<div class="prog"><span>${r[0]}</span><b>${r[2](r[1])}</b></div>`).join('') +
+    `<div class="prog"><span>Sao đã tích (Chữ cái, Đếm, Sắp xếp)</span><b>⭐ ${stars}</b></div>`;
+}
+$('reset-progress').onclick = () => {
+  if (!confirm('Đặt lại toàn bộ tiến độ học của bé? Bé sẽ học lại từ mức dễ nhất và số sao đã tích sẽ về 0. Việc này không hoàn tác được.')) return;
+  T.resetProgress(); renderProgress();
+  $('progress-ok').textContent = '✓ Đã đặt lại tiến độ học.';
+  setTimeout(() => { $('progress-ok').textContent = ''; }, 4000);
+};
 $('limit').onchange = () => { const s = T.settings(); s.limitMin = +$('limit').value; T.save(T.SK, s); render(); };
 $('change-pin').onclick = () => gateMode('change');
 $('lock').onclick = () => gateMode('enter');

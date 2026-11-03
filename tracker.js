@@ -26,6 +26,13 @@
     save(PK, data);
   }
 
+  /* Tiến độ học: mức độ khó đã mở khóa + số sao tích lũy. Lịch sử chơi (bePlay) và cài đặt phụ huynh không nằm ở đây. */
+  var LEVEL_KEYS = ['chu-correct', 'doVatCorrect', 'animalCorrect', 'colorCorrect', 'shapeCorrect'];
+  var STAR_KEYS = ['abc-stars', 'count-stars', 'sort-stars'];
+  function resetProgress() {
+    LEVEL_KEYS.concat(STAR_KEYS).forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+  }
+
   var page = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '') || 'index';
   var isGame = Object.prototype.hasOwnProperty.call(GAMES, page);
   var blocked = false;
@@ -82,6 +89,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
   window.BeTracker = {
+    LEVEL_KEYS: LEVEL_KEYS, STAR_KEYS: STAR_KEYS, resetProgress: resetProgress,
     GAMES: GAMES, PK: PK, SK: SK, load: load, save: save, dayKey: dayKey, settings: settings, todaySec: todaySec,
     /* Game gọi hàm này sau mỗi lượt trả lời: BeTracker.round(true/false) */
     round: function (ok) { if (isGame) { add(page, 'rounds', 1); if (ok) add(page, 'correct', 1); } }
