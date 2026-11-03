@@ -17,6 +17,7 @@ Bộ trò chơi giáo dục bằng tiếng Việt cho bé 3–6 tuổi. Chỉ g�
 | `hoc-tieng-anh.html` | Từ vựng tiếng Anh cho bé 3–5 tuổi: 98 từ / 12 chủ đề (có số đếm 1–10, cảm xúc, hoạt động hằng ngày, nghề nghiệp, quần áo, phương tiện), 3 chế độ: học từ, đố vui (bé tự chọn chủ đề hoặc trộn tất cả), đếm số (chọn nhóm đồ vật, đếm hình rồi chọn số), chế độ học từ và đố vui, phát âm bằng giọng đọc tiếng Anh |
 | `so-vui.html` | Số Vui cho bé 3–5 tuổi: so sánh nhiều hơn/ít hơn, tìm số còn thiếu, cộng bằng hình (số tới 5 rồi tới 10) |
 | `tap-viet-so.html` | Tập viết số 0–9: bé tô theo nét bằng ngón tay, có chấm xanh báo điểm bắt đầu, xem mẫu, nét mảnh dần khi viết quen |
+| `tap-viet-chu.html` | Tập viết 29 chữ cái tiếng Việt (chữ hoa và chữ thường): tô theo nét, tự thu phóng cho vừa khung, nét mảnh dần khi viết quen |
 | `ghep_hinh.html` | Ghép hình với bóng |
 | `do_vat.html` | Game toán bảng nhân/chia 4 (lớp lớn hơn, chưa gắn vào trang chủ) |
 
