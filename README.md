@@ -11,6 +11,7 @@ Bộ trò chơi giáo dục bằng tiếng Việt cho bé 3–6 tuổi. Chỉ g�
 | `be-hoc-dem.html` | Kéo thả tập đếm 1–5 |
 | `be-phan-loai.html` | Phân loại theo màu, hình, to/nhỏ |
 | `hoc-do-vat.html` | Nhận biết đồ vật quen thuộc (hình → chọn tên, có giọng đọc tiếng Việt) |
+| `tieng-con-vat.html` | Bé nghe tiếng kêu rồi chạm vào con vật đúng (đáp án là hình) |
 | `ghep_hinh.html` | Ghép hình với bóng |
 | `do_vat.html` | Game toán bảng nhân/chia 4 (lớp lớn hơn, chưa gắn vào trang chủ) |
 

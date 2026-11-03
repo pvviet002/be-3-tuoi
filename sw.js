@@ -1,7 +1,7 @@
 /* Service worker đơn giản: lưu trang vào bộ nhớ đệm để chơi được cả khi mất mạng. */
-const CACHE = 'san-choi-be-v5';
+const CACHE = 'san-choi-be-v6';
 const FILES = ['./', 'index.html', 'hoc-chu.html', 'be-hoc-dem.html', 'be-phan-loai.html',
-  'hoc-do-vat.html', 'ghep_hinh.html', 'do_vat.html', 'parent.html', 'tracker.js', 'icon.svg', 'manifest.webmanifest',
+  'hoc-do-vat.html', 'tieng-con-vat.html', 'ghep_hinh.html', 'do_vat.html', 'parent.html', 'tracker.js', 'icon.svg', 'manifest.webmanifest',
   'vendor/confetti.browser.min.js', 'vendor/tailwind.css', 'vendor/react.production.min.js',
   'vendor/react-dom.production.min.js', 'vendor/ghep_hinh.js'];
 

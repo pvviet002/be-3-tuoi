@@ -78,7 +78,7 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
 @media (max-width:640px){ .card{ width:calc(50% - 8px); } }
 @media (max-width:360px){ .card{ width:100%; } }
 .card:nth-child(1){animation-delay:.06s;} .card:nth-child(2){animation-delay:.14s;} .card:nth-child(3){animation-delay:.22s;}
-.card:nth-child(4){animation-delay:.30s;} .card:nth-child(5){animation-delay:.38s;}
+.card:nth-child(4){animation-delay:.30s;} .card:nth-child(5){animation-delay:.38s;} .card:nth-child(6){animation-delay:.46s;}
 .card:hover { transform:translateY(-6px) rotate(-1deg); }
 .card:active { transform:translateY(3px); }
 @keyframes popIn { from{transform:scale(.6); opacity:0;} }
@@ -105,6 +105,8 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
 .c-object  .go{ color:var(--blue-deep); }
 .c-match   { background:linear-gradient(180deg,#6FD69B,var(--leaf)); box-shadow:0 8px 0 var(--leaf-deep), 0 16px 24px rgba(46,154,100,.32); }
 .c-match   .go{ color:var(--leaf-deep); }
+.c-animal  { background:linear-gradient(180deg,#FFC48A,var(--sun-deep)); box-shadow:0 8px 0 #C98300, 0 16px 24px rgba(245,167,0,.32); }
+.c-animal  .go{ color:#C98300; }
 
 .footer { position:relative; z-index:10; margin-top:auto; padding:6px 16px 18px; text-align:center; }
 .footer .badge { display:inline-flex; align-items:center; gap:7px; font-weight:700; font-size:.82rem; color:#fff;
@@ -242,6 +244,20 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
             </div>
             <span class="name">Ghép Hình</span>
             <span class="sub">Ghép mảnh thành hình hoàn chỉnh</span>
+            <span class="go">Chơi <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+
+        <a class="card c-animal" href="tieng-con-vat.html">
+            <div class="chip">
+                <svg viewBox="0 0 100 100">
+                    <circle cx="50" cy="56" r="30" fill="#FFD6A5" stroke="#fff" stroke-width="3"/>
+                    <ellipse cx="26" cy="30" rx="9" ry="14" fill="#FFB36B" transform="rotate(-20 26 30)"/><ellipse cx="74" cy="30" rx="9" ry="14" fill="#FFB36B" transform="rotate(20 74 30)"/>
+                    <circle cx="40" cy="52" r="4.5" fill="#4A4458"/><circle cx="60" cy="52" r="4.5" fill="#4A4458"/>
+                    <ellipse cx="50" cy="64" rx="7" ry="5" fill="#FF8FB4"/><path d="M42 72 Q50 80 58 72" stroke="#4A4458" stroke-width="3" fill="none" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <span class="name">Tiếng Con Vật</span>
+            <span class="sub">Con nào kêu gâu gâu, meo meo?</span>
             <span class="go">Chơi <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
         </a>
 
