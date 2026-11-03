@@ -4,7 +4,7 @@
   var PK = 'bePlay', SK = 'beSettings';
   var GAMES = {
     'hoc-chu': 'Học Chữ Cái', 'be-hoc-dem': 'Đếm Cùng Bé', 'be-phan-loai': 'Sắp Xếp Vui Vẻ',
-    'hoc-do-vat': 'Bé Học Đồ Vật', 'tieng-con-vat': 'Tiếng Con Vật', 'ghep_hinh': 'Ghép Hình', 'do_vat': 'Toán Câu Cá'
+    'hoc-do-vat': 'Bé Học Đồ Vật', 'tieng-con-vat': 'Tiếng Con Vật', 'hoc-mau': 'Học Màu Sắc', 'ghep_hinh': 'Ghép Hình', 'do_vat': 'Toán Câu Cá'
   };
   function load(k, d) { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } }
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
