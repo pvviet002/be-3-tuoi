@@ -17,8 +17,27 @@ Bộ trò chơi giáo dục bằng tiếng Việt cho bé 3–6 tuổi. Chỉ g�
 | `hoc-tieng-anh.html` | Từ vựng tiếng Anh cho bé 3–5 tuổi: 98 từ / 12 chủ đề (có số đếm 1–10, cảm xúc, hoạt động hằng ngày, nghề nghiệp, quần áo, phương tiện), 3 chế độ: học từ, đố vui (bé tự chọn chủ đề hoặc trộn tất cả), đếm số (chọn nhóm đồ vật, đếm hình rồi chọn số), chế độ học từ và đố vui, phát âm bằng giọng đọc tiếng Anh |
 | `so-vui.html` | Số Vui cho bé 3–5 tuổi: so sánh nhiều hơn/ít hơn, tìm số còn thiếu, cộng bằng hình (số tới 5 rồi tới 10) |
 | `tap-viet-so.html` | Tập viết số 0–9: bé tô theo nét bằng ngón tay, có chấm xanh báo điểm bắt đầu, xem mẫu, nét mảnh dần khi viết quen |
+| `tap-viet-chu.html` | Tập viết 29 chữ cái tiếng Việt (chữ hoa và chữ thường): tô theo nét, tự thu phóng cho vừa khung, nét mảnh dần khi viết quen |
 | `ghep_hinh.html` | Ghép hình với bóng |
 | `do_vat.html` | Game toán bảng nhân/chia 4 (lớp lớn hơn, chưa gắn vào trang chủ) |
+
+## Thiết bị được hỗ trợ
+
+Các màn chơi tự co vừa màn hình để bé không phải cuộn trang khi kéo thả hoặc tô nét. Đã kiểm tra bằng trình duyệt giả lập các khổ máy sau (xem `fit.css`):
+
+| Thiết bị | Khổ kiểm tra |
+|---|---|
+| Laptop | 1366×657, 1536×730 |
+| iPad Gen 10 | 820×1060 (dọc), 1180×720 (ngang) |
+| iPad 5 | 768×910 (dọc), 1024×640 (ngang) |
+| iPhone | 390×664, iPhone SE 375×553 |
+| Samsung Note 20 Ultra | 412×780 (dọc) |
+
+Điện thoại xoay ngang (ví dụ 780×340) vẫn chơi được nhưng một số màn phải cuộn; nên để điện thoại dọc. Trang chủ và khu phụ huynh là trang dài nên có cuộn dọc.
+
+## Lượt truy cập
+
+Web đếm lượt truy cập ngay trên thiết bị đang dùng (không gửi dữ liệu đi đâu): một lượt là một lần mở web sau ít nhất 30 phút không hoạt động. Số liệu hiện ở chân trang chủ và trong khu phụ huynh (hôm nay, 7 ngày qua, tổng cộng). Muốn đếm chung cho mọi người truy cập thì cần thêm dịch vụ lưu trữ ở máy chủ.
 
 ## Chạy thử
 

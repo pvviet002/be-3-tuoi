@@ -38,6 +38,8 @@ h1{font-size:clamp(1.3rem,5vw,2rem);color:var(--co-deep);text-shadow:0 2px 0 #ff
 
 /* Học từ */
 .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+/* Điện thoại: dải chủ đề cuộn ngang một hàng để tiết kiệm chỗ */
+@media(max-width:700px){.chips{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;width:100%;padding-bottom:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.chips::-webkit-scrollbar{display:none}.chips .chip{flex:none}}
 .chip{border:0;cursor:pointer;font:inherit;font-weight:800;border-radius:99px;padding:6px 14px;background:#fff;color:var(--co-deep);box-shadow:0 3px 0 var(--edge);font-size:.95rem}
 .chip.on{background:var(--co);color:#fff;box-shadow:0 3px 0 var(--co-deep)}
 .picker{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%}
@@ -46,7 +48,7 @@ h1{font-size:clamp(1.3rem,5vw,2rem);color:var(--co-deep);text-shadow:0 2px 0 #ff
 .topicbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
 .card{width:min(100%,380px);background:#fff;border-radius:34px;border:6px solid #fff;padding:18px 12px 20px;text-align:center;cursor:pointer;
   box-shadow:0 8px 0 var(--edge),0 16px 26px rgba(200,60,90,.2);animation:pop .35s cubic-bezier(.34,1.5,.5,1) both;border:0;font:inherit}
-.card .pic{font-size:min(36vw,150px);line-height:1.1;display:block}
+.card .pic{font-size:min(36vw,150px,calc(19 * var(--vh)));line-height:1.1;display:block}
 .card .en{font-size:clamp(2.2rem,10vw,3.4rem);font-weight:800;color:var(--co);display:block;line-height:1.05}
 .card .vi{font-size:1.1rem;font-weight:700;color:var(--soft);display:block;margin-top:2px}
 .card .tap{font-size:.85rem;font-weight:700;color:var(--soft);display:block;margin-top:6px}
@@ -62,11 +64,12 @@ h1{font-size:clamp(1.3rem,5vw,2rem);color:var(--co-deep);text-shadow:0 2px 0 #ff
 .ask .eg{display:block;font-size:.9rem;font-weight:700;color:var(--soft)}
 .ask:active{transform:translateY(3px)}
 .praise{font-weight:800;font-size:1.3rem;color:var(--leaf-deep);min-height:1.8em;text-align:center}
-.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%}
-.choices.two{grid-template-columns:repeat(2,1fr)}
-.choice{aspect-ratio:1;border:0;cursor:pointer;background:#fff;border-radius:28px;border:5px solid #fff;font-size:min(22vw,110px);
+.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%;max-width:calc(3 * 26 * var(--vh) + 24px);margin-inline:auto}
+.choices.two{grid-template-columns:repeat(2,minmax(0,1fr));max-width:calc(2 * 32 * var(--vh) + 12px)}
+.choice{aspect-ratio:1;border:0;cursor:pointer;background:#fff;border-radius:28px;border:5px solid #fff;font-size:min(14vw,calc(11 * var(--vh)),88px);
   display:flex;align-items:center;justify-content:center;box-shadow:0 7px 0 var(--edge),0 14px 22px rgba(200,60,90,.2);
   transition:transform .12s;animation:pop .4s cubic-bezier(.34,1.5,.5,1) both}
+.choices.two .choice{font-size:min(20vw,calc(15 * var(--vh)),110px)}
 .choice:nth-child(2){animation-delay:.07s}.choice:nth-child(3){animation-delay:.14s}
 .choice:active{transform:translateY(4px)}
 @keyframes pop{from{transform:scale(.6);opacity:0}}
@@ -79,16 +82,22 @@ h1{font-size:clamp(1.3rem,5vw,2rem);color:var(--co-deep);text-shadow:0 2px 0 #ff
 .note{font-size:.8rem;color:var(--soft);font-weight:700;text-align:center}
 /* Đếm số */
 .big.count{background:linear-gradient(180deg,#FFC48A,#F59E0B);box-shadow:0 8px 0 #C77700,0 16px 24px rgba(245,158,11,.28)}
-.things{display:flex;flex-wrap:wrap;gap:10px 14px;justify-content:center;align-items:center;background:#fff;border-radius:28px;padding:16px 12px;width:100%;
+.things{min-height:min(130px,calc(16 * var(--vh)));display:flex;flex-wrap:wrap;gap:10px 14px;justify-content:center;align-items:center;background:#fff;border-radius:28px;padding:16px 12px;width:100%;
   min-height:130px;box-shadow:0 7px 0 var(--edge),0 14px 22px rgba(200,60,90,.15)}
-.thing{position:relative;border:0;background:none;cursor:pointer;line-height:1;font-size:var(--sz,4.5rem);padding:2px;transition:transform .15s;animation:pop .35s cubic-bezier(.34,1.5,.5,1) both}
+.thing{position:relative;border:0;background:none;cursor:pointer;line-height:1;font-size:min(var(--sz,4.5rem),calc(10 * var(--vh)));padding:2px;transition:transform .15s;animation:pop .35s cubic-bezier(.34,1.5,.5,1) both}
 .thing .badge{position:absolute;right:-6px;top:-8px;min-width:1.7rem;height:1.7rem;border-radius:50%;background:var(--co);color:#fff;font:800 1rem/1.7rem 'Baloo 2',system-ui,sans-serif;
   text-align:center;box-shadow:0 2px 0 var(--co-deep)}
 .thing.counted{transform:scale(1.12)}
-.choice.num{font-size:min(16vw,70px);font-weight:800;color:var(--co);flex-direction:column;line-height:1;font-family:inherit}
+.choice.num{aspect-ratio:auto;height:min(calc(15 * var(--vh)),110px);font-size:min(14vw,calc(10 * var(--vh)),64px);font-weight:800;color:var(--co);flex-direction:column;line-height:1;font-family:inherit}
 .choice.num small{font-size:.3em;color:var(--soft);font-weight:700;margin-top:4px}
+/* Nhiều hình (từ 7 hình): thu nhỏ để xếp được 2 hàng trên điện thoại */
+.things[data-many="1"] .thing{font-size:min(var(--sz,3rem),11vw,calc(10 * var(--vh)))}
+/* Màn thấp: gọn hộp câu hỏi và khoảng cách để vừa một màn */
+@media(max-height:800px){.menu{gap:8px}.ask{padding:6px 18px}.ask .say{font-size:1.8rem}.ask .name{font-size:clamp(1.6rem,6vw,2.4rem)}.ask .eg{font-size:.8rem}}
+@media(max-height:640px){.ask .eg{display:none}.things{padding:8px}.choice.num{height:calc(12 * var(--vh))}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
+<link rel="stylesheet" href="fit.css">
 <script src="tracker.js"></script>
 </head>
 <body>
@@ -229,6 +238,8 @@ let topicIdx = 0, wordIdx = 0;
 function renderChips(){
   $('chips').innerHTML = TOPICS.map((t,i)=>`<button class="chip ${i===topicIdx?'on':''}" data-i="${i}">${t.icon} ${t.name}</button>`).join('');
   $('chips').querySelectorAll('.chip').forEach(b => b.onclick = () => { topicIdx = +b.dataset.i; wordIdx = 0; renderCard(true); });
+  const on = $('chips').querySelector('.chip.on');   // đưa chủ đề đang chọn vào giữa dải cuộn
+  if (on) $('chips').scrollLeft = on.offsetLeft - ($('chips').clientWidth - on.offsetWidth) / 2;
 }
 function renderCard(speak){
   renderChips();
@@ -353,7 +364,7 @@ function newCountRound(){
   let t; do { t = list[Math.floor(Math.random()*list.length)]; } while (t === cthing && list.length > 1); cthing = t;
   $('cword').textContent = t[2]; $('cvi').textContent = '(' + t[3] + ')';
   const box = $('things'); box.innerHTML = '';
-  box.style.setProperty('--sz', n <= 3 ? '5rem' : (n <= 6 ? '4rem' : '3rem'));
+  box.style.setProperty('--sz', n <= 3 ? '5rem' : (n <= 6 ? '4rem' : '3rem')); box.dataset.many = n >= 7 ? '1' : '';
   for (let i = 0; i < n; i++){
     const b = document.createElement('button'); b.className = 'thing'; b.textContent = t[0]; b.setAttribute('aria-label', t[1]);
     b.style.animationDelay = (i*0.05) + 's';

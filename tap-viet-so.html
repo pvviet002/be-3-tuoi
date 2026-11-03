@@ -59,9 +59,10 @@ h1{font-size:clamp(1.3rem,5vw,2rem);color:var(--p-deep);text-shadow:0 2px 0 #fff
 @keyframes bounce{40%{transform:scale(1.05) rotate(-1.5deg)}70%{transform:scale(.99) rotate(1deg)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
+<link rel="stylesheet" href="fit.css">
 <script src="tracker.js"></script>
 </head>
-<body>
+<body class="trace">
 <main class="stage">
   <div class="bar">
     <a class="btn" href="index.html" id="home" aria-label="Về trang chủ">🏠 Về nhà</a>
@@ -189,7 +190,7 @@ function openDigit(d){
     if (i > 0) g.style.display = 'none';
   });
   el('circle', { class: 'head', id: 'head', r: 4.5, cx: -10, cy: -10 });
-  $('qtext').textContent = 'Bé viết số ' + NUM[d] + ' nhé!';
+  $('qtext').textContent = 'Bé viết số ' + d + ' (' + NUM[d] + ') nhé!';
   show('play');
   setTimeout(() => say('Bé viết số ' + NUM[d] + ' nhé! Đặt ngón tay vào chấm xanh rồi kéo theo đường chấm.'), 300);
 }
