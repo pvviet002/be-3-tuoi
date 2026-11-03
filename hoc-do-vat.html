@@ -48,6 +48,7 @@ h1{font-size:clamp(1.4rem,5vw,2rem);color:var(--blue-deep);text-shadow:0 2px 0 #
 .praise{font-weight:800;font-size:1.3rem;color:var(--leaf-deep);min-height:1.8em;text-align:center}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
+<script src="tracker.js"></script>
 </head>
 <body>
 <main class="stage">
@@ -126,8 +127,8 @@ function newRound(){
 }
 function answer(btn, ok){
   if (locked) return;
-  if (!ok){ btn.classList.add('wrong'); beep(false); say('Thử lại nhé!'); $('praise').textContent='Thử lại nhé! 💪'; return; }
-  locked = true; btn.classList.add('right'); beep(true);
+  if (!ok){ if (window.BeTracker) BeTracker.round(false); btn.classList.add('wrong'); beep(false); say('Thử lại nhé!'); $('praise').textContent='Thử lại nhé! 💪'; return; }
+  locked = true; btn.classList.add('right'); beep(true); if (window.BeTracker) BeTracker.round(true);
   score++; $('score').textContent = '⭐ ' + score;
   const p = ['Giỏi quá!','Đúng rồi!','Bé tuyệt vời!','Hoan hô!'][Math.floor(Math.random()*4)];
   $('praise').textContent = p + ' 🎉';
