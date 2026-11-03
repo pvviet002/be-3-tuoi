@@ -78,7 +78,7 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
 @media (max-width:640px){ .card{ width:calc(50% - 8px); } }
 @media (max-width:360px){ .card{ width:100%; } }
 .card:nth-child(1){animation-delay:.06s;} .card:nth-child(2){animation-delay:.14s;} .card:nth-child(3){animation-delay:.22s;}
-.card:nth-child(4){animation-delay:.30s;} .card:nth-child(5){animation-delay:.38s;} .card:nth-child(6){animation-delay:.46s;} .card:nth-child(7){animation-delay:.54s;} .card:nth-child(8){animation-delay:.62s;} .card:nth-child(9){animation-delay:.7s;} .card:nth-child(10){animation-delay:.78s;}
+.card:nth-child(4){animation-delay:.30s;} .card:nth-child(5){animation-delay:.38s;} .card:nth-child(6){animation-delay:.46s;} .card:nth-child(7){animation-delay:.54s;} .card:nth-child(8){animation-delay:.62s;} .card:nth-child(9){animation-delay:.7s;} .card:nth-child(10){animation-delay:.78s;} .card:nth-child(11){animation-delay:.86s;}
 .card:hover { transform:translateY(-6px) rotate(-1deg); }
 .card:active { transform:translateY(3px); }
 @keyframes popIn { from{transform:scale(.6); opacity:0;} }
@@ -115,6 +115,8 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
 .c-english .go{ color:#C93A57; }
 .c-number  { background:linear-gradient(180deg,#A6DE5E,#65A30D); box-shadow:0 8px 0 #4D7C0F, 0 16px 24px rgba(77,124,15,.32); }
 .c-number  .go{ color:#4D7C0F; }
+.c-write   { background:linear-gradient(180deg,#E58AF2,#C026D3); box-shadow:0 8px 0 #86198F, 0 16px 24px rgba(134,25,143,.32); }
+.c-write   .go{ color:#86198F; }
 
 .footer { position:relative; z-index:10; margin-top:auto; padding:6px 16px 18px; text-align:center; }
 .footer .badge { display:inline-flex; align-items:center; gap:7px; font-weight:700; font-size:.82rem; color:#fff;
@@ -321,6 +323,19 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
             </div>
             <span class="name">Số Vui</span>
             <span class="sub">So sánh, số thiếu, cộng bằng hình</span>
+            <span class="go">Chơi <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+
+        <a class="card c-write" href="tap-viet-so.html">
+            <div class="chip">
+                <svg viewBox="0 0 100 140" preserveAspectRatio="xMidYMid meet">
+                    <path d="M22 42 C26 14 44 8 58 10 C80 14 88 40 72 62 C60 80 34 104 17 128 L88 128" fill="none" stroke="#F0ABFC" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22 42 C26 14 44 8 58 10 C80 14 88 40 72 62 C60 80 34 104 17 128 L88 128" fill="none" stroke="#C026D3" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 8"/>
+                    <circle cx="22" cy="42" r="8" fill="#34D399" stroke="#fff" stroke-width="3"/>
+                </svg>
+            </div>
+            <span class="name">Tập Viết Số</span>
+            <span class="sub">Tô theo nét số từ 0 đến 9</span>
             <span class="go">Chơi <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
         </a>
 

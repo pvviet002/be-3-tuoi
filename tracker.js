@@ -6,7 +6,7 @@
   var ENGLISH_TOPICS = 12;
   var GAMES = {
     'hoc-chu': 'Học Chữ Cái', 'be-hoc-dem': 'Đếm Cùng Bé', 'be-phan-loai': 'Sắp Xếp Vui Vẻ',
-    'hoc-do-vat': 'Bé Học Đồ Vật', 'tieng-con-vat': 'Tiếng Con Vật', 'hoc-mau': 'Học Màu Sắc', 'hinh-khoi': 'Hình Khối', 'hoc-tieng-anh': 'Bé Học Tiếng Anh', 'so-vui': 'Số Vui', 'ghep_hinh': 'Ghép Hình', 'do_vat': 'Toán Câu Cá'
+    'hoc-do-vat': 'Bé Học Đồ Vật', 'tieng-con-vat': 'Tiếng Con Vật', 'hoc-mau': 'Học Màu Sắc', 'hinh-khoi': 'Hình Khối', 'hoc-tieng-anh': 'Bé Học Tiếng Anh', 'so-vui': 'Số Vui', 'tap-viet-so': 'Tập Viết Số', 'ghep_hinh': 'Ghép Hình', 'do_vat': 'Toán Câu Cá'
   };
   function load(k, d) { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } }
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
@@ -29,7 +29,7 @@
   }
 
   /* Tiến độ học: mức độ khó đã mở khóa + số sao tích lũy. Lịch sử chơi (bePlay) và cài đặt phụ huynh không nằm ở đây. */
-  var LEVEL_KEYS = ['chu-correct', 'doVatCorrect', 'animalCorrect', 'colorCorrect', 'shapeCorrect', 'englishCorrect', 'englishCount', 'numberCorrect'];
+  var LEVEL_KEYS = ['chu-correct', 'doVatCorrect', 'animalCorrect', 'colorCorrect', 'shapeCorrect', 'englishCorrect', 'englishCount', 'numberCorrect', 'writeDone'];
   var STAR_KEYS = ['abc-stars', 'count-stars', 'sort-stars'];
   function resetProgress() {
     LEVEL_KEYS.concat(STAR_KEYS).forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
