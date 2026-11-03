@@ -138,6 +138,12 @@ h1{font-size:clamp(1.3rem,5vw,2rem);color:var(--co-deep);text-shadow:0 2px 0 #ff
 
   <!-- Đếm số -->
   <section class="menu hidden" id="count" style="align-items:center">
+    <div class="menu" id="cpick" style="align-items:center">
+      <p class="sub">Bé muốn đếm gì nào?</p>
+      <div class="picker" id="cchips"></div>
+    </div>
+    <div class="menu hidden" id="cplay" style="align-items:center">
+    <div class="topicbar"><span class="chip on" id="ctopic"></span><button class="chip" id="cchange">🔀 Đổi nhóm</button></div>
     <button class="ask" id="cask" aria-label="Nghe lại câu hỏi">
       <span class="say">🔊</span>
       <span class="txt">How many<span class="name" id="cword"></span><span class="eg" id="cvi"></span></span>
@@ -146,6 +152,7 @@ h1{font-size:clamp(1.3rem,5vw,2rem);color:var(--co-deep);text-shadow:0 2px 0 #ff
     <button class="btn" id="autocount">👆 Đếm cùng nhé</button>
     <div class="praise" id="cpraise" aria-live="polite"></div>
     <div class="choices" id="cchoices"></div>
+    </div>
   </section>
 
   <button class="btn" id="mute" aria-pressed="false">🔊 Âm thanh: Bật</button>
@@ -315,9 +322,16 @@ $('go-quiz').onclick = () => { show('quiz'); openQuizPicker(); };
 /* ── ĐẾM SỐ ──
    Hiện một nhóm đồ vật; bé chạm từng hình để đếm ("one, two, three...") rồi chọn số đúng.
    Học tăng dần: dưới 6 lần đúng đếm tới 3, dưới 14 lần đếm tới 5, sau đó tới 10. */
-const THINGS = [['🍎','apple','apples','quả táo'],['🐶','dog','dogs','con chó'],['🐱','cat','cats','con mèo'],['🦆','duck','ducks','con vịt'],
-  ['⭐','star','stars','ngôi sao'],['🎈','balloon','balloons','bóng bay'],['🚗','car','cars','xe hơi'],['🌸','flower','flowers','bông hoa'],
-  ['⚽','ball','balls','quả bóng'],['🍌','banana','bananas','quả chuối'],['🐟','fish','fish','con cá'],['❤️','heart','hearts','trái tim']];
+/* Đồ vật để đếm, gom theo nhóm để bé chọn: [hình, số ít, số nhiều, nghĩa tiếng Việt] */
+const COUNT_THEMES = [
+  { name:'Con vật',    icon:'🐶', things:[['🐶','dog','dogs','con chó'],['🐱','cat','cats','con mèo'],['🦆','duck','ducks','con vịt'],['🐟','fish','fish','con cá'],['🐦','bird','birds','con chim'],['🐰','rabbit','rabbits','con thỏ'],['🐷','pig','pigs','con heo']] },
+  { name:'Đồ ăn',      icon:'🍎', things:[['🍎','apple','apples','quả táo'],['🍌','banana','bananas','quả chuối'],['🍊','orange','oranges','quả cam'],['🍓','strawberry','strawberries','quả dâu'],['🍰','cake','cakes','cái bánh']] },
+  { name:'Đồ chơi',    icon:'🧸', things:[['🎈','balloon','balloons','bóng bay'],['⚽','ball','balls','quả bóng'],['🚗','car','cars','xe hơi'],['🧸','teddy bear','teddy bears','gấu bông'],['📖','book','books','quyển sách'],['❤️','heart','hearts','trái tim']] },
+  { name:'Thiên nhiên',icon:'🌸', things:[['⭐','star','stars','ngôi sao'],['🌸','flower','flowers','bông hoa'],['🌳','tree','trees','cái cây'],['🦋','butterfly','butterflies','con bướm']] }
+];
+const THINGS = COUNT_THEMES.flatMap(t => t.things);
+let countTheme = -1;   // -1: tất cả các nhóm; >= 0: bé chọn một nhóm
+function countList(){ return countTheme >= 0 ? COUNT_THEMES[countTheme].things : THINGS; }
 const NUMW = ['','one','two','three','four','five','six','seven','eight','nine','ten'];
 let cScore = 0, cn = 0, cthing = null, cdone = false, ccounted = 0, cauto = false, ctimers = [];
 function countCorrect(){ try { return parseInt(localStorage.getItem('englishCount')||'0',10)||0; } catch(e){ return 0; } }
@@ -335,7 +349,8 @@ function newCountRound(){
   clearCountTimers(); cdone = false; ccounted = 0; $('cpraise').textContent = '';
   const max = countMax();
   let n; do { n = 1 + Math.floor(Math.random()*max); } while (n === cn && max > 1); cn = n;
-  let t; do { t = THINGS[Math.floor(Math.random()*THINGS.length)]; } while (t === cthing); cthing = t;
+  const list = countList();
+  let t; do { t = list[Math.floor(Math.random()*list.length)]; } while (t === cthing && list.length > 1); cthing = t;
   $('cword').textContent = t[2]; $('cvi').textContent = '(' + t[3] + ')';
   const box = $('things'); box.innerHTML = '';
   box.style.setProperty('--sz', n <= 3 ? '5rem' : (n <= 6 ? '4rem' : '3rem'));
@@ -398,7 +413,22 @@ function cAnswer(btn, ok){
 }
 $('cask').onclick = () => { if (cthing) sayParts(cQuestion()); };
 $('autocount').onclick = autoCount;
-$('go-count').onclick = () => { cScore = 0; $('score').textContent = '⭐ 0'; cthing = null; cn = 0; show('count'); newCountRound(); };
+function openCountPicker(){
+  clearCountTimers();
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  $('cplay').classList.add('hidden'); $('cpick').classList.remove('hidden');
+  $('cchips').innerHTML = '<button class="chip all" data-i="-1">🎲 Tất cả</button>' +
+    COUNT_THEMES.map((t,i)=>`<button class="chip" data-i="${i}">${t.icon} ${t.name}</button>`).join('');
+  $('cchips').querySelectorAll('.chip').forEach(b => b.onclick = () => startCount(+b.dataset.i));
+}
+function startCount(i){
+  countTheme = i; cScore = 0; $('score').textContent = '⭐ 0'; cthing = null; cn = 0;
+  $('ctopic').textContent = i >= 0 ? COUNT_THEMES[i].icon + ' ' + COUNT_THEMES[i].name : '🎲 Tất cả';
+  $('cpick').classList.add('hidden'); $('cplay').classList.remove('hidden');
+  newCountRound();
+}
+$('cchange').onclick = openCountPicker;
+$('go-count').onclick = () => { show('count'); openCountPicker(); };
 
 function renderMute(){ $('mute').textContent = muted ? '🔇 Âm thanh: Tắt' : '🔊 Âm thanh: Bật'; $('mute').setAttribute('aria-pressed', muted); }
 $('mute').onclick = () => { muted = !muted; try{localStorage.setItem('englishMuted', muted?'1':'0');}catch(e){}; if (muted && 'speechSynthesis' in window) speechSynthesis.cancel(); renderMute(); };
