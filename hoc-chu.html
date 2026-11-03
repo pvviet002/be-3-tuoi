@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bé Học Chữ Cái - Vườn Chữ Vui Vẻ</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="vendor/tailwind.css">
+    <script src="vendor/confetti.browser.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -168,6 +168,7 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
+<script src="tracker.js"></script>
 </head>
 <body class="p-2 md:p-4 flex flex-col min-h-screen relative no-select">
 
@@ -675,11 +676,25 @@
             nextQuizQuestion(true);
         }
 
+        // Học tăng dần: bé mới bắt đầu chỉ gặp 6 chữ dễ phân biệt, cứ 2 lần đúng thì thêm 1 chữ.
+        // Tiến độ lưu trên thiết bị. Các chữ giống nhau (A/Ă/Â, O/Ô/Ơ...) được đưa vào sau cùng.
+        const EASY_ORDER = ['A','B','C','D','M','N','O','T','H','L','E','I','K','S','U','V','X','P','R','G','Y','Q','Ă','Â','Đ','Ê','Ô','Ơ','Ư'];
+        const POOL_START = 6;
+        function quizCorrectTotal() { try { return parseInt(localStorage.getItem('chu-correct') || '0', 10) || 0; } catch (e) { return 0; } }
+        function quizPool() {
+            const size = Math.min(LETTERS.length, POOL_START + Math.floor(quizCorrectTotal() / 2));
+            return EASY_ORDER.slice(0, size).map(u => LETTERS.findIndex(l => l.up === u)).filter(i => i >= 0);
+        }
+        function quizChoiceCount() { return quizPool().length < 10 ? 2 : 3; }
+        function quizGrow() { try { localStorage.setItem('chu-correct', String(quizCorrectTotal() + 1)); } catch (e) {} }
+
         function pickQuizLetter() {
-            let candidates = LETTERS.map((_, i) => i).filter(i => !recentQuiz.includes(i));
+            const pool = quizPool();
+            const keep = Math.min(5, pool.length - 2);
+            let candidates = pool.filter(i => !recentQuiz.includes(i));
             let idx = candidates[Math.floor(Math.random() * candidates.length)];
             recentQuiz.push(idx);
-            if (recentQuiz.length > 5) recentQuiz.shift();
+            while (recentQuiz.length > keep) recentQuiz.shift();
             return idx;
         }
 
@@ -689,9 +704,9 @@
 
             quizAnswer = pickQuizLetter();
 
-            let others = LETTERS.map((_, i) => i).filter(i => i !== quizAnswer);
+            let others = quizPool().filter(i => i !== quizAnswer);
             others.sort(() => Math.random() - 0.5);
-            let options = [quizAnswer, others[0], others[1]];
+            let options = [quizAnswer, ...others.slice(0, quizChoiceCount() - 1)];
             options.sort(() => Math.random() - 0.5);
 
             const box = document.getElementById('quiz-options');
@@ -741,6 +756,8 @@
             const L = LETTERS[quizAnswer];
 
             if (idx === quizAnswer) {
+                if (window.BeTracker) BeTracker.round(true);
+                quizGrow();
                 quizLocked = true;
                 sfxPop();
                 setTimeout(sfxSparkle, 150);
@@ -787,6 +804,7 @@
                 });
 
             } else {
+                if (window.BeTracker) BeTracker.round(false);
                 sfxBoing();
                 cardEl.classList.remove('wiggle');
                 void cardEl.offsetWidth;

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khu Phụ Huynh — Sân Chơi Của Bé</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4F8FC;--card:#fff;--ink:#3B3A4A;--soft:#7C7A8E;--line:#E3EAF2;--blue:#2E86DB;--blue-lt:#DCEEFF;--berry:#E84D89;--leaf:#2E9A64;--sun:#F5A700}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Baloo 2',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px;display:flex;justify-content:center}
+main{width:100%;max-width:720px;display:flex;flex-direction:column;gap:14px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+h1{font-size:1.6rem}h2{font-size:1.15rem;margin-bottom:10px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:16px}
+.btn{border:0;cursor:pointer;font:inherit;font-weight:800;border-radius:12px;padding:9px 16px;background:var(--blue);color:#fff;text-decoration:none;display:inline-block}
+.btn.ghost{background:var(--blue-lt);color:var(--blue)}.btn.danger{background:#FDE4EE;color:var(--berry)}
+.soft{color:var(--soft);font-size:.9rem;font-weight:600}
+input[type=password],input[type=text]{font:inherit;font-weight:800;font-size:1.4rem;letter-spacing:.4em;text-align:center;width:180px;padding:8px;border:2px solid var(--line);border-radius:12px}
+.gate{max-width:380px;margin:60px auto;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.err{color:var(--berry);font-weight:700;min-height:1.4em}
+.today{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.today b{font-size:2.4rem;color:var(--blue)}
+.meter{height:14px;background:var(--blue-lt);border-radius:99px;overflow:hidden;margin-top:8px}.meter i{display:block;height:100%;background:var(--leaf);border-radius:99px}
+.meter.over i{background:var(--berry)}
+.chart{display:flex;align-items:flex-end;gap:8px;height:150px;padding-top:8px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;font-size:.78rem;font-weight:700;color:var(--soft)}
+.bar i{width:100%;max-width:44px;background:var(--blue);border-radius:8px 8px 3px 3px;min-height:2px}
+.bar.today-bar i{background:var(--sun)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}th{color:var(--soft);font-weight:700;font-size:.8rem}
+td.n,th.n{text-align:right}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}
+select{font:inherit;font-weight:700;padding:7px 10px;border-radius:10px;border:2px solid var(--line)}
+.switch{width:46px;height:26px;border-radius:99px;background:#CBD5E1;position:relative;cursor:pointer;border:0;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}
+.switch[aria-checked=true]{background:var(--leaf)}.switch[aria-checked=true]::after{left:23px}
+.hidden{display:none!important}
+.prog{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:.95rem}.prog:last-of-type{border:0}
+.prog b{color:var(--blue)}
+.ok{color:var(--leaf);font-weight:700;min-height:1.4em}
+.note{font-size:.82rem;color:var(--soft);font-weight:600;line-height:1.4}
+</style>
+</head>
+<body>
+<main>
+  <!-- Cổng PIN -->
+  <section id="gate" class="card gate">
+    <div style="font-size:54px">🔒</div>
+    <h1 id="gate-title">Khu phụ huynh</h1>
+    <p class="soft" id="gate-sub"></p>
+    <input id="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="Mã PIN 4 số">
+    <input id="pin2" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="Nhập lại mã PIN" class="hidden" placeholder="">
+    <div class="err" id="gate-err" role="alert"></div>
+    <button class="btn" id="gate-ok">Tiếp tục</button>
+    <a class="soft" href="index.html">← Về sân chơi của bé</a>
+  </section>
+
+  <!-- Bảng điều khiển -->
+  <div id="dash" class="hidden" style="display:flex;flex-direction:column;gap:14px">
+    <header>
+      <h1>👨‍👩‍👧 Khu phụ huynh</h1>
+      <a class="btn ghost" href="index.html">← Về sân chơi</a>
+    </header>
+
+    <section class="card">
+      <h2>Hôm nay</h2>
+      <div class="today"><b id="today-min">0</b><span>phút đã chơi</span><span class="soft" id="today-limit"></span></div>
+      <div class="meter" id="meter"><i style="width:0"></i></div>
+    </section>
+
+    <section class="card">
+      <h2>7 ngày gần đây (phút)</h2>
+      <div class="chart" id="chart" role="img" aria-label="Biểu đồ phút chơi 7 ngày gần đây"></div>
+    </section>
+
+    <section class="card">
+      <h2>Theo từng trò chơi (7 ngày)</h2>
+      <table>
+        <thead><tr><th>Trò chơi</th><th class="n">Thời gian</th><th class="n">Lượt</th><th class="n">Đúng</th></tr></thead>
+        <tbody id="games-body"></tbody>
+      </table>
+      <p class="note" style="margin-top:8px">“Lượt” là số lần bé thử trả lời; “Đúng” là tỉ lệ trả lời đúng ngay.</p>
+    </section>
+
+    <section class="card">
+      <h2>Cài đặt</h2>
+      <div class="row">
+        <div><b>Giới hạn thời gian mỗi ngày</b><div class="soft">Hết giờ bé sẽ thấy màn hình nghỉ ngơi</div></div>
+        <select id="limit">
+          <option value="0">Không giới hạn</option><option value="10">10 phút</option><option value="15">15 phút</option>
+          <option value="20">20 phút</option><option value="30">30 phút</option><option value="45">45 phút</option><option value="60">60 phút</option>
+        </select>
+      </div>
+      <h2 style="margin-top:14px">Trò chơi bé được chơi</h2>
+      <div id="toggles"></div>
+    </section>
+
+    <section class="card">
+      <h2>Tiến độ học của bé</h2>
+      <div id="progress"></div>
+      <p class="note" style="margin:8px 0 10px">Các trò chơi tự mở thêm chữ, màu, hình và đáp án khi bé trả lời đúng. Đặt lại để bé học lại từ mức dễ nhất (ví dụ khi đổi sang bé khác dùng chung thiết bị). Lịch sử chơi, giới hạn thời gian và cài đặt ở trên vẫn giữ nguyên.</p>
+      <button class="btn danger" id="reset-progress">Đặt lại tiến độ học</button>
+      <div class="ok" id="progress-ok" role="status"></div>
+    </section>
+
+    <section class="card">
+      <h2>Bảo mật & dữ liệu</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn ghost" id="change-pin">Đổi mã PIN</button>
+        <button class="btn danger" id="reset">Xóa lịch sử chơi</button>
+        <button class="btn ghost" id="lock">Khóa lại</button>
+      </div>
+      <p class="note" style="margin-top:10px">Dữ liệu chỉ lưu trên trình duyệt của thiết bị này, không gửi đi đâu. Mã PIN chỉ ngăn bé vô tình vào đây, không phải bảo mật cao. Dùng thiết bị hoặc trình duyệt khác sẽ có số liệu riêng.</p>
+    </section>
+  </div>
+</main>
+
+<script src="tracker.js"></script>
+<script>
+const T = window.BeTracker, $ = id => document.getElementById(id);
+const WD = ['CN','T2','T3','T4','T5','T6','T7'];
+let mode = 'enter';   // enter | create | change
+
+function fmtMin(sec){ return sec < 60 ? (sec ? '<1 phút' : '0 phút') : Math.round(sec/60) + ' phút'; }
+
+/* ── Cổng PIN ── */
+function gateMode(m){
+  mode = m;
+  $('pin').value = ''; $('pin2').value = ''; $('gate-err').textContent = '';
+  $('pin2').classList.toggle('hidden', m === 'enter');
+  $('gate-title').textContent = m === 'enter' ? 'Nhập mã PIN' : (m === 'create' ? 'Tạo mã PIN' : 'Đổi mã PIN');
+  $('gate-sub').textContent = m === 'enter' ? 'Chỉ dành cho bố mẹ.' : 'Chọn 4 chữ số, rồi nhập lại lần nữa để xác nhận.';
+  $('pin').placeholder = '';
+  $('gate').classList.remove('hidden'); $('dash').classList.add('hidden');
+  $('pin').focus();
+}
+function submitGate(){
+  const s = T.settings(), p = $('pin').value;
+  if (!/^\d{4}$/.test(p)) { $('gate-err').textContent = 'Mã PIN gồm đúng 4 chữ số.'; return; }
+  if (mode === 'enter') {
+    if (p !== s.pin) { $('gate-err').textContent = 'Sai mã PIN, thử lại nhé.'; $('pin').value = ''; return; }
+    return openDash();
+  }
+  if (p !== $('pin2').value) { $('gate-err').textContent = 'Hai lần nhập chưa giống nhau.'; return; }
+  s.pin = p; T.save(T.SK, s); openDash();
+}
+$('gate-ok').onclick = submitGate;
+['pin','pin2'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') submitGate(); }));
+
+/* ── Bảng điều khiển ── */
+function openDash(){
+  $('gate').classList.add('hidden'); $('dash').classList.remove('hidden');
+  render();
+}
+function lastDays(n){
+  const out = [];
+  for (let i = n - 1; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); out.push(d); }
+  return out;
+}
+function render(){
+  const s = T.settings(), data = T.load(T.PK, {}), days = lastDays(7), today = T.dayKey();
+  // Hôm nay
+  const ts = T.todaySec();
+  $('today-min').textContent = Math.round(ts / 60);
+  $('today-limit').textContent = s.limitMin ? '/ ' + s.limitMin + ' phút cho phép' : '(không giới hạn)';
+  const m = $('meter'); m.classList.toggle('over', s.limitMin > 0 && ts >= s.limitMin * 60);
+  m.firstElementChild.style.width = s.limitMin ? Math.min(100, ts / (s.limitMin * 60) * 100) + '%' : '0';
+  // Biểu đồ 7 ngày
+  const mins = days.map(d => { const g = data[T.dayKey(d)] || {}; let t = 0; for (const k in g) t += g[k].sec || 0; return Math.round(t / 60); });
+  const max = Math.max(5, ...mins);
+  $('chart').innerHTML = days.map((d, i) =>
+    `<div class="bar ${T.dayKey(d) === today ? 'today-bar' : ''}"><span>${mins[i]}</span><i style="height:${mins[i] / max * 100}%"></i><span>${WD[d.getDay()]}</span></div>`).join('');
+  // Theo trò chơi
+  const agg = {};
+  days.forEach(d => { const g = data[T.dayKey(d)] || {}; for (const k in g) { const a = agg[k] = agg[k] || { sec: 0, rounds: 0, correct: 0 }; a.sec += g[k].sec || 0; a.rounds += g[k].rounds || 0; a.correct += g[k].correct || 0; } });
+  $('games-body').innerHTML = Object.keys(T.GAMES).map(id => {
+    const a = agg[id] || { sec: 0, rounds: 0, correct: 0 };
+    return `<tr><td>${T.GAMES[id]}</td><td class="n">${fmtMin(a.sec)}</td><td class="n">${a.rounds || '–'}</td><td class="n">${a.rounds ? Math.round(a.correct / a.rounds * 100) + '%' : '–'}</td></tr>`;
+  }).join('');
+  renderProgress();
+  // Cài đặt
+  $('limit').value = String(s.limitMin);
+  $('toggles').innerHTML = Object.keys(T.GAMES).map(id =>
+    `<div class="row"><span>${T.GAMES[id]}</span><button class="switch" role="switch" data-id="${id}" aria-label="${T.GAMES[id]}" aria-checked="${s.disabled.indexOf(id) === -1}"></button></div>`).join('');
+  document.querySelectorAll('.switch').forEach(b => b.onclick = () => {
+    const st = T.settings(), id = b.dataset.id, i = st.disabled.indexOf(id);
+    if (i === -1) st.disabled.push(id); else st.disabled.splice(i, 1);
+    T.save(T.SK, st); render();
+  });
+}
+function renderProgress(){
+  const num = k => { try { return parseInt(localStorage.getItem(k) || '0', 10) || 0; } catch (e) { return 0; } };
+  const rows = [
+    ['Học Chữ Cái',    num('chu-correct'),    c => Math.min(29, 6 + Math.floor(c / 2)) + '/29 chữ'],
+    ['Học Màu Sắc',    num('colorCorrect'),   c => Math.min(8, 4 + Math.floor(c / 3)) + '/8 màu'],
+    ['Hình Khối',      num('shapeCorrect'),   c => Math.min(8, 3 + Math.floor(c / 3)) + '/8 hình'],
+    ['Bé Học Đồ Vật',  num('doVatCorrect'),   c => (c < 8 ? 2 : 3) + ' đáp án'],
+    ['Tiếng Con Vật',  num('animalCorrect'),  c => (c < 8 ? 2 : 3) + ' hình để chọn'],
+    ['Bé Học Tiếng Anh', num('englishCorrect'), c => Math.min(T.ENGLISH_TOPICS, 1 + Math.floor(c / 8)) + '/' + T.ENGLISH_TOPICS + ' chủ đề'],
+    ['Tiếng Anh: Đếm số', num('englishCount'), c => c < 6 ? 'đếm tới 3' : (c < 14 ? 'đếm tới 5' : 'đếm tới 10')],
+    ['Số Vui', num('numberCorrect'), c => c < 8 ? 'số tới 5, 2 đáp án' : 'số tới 10, 3 đáp án']
+  ];
+  const stars = T.STAR_KEYS.reduce((t, k) => t + num(k), 0);
+  $('progress').innerHTML = rows.map(r => `<div class="prog"><span>${r[0]}</span><b>${r[2](r[1])}</b></div>`).join('') +
+    `<div class="prog"><span>Sao đã tích (Chữ cái, Đếm, Sắp xếp)</span><b>⭐ ${stars}</b></div>`;
+}
+$('reset-progress').onclick = () => {
+  if (!confirm('Đặt lại toàn bộ tiến độ học của bé? Bé sẽ học lại từ mức dễ nhất và số sao đã tích sẽ về 0. Việc này không hoàn tác được.')) return;
+  T.resetProgress(); renderProgress();
+  $('progress-ok').textContent = '✓ Đã đặt lại tiến độ học.';
+  setTimeout(() => { $('progress-ok').textContent = ''; }, 4000);
+};
+$('limit').onchange = () => { const s = T.settings(); s.limitMin = +$('limit').value; T.save(T.SK, s); render(); };
+$('change-pin').onclick = () => gateMode('change');
+$('lock').onclick = () => gateMode('enter');
+$('reset').onclick = () => { if (confirm('Xóa toàn bộ lịch sử chơi? Việc này không hoàn tác được.')) { T.save(T.PK, {}); render(); } };
+
+gateMode(T.settings().pin ? 'enter' : 'create');
+</script>
+</body>
+</html>

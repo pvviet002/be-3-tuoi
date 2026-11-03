@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Bé Học Tiếng Anh — Từ vựng quen thuộc</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F0506E">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--co:#F0506E;--co-deep:#C93A57;--leaf-deep:#2E9A64;--sun:#FFCB3D;--ink:#4A4458;--soft:#8B85A0;--edge:#F2C4CD}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Baloo 2',system-ui,sans-serif;color:var(--ink);min-height:100vh;padding:12px;display:flex;justify-content:center;
+  background:linear-gradient(180deg,#FFD6DD 0%,#FFEEF1 55%,#F2FBEF 100%);user-select:none;-webkit-user-select:none;overflow-x:hidden}
+.stage{width:100%;max-width:720px;border:8px solid #fff;border-radius:32px;padding:14px 16px 22px;
+  background:linear-gradient(180deg,#FFC2CC 0%,#FFEDF0 50%,#F1FBEF 100%);box-shadow:0 24px 50px rgba(200,60,90,.28);
+  display:flex;flex-direction:column;align-items:center;gap:14px}
+.bar{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.btn{border:0;cursor:pointer;font:inherit;font-weight:800;border-radius:99px;padding:8px 18px;background:#fff;color:var(--co-deep);
+  box-shadow:0 4px 0 rgba(0,0,0,.14);font-size:1rem;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.14)}
+.score{font-weight:800;background:var(--sun);color:#7A5C00;border-radius:99px;padding:6px 16px;box-shadow:0 4px 0 #F5A700}
+h1{font-size:clamp(1.3rem,5vw,2rem);color:var(--co-deep);text-shadow:0 2px 0 #fff;text-align:center}
+.hidden{display:none!important}
+.sub{font-weight:700;color:var(--soft);text-align:center}
+
+/* Màn hình chọn */
+.menu{display:flex;flex-direction:column;gap:14px;width:100%}
+.big{border:0;cursor:pointer;font:inherit;border-radius:28px;padding:18px 20px;display:flex;align-items:center;gap:16px;color:#fff;text-align:left;
+  border:5px solid #fff;box-shadow:0 8px 0 var(--co-deep),0 16px 24px rgba(200,60,90,.25)}
+.big.learn{background:linear-gradient(180deg,#FF9BAA,var(--co))}
+.big.quiz{background:linear-gradient(180deg,#8FD9B0,#43B97F);box-shadow:0 8px 0 var(--leaf-deep),0 16px 24px rgba(46,154,100,.25)}
+.big:active{transform:translateY(4px)}
+.big .ico{font-size:3rem}
+.big b{font-size:1.5rem;display:block;line-height:1.05}
+.big span{font-weight:700;font-size:.95rem;opacity:.95}
+
+/* Học từ */
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{border:0;cursor:pointer;font:inherit;font-weight:800;border-radius:99px;padding:6px 14px;background:#fff;color:var(--co-deep);box-shadow:0 3px 0 var(--edge);font-size:.95rem}
+.chip.on{background:var(--co);color:#fff;box-shadow:0 3px 0 var(--co-deep)}
+.picker{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%}
+.picker .chip{font-size:1.1rem;padding:10px 18px;box-shadow:0 4px 0 var(--edge)}
+.picker .chip.all{background:var(--co);color:#fff;box-shadow:0 4px 0 var(--co-deep);width:100%;font-size:1.25rem}
+.topicbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+.card{width:min(100%,380px);background:#fff;border-radius:34px;border:6px solid #fff;padding:18px 12px 20px;text-align:center;cursor:pointer;
+  box-shadow:0 8px 0 var(--edge),0 16px 26px rgba(200,60,90,.2);animation:pop .35s cubic-bezier(.34,1.5,.5,1) both;border:0;font:inherit}
+.card .pic{font-size:min(36vw,150px);line-height:1.1;display:block}
+.card .en{font-size:clamp(2.2rem,10vw,3.4rem);font-weight:800;color:var(--co);display:block;line-height:1.05}
+.card .vi{font-size:1.1rem;font-weight:700;color:var(--soft);display:block;margin-top:2px}
+.card .tap{font-size:.85rem;font-weight:700;color:var(--soft);display:block;margin-top:6px}
+.nav{display:flex;align-items:center;gap:14px}
+.nav .btn{font-size:1.3rem;padding:10px 22px}
+.dots{font-weight:800;color:var(--co-deep)}
+
+/* Đố vui */
+.ask{display:flex;align-items:center;gap:14px;background:#fff;border-radius:28px;padding:12px 22px;box-shadow:0 6px 0 var(--edge);cursor:pointer;border:0;font:inherit;text-align:left}
+.ask .say{font-size:2.2rem}
+.ask .txt{font-weight:800;font-size:1.1rem;color:var(--ink);line-height:1.1}
+.ask .name{display:block;font-size:clamp(2rem,8vw,3.2rem);font-weight:800;color:var(--co);line-height:1}
+.ask .eg{display:block;font-size:.9rem;font-weight:700;color:var(--soft)}
+.ask:active{transform:translateY(3px)}
+.praise{font-weight:800;font-size:1.3rem;color:var(--leaf-deep);min-height:1.8em;text-align:center}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%}
+.choices.two{grid-template-columns:repeat(2,1fr)}
+.choice{aspect-ratio:1;border:0;cursor:pointer;background:#fff;border-radius:28px;border:5px solid #fff;font-size:min(22vw,110px);
+  display:flex;align-items:center;justify-content:center;box-shadow:0 7px 0 var(--edge),0 14px 22px rgba(200,60,90,.2);
+  transition:transform .12s;animation:pop .4s cubic-bezier(.34,1.5,.5,1) both}
+.choice:nth-child(2){animation-delay:.07s}.choice:nth-child(3){animation-delay:.14s}
+.choice:active{transform:translateY(4px)}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.choice.wrong{animation:shake .4s;opacity:.4}
+.choice.right{outline:6px solid var(--sun);animation:bounce .6s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes bounce{40%{transform:scale(1.14) rotate(-4deg)}70%{transform:scale(.97) rotate(3deg)}}
+.star{position:fixed;pointer-events:none;font-size:2rem;animation:fly 1.1s ease-out forwards;z-index:50}
+@keyframes fly{to{transform:translate(var(--dx),var(--dy)) rotate(360deg);opacity:0}}
+.note{font-size:.8rem;color:var(--soft);font-weight:700;text-align:center}
+/* Đếm số */
+.big.count{background:linear-gradient(180deg,#FFC48A,#F59E0B);box-shadow:0 8px 0 #C77700,0 16px 24px rgba(245,158,11,.28)}
+.things{display:flex;flex-wrap:wrap;gap:10px 14px;justify-content:center;align-items:center;background:#fff;border-radius:28px;padding:16px 12px;width:100%;
+  min-height:130px;box-shadow:0 7px 0 var(--edge),0 14px 22px rgba(200,60,90,.15)}
+.thing{position:relative;border:0;background:none;cursor:pointer;line-height:1;font-size:var(--sz,4.5rem);padding:2px;transition:transform .15s;animation:pop .35s cubic-bezier(.34,1.5,.5,1) both}
+.thing .badge{position:absolute;right:-6px;top:-8px;min-width:1.7rem;height:1.7rem;border-radius:50%;background:var(--co);color:#fff;font:800 1rem/1.7rem 'Baloo 2',system-ui,sans-serif;
+  text-align:center;box-shadow:0 2px 0 var(--co-deep)}
+.thing.counted{transform:scale(1.12)}
+.choice.num{font-size:min(16vw,70px);font-weight:800;color:var(--co);flex-direction:column;line-height:1;font-family:inherit}
+.choice.num small{font-size:.3em;color:var(--soft);font-weight:700;margin-top:4px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+<script src="tracker.js"></script>
+</head>
+<body>
+<main class="stage">
+  <div class="bar">
+    <a class="btn" href="index.html" id="home" aria-label="Về trang chủ">🏠 Về nhà</a>
+    <button class="btn hidden" id="back" aria-label="Về màn hình chọn">⬅ Chọn lại</button>
+    <span class="score hidden" id="score" aria-live="polite">⭐ 0</span>
+  </div>
+  <h1>Bé Học Tiếng Anh</h1>
+
+  <!-- Chọn chế độ -->
+  <section class="menu" id="menu">
+    <p class="sub">Bé nghe và học các từ tiếng Anh quen thuộc nhé!</p>
+    <button class="big learn" id="go-learn"><span class="ico">📖</span><div><b>Học từ mới</b><span>Xem hình, nghe cách đọc</span></div></button>
+    <button class="big quiz" id="go-quiz"><span class="ico">🎯</span><div><b>Đố vui</b><span>Nghe từ, chạm vào hình đúng</span></div></button>
+    <button class="big count" id="go-count"><span class="ico">🔢</span><div><b>Đếm số</b><span>Đếm hình, chọn số đúng</span></div></button>
+  </section>
+
+  <!-- Học từ -->
+  <section class="menu hidden" id="learn" style="align-items:center">
+    <div class="chips" id="chips"></div>
+    <button class="card" id="card" aria-label="Nghe lại từ"></button>
+    <div class="nav">
+      <button class="btn" id="prev" aria-label="Từ trước">◀</button>
+      <span class="dots" id="dots"></span>
+      <button class="btn" id="next" aria-label="Từ sau">▶</button>
+    </div>
+  </section>
+
+  <!-- Đố vui -->
+  <section class="menu hidden" id="quiz" style="align-items:center">
+    <div class="menu" id="qpick" style="align-items:center">
+      <p class="sub">Bé muốn đố về chủ đề nào?</p>
+      <div class="picker" id="qchips"></div>
+    </div>
+    <div class="menu hidden" id="qplay" style="align-items:center">
+    <div class="topicbar"><span class="chip on" id="qtopic"></span><button class="chip" id="qchange">🔀 Đổi chủ đề</button></div>
+    <button class="ask" id="ask" aria-label="Nghe lại từ">
+      <span class="say">🔊</span>
+      <span class="txt">Chạm vào<span class="name" id="qword"></span><span class="eg" id="qvi"></span></span>
+    </button>
+    <div class="praise" id="praise" aria-live="polite"></div>
+    <div class="choices" id="choices"></div>
+    </div>
+  </section>
+
+  <!-- Đếm số -->
+  <section class="menu hidden" id="count" style="align-items:center">
+    <div class="menu" id="cpick" style="align-items:center">
+      <p class="sub">Bé muốn đếm gì nào?</p>
+      <div class="picker" id="cchips"></div>
+    </div>
+    <div class="menu hidden" id="cplay" style="align-items:center">
+    <div class="topicbar"><span class="chip on" id="ctopic"></span><button class="chip" id="cchange">🔀 Đổi nhóm</button></div>
+    <button class="ask" id="cask" aria-label="Nghe lại câu hỏi">
+      <span class="say">🔊</span>
+      <span class="txt">How many<span class="name" id="cword"></span><span class="eg" id="cvi"></span></span>
+    </button>
+    <div class="things" id="things" aria-label="Các hình cần đếm"></div>
+    <button class="btn" id="autocount">👆 Đếm cùng nhé</button>
+    <div class="praise" id="cpraise" aria-live="polite"></div>
+    <div class="choices" id="cchoices"></div>
+    </div>
+  </section>
+
+  <button class="btn" id="mute" aria-pressed="false">🔊 Âm thanh: Bật</button>
+  <p class="note">Cần điện thoại/máy tính có giọng đọc tiếng Anh để nghe phát âm.</p>
+</main>
+
+<script>
+/* [từ tiếng Anh, hình, nghĩa tiếng Việt] — 8 chủ đề, xếp theo thứ tự mở dần */
+const TOPICS = [
+  { name:'Con vật',   icon:'🐶', words:[['dog','🐶','con chó'],['cat','🐱','con mèo'],['bird','🐦','con chim'],['fish','🐟','con cá'],['duck','🦆','con vịt'],['cow','🐮','con bò'],['pig','🐷','con heo'],['rabbit','🐰','con thỏ']] },
+  { name:'Đồ ăn',     icon:'🍎', words:[['apple','🍎','quả táo'],['banana','🍌','quả chuối'],['orange','🍊','quả cam'],['milk','🥛','sữa'],['egg','🥚','quả trứng'],['bread','🍞','bánh mì'],['water','💧','nước'],['cake','🍰','bánh ngọt']] },
+  { name:'Số đếm',    icon:'🔢', words:[['one','1️⃣','số một'],['two','2️⃣','số hai'],['three','3️⃣','số ba'],['four','4️⃣','số bốn'],['five','5️⃣','số năm'],['six','6️⃣','số sáu'],['seven','7️⃣','số bảy'],['eight','8️⃣','số tám'],['nine','9️⃣','số chín'],['ten','🔟','số mười']] },
+  { name:'Gia đình',  icon:'👨‍👩‍👧', words:[['mom','👩','mẹ'],['dad','👨','bố'],['baby','👶','em bé'],['grandma','👵','bà'],['grandpa','👴','ông'],['brother','👦','anh/em trai'],['sister','👧','chị/em gái'],['friend','🧒','bạn']] },
+  { name:'Cảm xúc',   icon:'😊', words:[['happy','😊','vui'],['sad','😢','buồn'],['angry','😠','giận'],['scared','😨','sợ'],['sleepy','😴','buồn ngủ'],['surprised','😮','ngạc nhiên'],['excited','🤩','hào hứng'],['hungry','🤤','đói bụng']] },
+  { name:'Cơ thể',    icon:'🖐️', words:[['eye','👁️','mắt'],['ear','👂','tai'],['nose','👃','mũi'],['mouth','👄','miệng'],['hand','✋','bàn tay'],['foot','🦶','bàn chân'],['tooth','🦷','răng'],['heart','❤️','trái tim']] },
+  { name:'Hoạt động', icon:'🏃', words:[['eat','🍽️','ăn'],['drink','🥤','uống'],['sleep','🛌','ngủ'],['bath','🛁','tắm'],['wash','🧼','rửa tay'],['play','🧸','chơi'],['run','🏃','chạy'],['read','📚','đọc sách']] },
+  { name:'Nghề nghiệp',icon:'🧑‍⚕️', words:[['doctor','🧑‍⚕️','bác sĩ'],['teacher','🧑‍🏫','cô giáo'],['police','👮','chú công an'],['firefighter','🧑‍🚒','lính cứu hỏa'],['farmer','🧑‍🌾','nông dân'],['chef','🧑‍🍳','đầu bếp'],['pilot','🧑‍✈️','phi công'],['artist','🧑‍🎨','họa sĩ']] },
+  { name:'Quần áo',   icon:'👕', words:[['shirt','👕','áo sơ mi'],['pants','👖','quần dài'],['dress','👗','cái váy'],['shoes','👟','đôi giày'],['socks','🧦','đôi tất'],['hat','🧢','cái mũ'],['coat','🧥','áo khoác'],['gloves','🧤','đôi găng tay']] },
+  { name:'Đồ dùng',   icon:'🧸', words:[['ball','⚽','quả bóng'],['book','📖','quyển sách'],['bed','🛏️','cái giường'],['chair','🪑','cái ghế'],['door','🚪','cái cửa'],['phone','📱','điện thoại'],['clock','⏰','đồng hồ'],['bag','🎒','cái cặp']] },
+  { name:'Phương tiện',icon:'🚌', words:[['car','🚗','xe hơi'],['bus','🚌','xe buýt'],['bike','🚲','xe đạp'],['motorbike','🏍️','xe máy'],['train','🚂','tàu hỏa'],['boat','⛵','thuyền'],['plane','✈️','máy bay'],['truck','🚚','xe tải']] },
+  { name:'Xung quanh',icon:'🌳', words:[['sun','☀️','mặt trời'],['moon','🌙','mặt trăng'],['star','⭐','ngôi sao'],['tree','🌳','cái cây'],['flower','🌸','bông hoa'],['cloud','☁️','đám mây'],['rain','🌧️','mưa'],['house','🏠','ngôi nhà']] }
+];
+const PRAISES = ['Great job!','Good job!','Well done!','Yay!'];
+const $ = id => document.getElementById(id);
+let muted = false, score = 0, current = null, locked = false, recent = [];
+try { muted = localStorage.getItem('englishMuted') === '1'; } catch(e){}
+
+/* ── Giọng đọc: tiếng Anh cho từ vựng, tiếng Việt cho nghĩa ── */
+let enVoice = null, viVoice = null;
+function loadVoices(){
+  const v = speechSynthesis.getVoices() || [];
+  enVoice = v.find(x=>/^en[-_]US/i.test(x.lang)) || v.find(x=>/^en/i.test(x.lang)) || null;
+  viVoice = v.find(x=>/^vi/i.test(x.lang)) || null;
+}
+if ('speechSynthesis' in window){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+/* parts: [[văn bản, 'en-US' | 'vi-VN'], ...] đọc lần lượt; onend gọi khi đọc xong (hoặc ngay nếu tắt tiếng) */
+function sayParts(parts, onend){
+  if (muted || !('speechSynthesis' in window)) { if (onend) onend(); return; }
+  speechSynthesis.cancel();
+  parts.forEach((p, i) => {
+    const u = new SpeechSynthesisUtterance(p[0]);
+    u.lang = p[1]; const v = p[1]==='en-US' ? enVoice : viVoice; if (v) u.voice = v;
+    u.rate = p[1]==='en-US' ? .75 : .85; u.pitch = 1.15;
+    if (onend && i === parts.length-1) u.onend = onend;
+    speechSynthesis.speak(u);
+  });
+}
+let ac = null;
+function beep(ok){
+  if (muted) return;
+  try{
+    ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+    const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'triangle'; o.frequency.setValueAtTime(ok?520:220, t);
+    if (ok) o.frequency.exponentialRampToValueAtTime(880, t+.12);
+    g.gain.setValueAtTime(.25, t); g.gain.exponentialRampToValueAtTime(.01, t+.2);
+    o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t+.22);
+  }catch(e){}
+}
+
+/* ── Chuyển màn hình ── */
+function show(name){
+  clearCountTimers();
+  ['menu','learn','quiz','count'].forEach(s => $(s).classList.toggle('hidden', s !== name));
+  $('back').classList.toggle('hidden', name === 'menu');
+  $('home').classList.toggle('hidden', name !== 'menu');
+  $('score').classList.toggle('hidden', name !== 'quiz' && name !== 'count');
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+}
+$('back').onclick = () => show('menu');
+
+/* ── HỌC TỪ MỚI ── */
+let topicIdx = 0, wordIdx = 0;
+function renderChips(){
+  $('chips').innerHTML = TOPICS.map((t,i)=>`<button class="chip ${i===topicIdx?'on':''}" data-i="${i}">${t.icon} ${t.name}</button>`).join('');
+  $('chips').querySelectorAll('.chip').forEach(b => b.onclick = () => { topicIdx = +b.dataset.i; wordIdx = 0; renderCard(true); });
+}
+function renderCard(speak){
+  renderChips();
+  const w = TOPICS[topicIdx].words[wordIdx];
+  const c = $('card'); c.style.animation = 'none'; void c.offsetWidth; c.style.animation = '';
+  c.innerHTML = `<span class="pic">${w[1]}</span><span class="en">${w[0]}</span><span class="vi">${w[2]}</span><span class="tap">🔊 Chạm để nghe lại</span>`;
+  $('dots').textContent = (wordIdx+1) + ' / ' + TOPICS[topicIdx].words.length;
+  if (speak) setTimeout(() => sayWord(w), 250);
+}
+function sayWord(w){ sayParts([[w[0],'en-US'],[w[0],'en-US'],[w[2],'vi-VN']]); }
+$('card').onclick = () => sayWord(TOPICS[topicIdx].words[wordIdx]);
+$('prev').onclick = () => { const n = TOPICS[topicIdx].words.length; wordIdx = (wordIdx - 1 + n) % n; renderCard(true); };
+$('next').onclick = () => { const n = TOPICS[topicIdx].words.length; wordIdx = (wordIdx + 1) % n; renderCard(true); };
+$('go-learn').onclick = () => { show('learn'); topicIdx = 0; wordIdx = 0; renderCard(true); };
+
+/* ── ĐỐ VUI ──
+   Học tăng dần: bắt đầu với chủ đề 1; cứ 8 lần đúng mở thêm 1 chủ đề (mở hết tất cả chủ đề).
+   Dưới 16 từ: 2 hình để chọn; từ 16 từ trở lên: 3 hình. Tiến độ lưu trên thiết bị. */
+function totalCorrect(){ try { return parseInt(localStorage.getItem('englishCorrect')||'0',10)||0; } catch(e){ return 0; } }
+function unlockedTopics(){ return Math.min(TOPICS.length, 1 + Math.floor(totalCorrect()/8)); }
+/* quizTopic = -1: trộn các chủ đề đã mở (học tăng dần như trước); >= 0: bé chọn riêng một chủ đề (cả 12 chủ đề đều chọn được) */
+let quizTopic = -1;
+function pool(){ return quizTopic >= 0 ? TOPICS[quizTopic].words : TOPICS.slice(0, unlockedTopics()).flatMap(t => t.words); }
+function choiceCount(){ return quizTopic >= 0 ? (totalCorrect() < 8 ? 2 : 3) : (pool().length < 16 ? 2 : 3); }
+function nextWord(){
+  const p = pool(), keep = Math.min(3, p.length-2);
+  const c = p.filter(x=>!recent.includes(x));
+  const pick = c[Math.floor(Math.random()*c.length)];
+  recent.push(pick); while (recent.length > keep) recent.shift();
+  return pick;
+}
+function newRound(){
+  locked = false; $('praise').textContent = '';
+  current = nextWord();
+  $('qword').textContent = current[0];
+  $('qvi').textContent = '(' + current[2] + ')';
+  const n = choiceCount();
+  const wrong = pool().filter(w=>w!==current).sort(()=>Math.random()-.5).slice(0,n-1);
+  const opts = [current,...wrong].sort(()=>Math.random()-.5);
+  const box = $('choices'); box.innerHTML = ''; box.classList.toggle('two', n===2);
+  opts.forEach(w=>{
+    const b = document.createElement('button');
+    b.className = 'choice'; b.textContent = w[1]; b.setAttribute('aria-label', w[2]);
+    b.onclick = () => answer(b, w===current);
+    box.appendChild(b);
+  });
+  setTimeout(()=>sayParts([[current[0],'en-US'],[current[0],'en-US']]), 350);
+}
+function answer(btn, ok){
+  if (locked) return;
+  if (!ok){
+    if (window.BeTracker) BeTracker.round(false);
+    btn.classList.add('wrong'); beep(false); sayParts([['Try again!','en-US']]);
+    $('praise').textContent = 'Try again! 💪 (Thử lại nhé)'; return;
+  }
+  if (window.BeTracker) BeTracker.round(true);
+  locked = true; btn.classList.add('right'); beep(true);
+  try{ localStorage.setItem('englishCorrect', String(totalCorrect()+1)); }catch(e){}
+  score++; $('score').textContent = '⭐ ' + score;
+  const p = PRAISES[Math.floor(Math.random()*PRAISES.length)];
+  $('praise').textContent = p + ' 🎉';
+  const r = btn.getBoundingClientRect();
+  for (let i=0;i<10;i++){
+    const s = document.createElement('div'); s.className='star'; s.textContent='⭐';
+    s.style.left = (r.left+r.width/2)+'px'; s.style.top = (r.top+r.height/2)+'px';
+    s.style.setProperty('--dx',(Math.random()*240-120)+'px'); s.style.setProperty('--dy',(Math.random()*-200-20)+'px');
+    document.body.appendChild(s); setTimeout(()=>s.remove(),1200);
+  }
+  let advanced = false;
+  const go = () => { if (advanced) return; advanced = true; setTimeout(newRound, 700); };
+  sayParts([[p,'en-US'],[current[0],'en-US'],[current[2],'vi-VN']], go);
+  setTimeout(go, 6000);   // phòng khi trình duyệt không báo giọng đọc đã xong
+}
+$('ask').onclick = () => { if (current) sayParts([[current[0],'en-US'],[current[0],'en-US']]); };
+function openQuizPicker(){
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  $('qplay').classList.add('hidden'); $('qpick').classList.remove('hidden');
+  const all = `<button class="chip all" data-i="-1">🎲 Tất cả (${unlockedTopics()} chủ đề đã mở)</button>`;
+  $('qchips').innerHTML = all + TOPICS.map((t,i)=>`<button class="chip" data-i="${i}">${t.icon} ${t.name}</button>`).join('');
+  $('qchips').querySelectorAll('.chip').forEach(b => b.onclick = () => startQuiz(+b.dataset.i));
+}
+function startQuiz(i){
+  quizTopic = i; score = 0; $('score').textContent = '⭐ 0'; recent = [];
+  $('qtopic').textContent = i >= 0 ? TOPICS[i].icon + ' ' + TOPICS[i].name : '🎲 Tất cả';
+  $('qpick').classList.add('hidden'); $('qplay').classList.remove('hidden');
+  newRound();
+}
+$('qchange').onclick = openQuizPicker;
+$('go-quiz').onclick = () => { show('quiz'); openQuizPicker(); };
+
+/* ── ĐẾM SỐ ──
+   Hiện một nhóm đồ vật; bé chạm từng hình để đếm ("one, two, three...") rồi chọn số đúng.
+   Học tăng dần: dưới 6 lần đúng đếm tới 3, dưới 14 lần đếm tới 5, sau đó tới 10. */
+/* Đồ vật để đếm, gom theo nhóm để bé chọn: [hình, số ít, số nhiều, nghĩa tiếng Việt] */
+const COUNT_THEMES = [
+  { name:'Con vật',    icon:'🐶', things:[['🐶','dog','dogs','con chó'],['🐱','cat','cats','con mèo'],['🦆','duck','ducks','con vịt'],['🐟','fish','fish','con cá'],['🐦','bird','birds','con chim'],['🐰','rabbit','rabbits','con thỏ'],['🐷','pig','pigs','con heo']] },
+  { name:'Đồ ăn',      icon:'🍎', things:[['🍎','apple','apples','quả táo'],['🍌','banana','bananas','quả chuối'],['🍊','orange','oranges','quả cam'],['🍓','strawberry','strawberries','quả dâu'],['🍰','cake','cakes','cái bánh']] },
+  { name:'Đồ chơi',    icon:'🧸', things:[['🎈','balloon','balloons','bóng bay'],['⚽','ball','balls','quả bóng'],['🚗','car','cars','xe hơi'],['🧸','teddy bear','teddy bears','gấu bông'],['📖','book','books','quyển sách'],['❤️','heart','hearts','trái tim']] },
+  { name:'Thiên nhiên',icon:'🌸', things:[['⭐','star','stars','ngôi sao'],['🌸','flower','flowers','bông hoa'],['🌳','tree','trees','cái cây'],['🦋','butterfly','butterflies','con bướm']] }
+];
+const THINGS = COUNT_THEMES.flatMap(t => t.things);
+let countTheme = -1;   // -1: tất cả các nhóm; >= 0: bé chọn một nhóm
+function countList(){ return countTheme >= 0 ? COUNT_THEMES[countTheme].things : THINGS; }
+const NUMW = ['','one','two','three','four','five','six','seven','eight','nine','ten'];
+let cScore = 0, cn = 0, cthing = null, cdone = false, ccounted = 0, cauto = false, ctimers = [];
+function countCorrect(){ try { return parseInt(localStorage.getItem('englishCount')||'0',10)||0; } catch(e){ return 0; } }
+function countMax(){ const c = countCorrect(); return c < 6 ? 3 : (c < 14 ? 5 : 10); }
+function clearCountTimers(){ ctimers.forEach(clearTimeout); ctimers = []; cauto = false; }
+function cQuestion(){ return [['How many ' + cthing[2] + '?','en-US']]; }
+function markCounted(el, k){
+  if (el.dataset.c) return false;
+  el.dataset.c = '1'; el.classList.add('counted');
+  const b = document.createElement('span'); b.className = 'badge'; b.textContent = k; el.appendChild(b);
+  sayParts([[NUMW[k],'en-US']]);
+  return true;
+}
+function newCountRound(){
+  clearCountTimers(); cdone = false; ccounted = 0; $('cpraise').textContent = '';
+  const max = countMax();
+  let n; do { n = 1 + Math.floor(Math.random()*max); } while (n === cn && max > 1); cn = n;
+  const list = countList();
+  let t; do { t = list[Math.floor(Math.random()*list.length)]; } while (t === cthing && list.length > 1); cthing = t;
+  $('cword').textContent = t[2]; $('cvi').textContent = '(' + t[3] + ')';
+  const box = $('things'); box.innerHTML = '';
+  box.style.setProperty('--sz', n <= 3 ? '5rem' : (n <= 6 ? '4rem' : '3rem'));
+  for (let i = 0; i < n; i++){
+    const b = document.createElement('button'); b.className = 'thing'; b.textContent = t[0]; b.setAttribute('aria-label', t[1]);
+    b.style.animationDelay = (i*0.05) + 's';
+    b.onclick = () => { if (cauto || cdone) return; if (markCounted(b, ccounted + 1)) ccounted++; };
+    box.appendChild(b);
+  }
+  const k = max <= 3 ? 2 : 3;
+  /* Đáp án nhiễu ưu tiên số gần số đúng (±2) để bé phải đếm thật, không loại bằng mắt */
+  const near = [], far = [];
+  for (let i = 1; i <= max; i++) if (i !== n) (Math.abs(i - n) <= 2 ? near : far).push(i);
+  const shuffle = a => a.sort(()=>Math.random()-.5);
+  const wrongs = shuffle(near).concat(shuffle(far)).slice(0, k-1);
+  const opts = shuffle([n, ...wrongs]);
+  const cb = $('cchoices'); cb.innerHTML = ''; cb.classList.toggle('two', k === 2);
+  opts.forEach(v => {
+    const b = document.createElement('button'); b.className = 'choice num';
+    b.innerHTML = v + '<small>' + NUMW[v] + '</small>'; b.setAttribute('aria-label', NUMW[v]);
+    b.onclick = () => cAnswer(b, v === n);
+    cb.appendChild(b);
+  });
+  ctimers.push(setTimeout(() => sayParts(cQuestion()), 350));
+}
+function autoCount(){
+  if (cauto || cdone) return;
+  cauto = true; ccounted = 0;
+  const els = [...$('things').children];
+  els.forEach(e => { e.dataset.c = ''; e.classList.remove('counted'); const b = e.querySelector('.badge'); if (b) b.remove(); });
+  els.forEach((e, i) => ctimers.push(setTimeout(() => {
+    markCounted(e, i + 1); ccounted = i + 1;
+    if (i === els.length - 1) cauto = false;
+  }, 300 + i * 950)));
+}
+function cAnswer(btn, ok){
+  if (cdone) return;
+  if (!ok){
+    if (window.BeTracker) BeTracker.round(false);
+    btn.classList.add('wrong'); beep(false); sayParts([['Try again! Count with me.','en-US']]);
+    $('cpraise').textContent = 'Try again! 💪 Chạm vào hình để đếm nhé'; return;
+  }
+  if (window.BeTracker) BeTracker.round(true);
+  cdone = true; clearCountTimers(); btn.classList.add('right'); beep(true);
+  try{ localStorage.setItem('englishCount', String(countCorrect()+1)); }catch(e){}
+  cScore++; $('score').textContent = '⭐ ' + cScore;
+  const p = PRAISES[Math.floor(Math.random()*PRAISES.length)];
+  $('cpraise').textContent = p + ' ' + cn + ' ' + (cn === 1 ? cthing[1] : cthing[2]) + ' 🎉';
+  const r = btn.getBoundingClientRect();
+  for (let i=0;i<10;i++){
+    const s = document.createElement('div'); s.className='star'; s.textContent='⭐';
+    s.style.left = (r.left+r.width/2)+'px'; s.style.top = (r.top+r.height/2)+'px';
+    s.style.setProperty('--dx',(Math.random()*240-120)+'px'); s.style.setProperty('--dy',(Math.random()*-200-20)+'px');
+    document.body.appendChild(s); setTimeout(()=>s.remove(),1200);
+  }
+  let advanced = false;
+  const go = () => { if (advanced) return; advanced = true; setTimeout(newCountRound, 700); };
+  sayParts([[p,'en-US'],[NUMW[cn] + ' ' + (cn === 1 ? cthing[1] : cthing[2]),'en-US']], go);
+  setTimeout(go, 6000);   // phòng khi trình duyệt không báo giọng đọc đã xong
+}
+$('cask').onclick = () => { if (cthing) sayParts(cQuestion()); };
+$('autocount').onclick = autoCount;
+function openCountPicker(){
+  clearCountTimers();
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  $('cplay').classList.add('hidden'); $('cpick').classList.remove('hidden');
+  $('cchips').innerHTML = '<button class="chip all" data-i="-1">🎲 Tất cả</button>' +
+    COUNT_THEMES.map((t,i)=>`<button class="chip" data-i="${i}">${t.icon} ${t.name}</button>`).join('');
+  $('cchips').querySelectorAll('.chip').forEach(b => b.onclick = () => startCount(+b.dataset.i));
+}
+function startCount(i){
+  countTheme = i; cScore = 0; $('score').textContent = '⭐ 0'; cthing = null; cn = 0;
+  $('ctopic').textContent = i >= 0 ? COUNT_THEMES[i].icon + ' ' + COUNT_THEMES[i].name : '🎲 Tất cả';
+  $('cpick').classList.add('hidden'); $('cplay').classList.remove('hidden');
+  newCountRound();
+}
+$('cchange').onclick = openCountPicker;
+$('go-count').onclick = () => { show('count'); openCountPicker(); };
+
+function renderMute(){ $('mute').textContent = muted ? '🔇 Âm thanh: Tắt' : '🔊 Âm thanh: Bật'; $('mute').setAttribute('aria-pressed', muted); }
+$('mute').onclick = () => { muted = !muted; try{localStorage.setItem('englishMuted', muted?'1':'0');}catch(e){}; if (muted && 'speechSynthesis' in window) speechSynthesis.cancel(); renderMute(); };
+renderMute(); show('menu');
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

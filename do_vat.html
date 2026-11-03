@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bài 6.1: Bảng nhân, chia 4 - Câu cá</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="vendor/tailwind.css">
+    <script src="vendor/confetti.browser.min.js"></script>
     <style>
         body {
             font-family: 'Nunito', system-ui, -apple-system, sans-serif;
@@ -175,6 +175,7 @@
             100% { transform: translateY(-400px) scale(1.5); opacity: 0; }
         }
     </style>
+<script src="tracker.js"></script>
 </head>
 <body class="p-2 md:p-4 lg:p-6 flex flex-col min-h-screen">
 
@@ -564,8 +565,10 @@
             let selectedVal = parseInt(fishElement.dataset.val);
 
             if (selectedVal === expectedAnswer) {
+                if (window.BeTracker) BeTracker.round(true);
                 pullFishGoldMinerStyle(fishElement);
             } else {
+                if (window.BeTracker) BeTracker.round(false);
                 playSound('snd-wrong');
                 streak = 0;
                 updateScore();

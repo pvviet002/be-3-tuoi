@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Sắp Xếp Vui Vẻ — Bé kéo thả phân loại</title>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="vendor/confetti.browser.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
@@ -165,6 +165,7 @@ button:focus-visible { outline:4px dashed var(--grape); outline-offset:3px; bord
     .drift-slow,.drift-fast,.rays,.flutter,.home-mascot,.play-mascot,.toy-float,.eye,.grab-ring { animation:none !important; }
 }
 </style>
+<script src="tracker.js"></script>
 </head>
 <body>
 <div class="stage">
@@ -367,7 +368,7 @@ function enableDrag(handle, opts){
 function snapBack(handle){ handle.style.transition='transform .3s cubic-bezier(.34,1.4,.5,1)'; handle.style.transform='translate(0,0)'; }
 
 /* ═══ VÒNG CHƠI ═══ */
-const ROUNDS=8;
+const ROUNDS=5;
 let stars=0, mode='color', currentItem=null, locked=false, roundBins=[], roundIdx=0;
 
 window.addEventListener('DOMContentLoaded',()=>{
@@ -450,6 +451,7 @@ function attachToyDrag(){
                 ctx.handle.style.opacity='0';
                 winRound(idx);
             } else {
+                if(window.BeTracker)BeTracker.round(false);
                 snapBack(ctx.handle);
                 const binEl=binsEls()[idx]; binEl.classList.remove('wiggle'); void binEl.offsetWidth; binEl.classList.add('wiggle');
                 sfx.boing(); playTTS('Chưa đúng rồi. Bé thử giỏ khác nhé!');
@@ -460,6 +462,7 @@ function attachToyDrag(){
 
 const PRAISES=['Giỏi quá','Tuyệt vời','Đúng rồi','Hoan hô bé','Xuất sắc','Bé thông minh quá'];
 function winRound(idx){
+    if(window.BeTracker)BeTracker.round(true);
     const binEl=document.querySelectorAll('.bin')[idx];
     sfx.pop(); setTimeout(sfx.sparkle,150);
     binEl.classList.add('bin-glow'); setTimeout(()=>binEl.classList.remove('bin-glow'),700);
