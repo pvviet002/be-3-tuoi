@@ -196,7 +196,7 @@ function renderProgress(){
     ['Hình Khối',      num('shapeCorrect'),   c => Math.min(8, 3 + Math.floor(c / 3)) + '/8 hình'],
     ['Bé Học Đồ Vật',  num('doVatCorrect'),   c => (c < 8 ? 2 : 3) + ' đáp án'],
     ['Tiếng Con Vật',  num('animalCorrect'),  c => (c < 8 ? 2 : 3) + ' hình để chọn'],
-    ['Bé Học Tiếng Anh', num('englishCorrect'), c => Math.min(8, 1 + Math.floor(c / 8)) + '/8 chủ đề'],
+    ['Bé Học Tiếng Anh', num('englishCorrect'), c => Math.min(T.ENGLISH_TOPICS, 1 + Math.floor(c / 8)) + '/' + T.ENGLISH_TOPICS + ' chủ đề'],
     ['Tiếng Anh: Đếm số', num('englishCount'), c => c < 6 ? 'đếm tới 3' : (c < 14 ? 'đếm tới 5' : 'đếm tới 10')]
   ];
   const stars = T.STAR_KEYS.reduce((t, k) => t + num(k), 0);

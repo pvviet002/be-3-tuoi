@@ -2,6 +2,8 @@
    Dữ liệu chỉ lưu trong localStorage của thiết bị này, không gửi đi đâu. */
 (function () {
   var PK = 'bePlay', SK = 'beSettings';
+  /* Số chủ đề từ vựng của game tiếng Anh (hoc-tieng-anh.html); khu phụ huynh dùng để hiện tiến độ */
+  var ENGLISH_TOPICS = 10;
   var GAMES = {
     'hoc-chu': 'Học Chữ Cái', 'be-hoc-dem': 'Đếm Cùng Bé', 'be-phan-loai': 'Sắp Xếp Vui Vẻ',
     'hoc-do-vat': 'Bé Học Đồ Vật', 'tieng-con-vat': 'Tiếng Con Vật', 'hoc-mau': 'Học Màu Sắc', 'hinh-khoi': 'Hình Khối', 'hoc-tieng-anh': 'Bé Học Tiếng Anh', 'ghep_hinh': 'Ghép Hình', 'do_vat': 'Toán Câu Cá'
@@ -89,7 +91,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
   window.BeTracker = {
-    LEVEL_KEYS: LEVEL_KEYS, STAR_KEYS: STAR_KEYS, resetProgress: resetProgress,
+    ENGLISH_TOPICS: ENGLISH_TOPICS, LEVEL_KEYS: LEVEL_KEYS, STAR_KEYS: STAR_KEYS, resetProgress: resetProgress,
     GAMES: GAMES, PK: PK, SK: SK, load: load, save: save, dayKey: dayKey, settings: settings, todaySec: todaySec,
     /* Game gọi hàm này sau mỗi lượt trả lời: BeTracker.round(true/false) */
     round: function (ok) { if (isGame) { add(page, 'rounds', 1); if (ok) add(page, 'correct', 1); } }
