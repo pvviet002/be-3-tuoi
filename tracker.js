@@ -27,7 +27,7 @@
   }
 
   /* Tiến độ học: mức độ khó đã mở khóa + số sao tích lũy. Lịch sử chơi (bePlay) và cài đặt phụ huynh không nằm ở đây. */
-  var LEVEL_KEYS = ['chu-correct', 'doVatCorrect', 'animalCorrect', 'colorCorrect', 'shapeCorrect', 'englishCorrect'];
+  var LEVEL_KEYS = ['chu-correct', 'doVatCorrect', 'animalCorrect', 'colorCorrect', 'shapeCorrect', 'englishCorrect', 'englishCount'];
   var STAR_KEYS = ['abc-stars', 'count-stars', 'sort-stars'];
   function resetProgress() {
     LEVEL_KEYS.concat(STAR_KEYS).forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
