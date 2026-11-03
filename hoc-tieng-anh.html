@@ -40,6 +40,10 @@ h1{font-size:clamp(1.3rem,5vw,2rem);color:var(--co-deep);text-shadow:0 2px 0 #ff
 .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .chip{border:0;cursor:pointer;font:inherit;font-weight:800;border-radius:99px;padding:6px 14px;background:#fff;color:var(--co-deep);box-shadow:0 3px 0 var(--edge);font-size:.95rem}
 .chip.on{background:var(--co);color:#fff;box-shadow:0 3px 0 var(--co-deep)}
+.picker{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%}
+.picker .chip{font-size:1.1rem;padding:10px 18px;box-shadow:0 4px 0 var(--edge)}
+.picker .chip.all{background:var(--co);color:#fff;box-shadow:0 4px 0 var(--co-deep);width:100%;font-size:1.25rem}
+.topicbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
 .card{width:min(100%,380px);background:#fff;border-radius:34px;border:6px solid #fff;padding:18px 12px 20px;text-align:center;cursor:pointer;
   box-shadow:0 8px 0 var(--edge),0 16px 26px rgba(200,60,90,.2);animation:pop .35s cubic-bezier(.34,1.5,.5,1) both;border:0;font:inherit}
 .card .pic{font-size:min(36vw,150px);line-height:1.1;display:block}
@@ -117,12 +121,19 @@ h1{font-size:clamp(1.3rem,5vw,2rem);color:var(--co-deep);text-shadow:0 2px 0 #ff
 
   <!-- Đố vui -->
   <section class="menu hidden" id="quiz" style="align-items:center">
+    <div class="menu" id="qpick" style="align-items:center">
+      <p class="sub">Bé muốn đố về chủ đề nào?</p>
+      <div class="picker" id="qchips"></div>
+    </div>
+    <div class="menu hidden" id="qplay" style="align-items:center">
+    <div class="topicbar"><span class="chip on" id="qtopic"></span><button class="chip" id="qchange">🔀 Đổi chủ đề</button></div>
     <button class="ask" id="ask" aria-label="Nghe lại từ">
       <span class="say">🔊</span>
       <span class="txt">Chạm vào<span class="name" id="qword"></span><span class="eg" id="qvi"></span></span>
     </button>
     <div class="praise" id="praise" aria-live="polite"></div>
     <div class="choices" id="choices"></div>
+    </div>
   </section>
 
   <!-- Đếm số -->
@@ -231,8 +242,10 @@ $('go-learn').onclick = () => { show('learn'); topicIdx = 0; wordIdx = 0; render
    Dưới 16 từ: 2 hình để chọn; từ 16 từ trở lên: 3 hình. Tiến độ lưu trên thiết bị. */
 function totalCorrect(){ try { return parseInt(localStorage.getItem('englishCorrect')||'0',10)||0; } catch(e){ return 0; } }
 function unlockedTopics(){ return Math.min(TOPICS.length, 1 + Math.floor(totalCorrect()/8)); }
-function pool(){ return TOPICS.slice(0, unlockedTopics()).flatMap(t => t.words); }
-function choiceCount(){ return pool().length < 16 ? 2 : 3; }
+/* quizTopic = -1: trộn các chủ đề đã mở (học tăng dần như trước); >= 0: bé chọn riêng một chủ đề (cả 12 chủ đề đều chọn được) */
+let quizTopic = -1;
+function pool(){ return quizTopic >= 0 ? TOPICS[quizTopic].words : TOPICS.slice(0, unlockedTopics()).flatMap(t => t.words); }
+function choiceCount(){ return quizTopic >= 0 ? (totalCorrect() < 8 ? 2 : 3) : (pool().length < 16 ? 2 : 3); }
 function nextWord(){
   const p = pool(), keep = Math.min(3, p.length-2);
   const c = p.filter(x=>!recent.includes(x));
@@ -283,7 +296,21 @@ function answer(btn, ok){
   setTimeout(go, 6000);   // phòng khi trình duyệt không báo giọng đọc đã xong
 }
 $('ask').onclick = () => { if (current) sayParts([[current[0],'en-US'],[current[0],'en-US']]); };
-$('go-quiz').onclick = () => { score = 0; $('score').textContent = '⭐ 0'; recent = []; show('quiz'); newRound(); };
+function openQuizPicker(){
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  $('qplay').classList.add('hidden'); $('qpick').classList.remove('hidden');
+  const all = `<button class="chip all" data-i="-1">🎲 Tất cả (${unlockedTopics()} chủ đề đã mở)</button>`;
+  $('qchips').innerHTML = all + TOPICS.map((t,i)=>`<button class="chip" data-i="${i}">${t.icon} ${t.name}</button>`).join('');
+  $('qchips').querySelectorAll('.chip').forEach(b => b.onclick = () => startQuiz(+b.dataset.i));
+}
+function startQuiz(i){
+  quizTopic = i; score = 0; $('score').textContent = '⭐ 0'; recent = [];
+  $('qtopic').textContent = i >= 0 ? TOPICS[i].icon + ' ' + TOPICS[i].name : '🎲 Tất cả';
+  $('qpick').classList.add('hidden'); $('qplay').classList.remove('hidden');
+  newRound();
+}
+$('qchange').onclick = openQuizPicker;
+$('go-quiz').onclick = () => { show('quiz'); openQuizPicker(); };
 
 /* ── ĐẾM SỐ ──
    Hiện một nhóm đồ vật; bé chạm từng hình để đếm ("one, two, three...") rồi chọn số đúng.
