@@ -119,11 +119,13 @@ h1{font-size:clamp(1.3rem,5vw,2rem);color:var(--co-deep);text-shadow:0 2px 0 #ff
 </main>
 
 <script>
-/* [từ tiếng Anh, hình, nghĩa tiếng Việt] — 6 chủ đề x 8 từ, xếp theo thứ tự mở dần */
+/* [từ tiếng Anh, hình, nghĩa tiếng Việt] — 8 chủ đề, xếp theo thứ tự mở dần */
 const TOPICS = [
   { name:'Con vật',   icon:'🐶', words:[['dog','🐶','con chó'],['cat','🐱','con mèo'],['bird','🐦','con chim'],['fish','🐟','con cá'],['duck','🦆','con vịt'],['cow','🐮','con bò'],['pig','🐷','con heo'],['rabbit','🐰','con thỏ']] },
   { name:'Đồ ăn',     icon:'🍎', words:[['apple','🍎','quả táo'],['banana','🍌','quả chuối'],['orange','🍊','quả cam'],['milk','🥛','sữa'],['egg','🥚','quả trứng'],['bread','🍞','bánh mì'],['water','💧','nước'],['cake','🍰','bánh ngọt']] },
+  { name:'Số đếm',    icon:'🔢', words:[['one','1️⃣','số một'],['two','2️⃣','số hai'],['three','3️⃣','số ba'],['four','4️⃣','số bốn'],['five','5️⃣','số năm'],['six','6️⃣','số sáu'],['seven','7️⃣','số bảy'],['eight','8️⃣','số tám'],['nine','9️⃣','số chín'],['ten','🔟','số mười']] },
   { name:'Gia đình',  icon:'👨‍👩‍👧', words:[['mom','👩','mẹ'],['dad','👨','bố'],['baby','👶','em bé'],['grandma','👵','bà'],['grandpa','👴','ông'],['brother','👦','anh/em trai'],['sister','👧','chị/em gái'],['friend','🧒','bạn']] },
+  { name:'Cảm xúc',   icon:'😊', words:[['happy','😊','vui'],['sad','😢','buồn'],['angry','😠','giận'],['scared','😨','sợ'],['sleepy','😴','buồn ngủ'],['surprised','😮','ngạc nhiên'],['excited','🤩','hào hứng'],['hungry','🤤','đói bụng']] },
   { name:'Cơ thể',    icon:'🖐️', words:[['eye','👁️','mắt'],['ear','👂','tai'],['nose','👃','mũi'],['mouth','👄','miệng'],['hand','✋','bàn tay'],['foot','🦶','bàn chân'],['tooth','🦷','răng'],['heart','❤️','trái tim']] },
   { name:'Đồ dùng',   icon:'🧸', words:[['ball','⚽','quả bóng'],['book','📖','quyển sách'],['bed','🛏️','cái giường'],['chair','🪑','cái ghế'],['door','🚪','cái cửa'],['shoes','👟','đôi giày'],['hat','🎩','cái mũ'],['bag','🎒','cái cặp']] },
   { name:'Xung quanh',icon:'🌳', words:[['sun','☀️','mặt trời'],['moon','🌙','mặt trăng'],['star','⭐','ngôi sao'],['tree','🌳','cái cây'],['flower','🌸','bông hoa'],['car','🚗','xe hơi'],['bus','🚌','xe buýt'],['plane','✈️','máy bay']] }
@@ -197,7 +199,7 @@ $('next').onclick = () => { const n = TOPICS[topicIdx].words.length; wordIdx = (
 $('go-learn').onclick = () => { show('learn'); topicIdx = 0; wordIdx = 0; renderCard(true); };
 
 /* ── ĐỐ VUI ──
-   Học tăng dần: bắt đầu với chủ đề 1; cứ 8 lần đúng mở thêm 1 chủ đề (tối đa 6).
+   Học tăng dần: bắt đầu với chủ đề 1; cứ 8 lần đúng mở thêm 1 chủ đề (mở hết tất cả chủ đề).
    Dưới 16 từ: 2 hình để chọn; từ 16 từ trở lên: 3 hình. Tiến độ lưu trên thiết bị. */
 function totalCorrect(){ try { return parseInt(localStorage.getItem('englishCorrect')||'0',10)||0; } catch(e){ return 0; } }
 function unlockedTopics(){ return Math.min(TOPICS.length, 1 + Math.floor(totalCorrect()/8)); }

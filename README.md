@@ -14,7 +14,7 @@ Bộ trò chơi giáo dục bằng tiếng Việt cho bé 3–6 tuổi. Chỉ g�
 | `tieng-con-vat.html` | Bé nghe tiếng kêu rồi chạm vào con vật đúng (đáp án là hình) |
 | `hoc-mau.html` | Học màu sắc: nghe tên màu rồi chạm bóng bay đúng màu |
 | `hinh-khoi.html` | Học hình khối: nghe tên hình rồi chạm hình đúng (tròn, vuông, tam giác, chữ nhật, sao, tim...) |
-| `hoc-tieng-anh.html` | Từ vựng tiếng Anh cho bé 3–5 tuổi: 48 từ / 6 chủ đề, chế độ học từ và đố vui, phát âm bằng giọng đọc tiếng Anh |
+| `hoc-tieng-anh.html` | Từ vựng tiếng Anh cho bé 3–5 tuổi: 66 từ / 8 chủ đề (có số đếm 1–10 và cảm xúc), chế độ học từ và đố vui, phát âm bằng giọng đọc tiếng Anh |
 | `ghep_hinh.html` | Ghép hình với bóng |
 | `do_vat.html` | Game toán bảng nhân/chia 4 (lớp lớn hơn, chưa gắn vào trang chủ) |
 
