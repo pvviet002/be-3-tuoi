@@ -33,6 +33,7 @@ h1{font-size:clamp(1.4rem,5vw,2rem);color:var(--blue-deep);text-shadow:0 2px 0 #
 @keyframes bounce{40%{transform:scale(1.12) rotate(-4deg)}70%{transform:scale(.97) rotate(3deg)}}
 .hint{font-size:.85rem;color:var(--ink-soft);font-weight:700}
 .choices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%}
+.choices.two{grid-template-columns:repeat(2,1fr)}
 @media(max-width:480px){.choices{grid-template-columns:1fr}}
 .choice{border:0;cursor:pointer;font:inherit;font-weight:800;font-size:clamp(1.15rem,4vw,1.5rem);color:#fff;
   padding:16px 8px;border-radius:24px;border:4px solid #fff;transition:transform .12s}
@@ -105,6 +106,8 @@ function beep(ok){
   }catch(e){}
 }
 
+function totalCorrect(){ try { return parseInt(localStorage.getItem('doVatCorrect')||'0',10)||0; } catch(e){ return 0; } }
+function choiceCount(){ return totalCorrect() < 8 ? 2 : 3; }
 function nextItem(){
   if (!bag.length) bag = ITEMS.map((_,i)=>i).sort(()=>Math.random()-.5);  // hết lượt mới xáo lại, không lặp
   return ITEMS[bag.pop()];
@@ -114,9 +117,10 @@ function newRound(){
   current = nextItem();
   const pic = $('picture');
   pic.textContent = current[0]; pic.classList.remove('bounce'); pic.style.animation='none'; void pic.offsetWidth; pic.style.animation='';
-  const wrong = ITEMS.filter(i=>i!==current).sort(()=>Math.random()-.5).slice(0,2);
+  const n = choiceCount();   // bé mới chơi: 2 đáp án, sau 8 lần đúng: 3 đáp án
+  const wrong = ITEMS.filter(i=>i!==current).sort(()=>Math.random()-.5).slice(0,n-1);
   const opts = [current,...wrong].sort(()=>Math.random()-.5);
-  $('choices').innerHTML = '';
+  $('choices').innerHTML = ''; $('choices').classList.toggle('two', n===2);
   opts.forEach(o=>{
     const b = document.createElement('button');
     b.className = 'choice'; b.textContent = o[1];
@@ -129,6 +133,7 @@ function answer(btn, ok){
   if (locked) return;
   if (!ok){ if (window.BeTracker) BeTracker.round(false); btn.classList.add('wrong'); beep(false); say('Thử lại nhé!'); $('praise').textContent='Thử lại nhé! 💪'; return; }
   locked = true; btn.classList.add('right'); beep(true); if (window.BeTracker) BeTracker.round(true);
+  try{ localStorage.setItem('doVatCorrect', String(totalCorrect()+1)); }catch(e){}
   score++; $('score').textContent = '⭐ ' + score;
   const p = ['Giỏi quá!','Đúng rồi!','Bé tuyệt vời!','Hoan hô!'][Math.floor(Math.random()*4)];
   $('praise').textContent = p + ' 🎉';
