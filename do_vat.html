@@ -565,8 +565,10 @@
             let selectedVal = parseInt(fishElement.dataset.val);
 
             if (selectedVal === expectedAnswer) {
+                if (window.BeTracker) BeTracker.round(true);
                 pullFishGoldMinerStyle(fishElement);
             } else {
+                if (window.BeTracker) BeTracker.round(false);
                 playSound('snd-wrong');
                 streak = 0;
                 updateScore();

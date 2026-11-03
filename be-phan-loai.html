@@ -451,6 +451,7 @@ function attachToyDrag(){
                 ctx.handle.style.opacity='0';
                 winRound(idx);
             } else {
+                if(window.BeTracker)BeTracker.round(false);
                 snapBack(ctx.handle);
                 const binEl=binsEls()[idx]; binEl.classList.remove('wiggle'); void binEl.offsetWidth; binEl.classList.add('wiggle');
                 sfx.boing(); playTTS('Chưa đúng rồi. Bé thử giỏ khác nhé!');
@@ -461,6 +462,7 @@ function attachToyDrag(){
 
 const PRAISES=['Giỏi quá','Tuyệt vời','Đúng rồi','Hoan hô bé','Xuất sắc','Bé thông minh quá'];
 function winRound(idx){
+    if(window.BeTracker)BeTracker.round(true);
     const binEl=document.querySelectorAll('.bin')[idx];
     sfx.pop(); setTimeout(sfx.sparkle,150);
     binEl.classList.add('bin-glow'); setTimeout(()=>binEl.classList.remove('bin-glow'),700);

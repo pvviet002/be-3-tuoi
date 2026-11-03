@@ -561,6 +561,7 @@ function attachBeadDrag(bead, n){
                 const countSpeech=Array.from({length:targetCount},(_,i)=>NUM_WORDS[i+1]).join(', ');
                 setTimeout(()=>finishRound(`${countSpeech}. Có tất cả ${NUM_WORDS[targetCount]} ${currentItemType.name}.`, `Đúng rồi! Số ${targetCount}`), targetCount*340+250);
             } else {
+                if(window.BeTracker)BeTracker.round(false);
                 snapBack(ctx.handle);
                 bead.classList.remove('wiggle'); void bead.offsetWidth; bead.classList.add('wiggle');
                 sfx.boing(); playTTS(`Đây là số ${NUM_WORDS[n]}. Bé đếm lại rồi thử nữa nhé!`);
@@ -570,6 +571,7 @@ function attachBeadDrag(bead, n){
 }
 
 function finishRound(speech, pillText){
+    if(window.BeTracker)BeTracker.round(true);
     sfx.sparkle(); mascotHappy('play-mascot');
     confetti({particleCount:70,spread:95,zIndex:100,origin:{y:.5},colors:['#FFCB3D','#FF6FA5','#4FA8F5','#43B97F']});
     addStar(); roundIdx++; renderBeads();

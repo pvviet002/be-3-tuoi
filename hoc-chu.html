@@ -742,6 +742,7 @@
             const L = LETTERS[quizAnswer];
 
             if (idx === quizAnswer) {
+                if (window.BeTracker) BeTracker.round(true);
                 quizLocked = true;
                 sfxPop();
                 setTimeout(sfxSparkle, 150);
@@ -788,6 +789,7 @@
                 });
 
             } else {
+                if (window.BeTracker) BeTracker.round(false);
                 sfxBoing();
                 cardEl.classList.remove('wiggle');
                 void cardEl.offsetWidth;
