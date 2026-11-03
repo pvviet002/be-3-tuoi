@@ -359,6 +359,7 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
     <div class="footer">
         <span class="badge"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17l-5.9 3.2 1.3-6.6L2.5 9l6.6-.8z"/></svg>Học mà chơi — chơi mà học · dành cho bé 3–6 tuổi</span>
         <div style="margin-top:10px"><a href="parent.html" style="font-weight:700;font-size:.8rem;color:var(--ink-soft);text-decoration:underline">👨‍👩‍👧 Dành cho phụ huynh</a></div>
+        <div id="visits" style="margin-top:6px;font-weight:700;font-size:.78rem;color:var(--ink-soft)" aria-live="polite">👀 Lượt truy cập: <b id="visit-count">–</b></div>
     </div>
 </div>
 
@@ -376,6 +377,7 @@ function pop(){
     }catch(e){}
 }
 document.querySelectorAll('.card').forEach(c=>c.addEventListener('pointerdown',pop));
+try{ if(window.BeTracker){ document.getElementById('visit-count').textContent = BeTracker.visits().total.toLocaleString('vi-VN'); } }catch(e){}
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>

@@ -38,6 +38,9 @@ select{font:inherit;font-weight:700;padding:7px 10px;border-radius:10px;border:2
 .prog{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:.95rem}.prog:last-of-type{border:0}
 .prog b{color:var(--blue)}
 .ok{color:var(--leaf);font-weight:700;min-height:1.4em}
+.vgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;text-align:center}
+.vgrid b{display:block;font-size:2rem;color:var(--blue);line-height:1.1}
+.vgrid span{font-size:.85rem;color:var(--soft);font-weight:700}
 .note{font-size:.82rem;color:var(--soft);font-weight:600;line-height:1.4}
 </style>
 </head>
@@ -66,6 +69,16 @@ select{font:inherit;font-weight:700;padding:7px 10px;border-radius:10px;border:2
       <h2>Hôm nay</h2>
       <div class="today"><b id="today-min">0</b><span>phút đã chơi</span><span class="soft" id="today-limit"></span></div>
       <div class="meter" id="meter"><i style="width:0"></i></div>
+    </section>
+
+    <section class="card">
+      <h2>Lượt truy cập</h2>
+      <div class="vgrid">
+        <div><b id="v-today">0</b><span>hôm nay</span></div>
+        <div><b id="v-week">0</b><span>7 ngày qua</span></div>
+        <div><b id="v-total">0</b><span>tổng cộng</span></div>
+      </div>
+      <p class="note" style="margin-top:8px" id="v-note"></p>
     </section>
 
     <section class="card">
@@ -159,6 +172,10 @@ function lastDays(n){
 }
 function render(){
   const s = T.settings(), data = T.load(T.PK, {}), days = lastDays(7), today = T.dayKey();
+  // Lượt truy cập (đếm trên thiết bị này; một lượt = một lần mở web sau >= 30 phút không hoạt động)
+  const vi = T.visits(), nf = n => n.toLocaleString('vi-VN');
+  $('v-today').textContent = nf(vi.today); $('v-week').textContent = nf(vi.week); $('v-total').textContent = nf(vi.total);
+  $('v-note').textContent = 'Đếm trên thiết bị này' + (vi.first ? ', từ ' + new Date(vi.first).toLocaleDateString('vi-VN') : '') + '. Một lượt là một lần mở web sau ít nhất 30 phút không chơi. Số liệu không gửi đi đâu.';
   // Hôm nay
   const ts = T.todaySec();
   $('today-min').textContent = Math.round(ts / 60);
