@@ -78,7 +78,7 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
 @media (max-width:640px){ .card{ width:calc(50% - 8px); } }
 @media (max-width:360px){ .card{ width:100%; } }
 .card:nth-child(1){animation-delay:.06s;} .card:nth-child(2){animation-delay:.14s;} .card:nth-child(3){animation-delay:.22s;}
-.card:nth-child(4){animation-delay:.30s;} .card:nth-child(5){animation-delay:.38s;} .card:nth-child(6){animation-delay:.46s;} .card:nth-child(7){animation-delay:.54s;} .card:nth-child(8){animation-delay:.62s;} .card:nth-child(9){animation-delay:.7s;} .card:nth-child(10){animation-delay:.78s;} .card:nth-child(11){animation-delay:.86s;} .card:nth-child(12){animation-delay:.94s;}
+.card:nth-child(4){animation-delay:.30s;} .card:nth-child(5){animation-delay:.38s;} .card:nth-child(6){animation-delay:.46s;} .card:nth-child(7){animation-delay:.54s;} .card:nth-child(8){animation-delay:.62s;} .card:nth-child(9){animation-delay:.7s;} .card:nth-child(10){animation-delay:.78s;} .card:nth-child(11){animation-delay:.86s;} .card:nth-child(12){animation-delay:.94s;} .card:nth-child(13){animation-delay:1.02s;}
 .card:hover { transform:translateY(-6px) rotate(-1deg); }
 .card:active { transform:translateY(3px); }
 @keyframes popIn { from{transform:scale(.6); opacity:0;} }
@@ -119,6 +119,8 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
 .c-write   .go{ color:#86198F; }
 .c-letterwrite { background:linear-gradient(180deg,#5CCFCB,#0E9F9E); box-shadow:0 8px 0 #0B6F6E, 0 16px 24px rgba(11,111,110,.32); }
 .c-letterwrite .go{ color:#0B6F6E; }
+.c-abc     { background:linear-gradient(180deg,#FFC24D,#F59E0B); box-shadow:0 8px 0 #B45309, 0 16px 24px rgba(180,83,9,.32); }
+.c-abc     .go{ color:#B45309; }
 
 .footer { position:relative; z-index:10; margin-top:auto; padding:6px 16px 18px; text-align:center; }
 .footer .badge { display:inline-flex; align-items:center; gap:7px; font-weight:700; font-size:.82rem; color:#fff;
@@ -351,6 +353,18 @@ a:focus-visible { outline:4px dashed var(--grape); outline-offset:4px; }
             </div>
             <span class="name">Tập Viết Chữ</span>
             <span class="sub">Tô theo nét 29 chữ cái, chữ hoa và chữ thường</span>
+            <span class="go">Chơi <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+
+        <a class="card c-abc" href="tap-viet-abc.html">
+            <div class="chip">
+                <svg viewBox="0 0 100 100">
+                    <text x="50" y="66" text-anchor="middle" font-family="Baloo 2" font-weight="800" font-size="52" fill="#F59E0B">Aa</text>
+                    <path d="M14 82 L86 82" stroke="#F59E0B" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 8"/>
+                </svg>
+            </div>
+            <span class="name">Tập Viết ABC</span>
+            <span class="sub">Tô theo nét 26 chữ cái tiếng Anh</span>
             <span class="go">Chơi <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
         </a>
 
