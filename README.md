@@ -18,6 +18,7 @@ Bộ trò chơi giáo dục bằng tiếng Việt cho bé 3–6 tuổi. Chỉ g�
 | `so-vui.html` | Số Vui cho bé 3–5 tuổi: so sánh nhiều hơn/ít hơn, tìm số còn thiếu, cộng bằng hình (số tới 5 rồi tới 10) |
 | `tap-viet-so.html` | Tập viết số 0–9: bé tô theo nét bằng ngón tay, có chấm xanh báo điểm bắt đầu, xem mẫu, nét mảnh dần khi viết quen |
 | `tap-viet-chu.html` | Tập viết 29 chữ cái tiếng Việt (chữ hoa và chữ thường): tô theo nét, tự thu phóng cho vừa khung, nét mảnh dần khi viết quen |
+| `tap-viet-abc.html` | Tập viết bảng chữ cái tiếng Anh (26 chữ, hoa và thường): tô theo nét, đọc "A for apple" bằng giọng tiếng Anh |
 | `ghep_hinh.html` | Ghép hình với bóng |
 | `do_vat.html` | Game toán bảng nhân/chia 4 (lớp lớn hơn, chưa gắn vào trang chủ) |
 
